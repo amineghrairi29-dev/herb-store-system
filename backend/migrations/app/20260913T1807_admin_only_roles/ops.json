@@ -1,0 +1,144 @@
+[
+  {
+    "id": "dropCheckConstraint.user.user_role_cd3d4bd8",
+    "label": "Drop check constraint \"user_role_cd3d4bd8\" on \"user\"",
+    "operationClass": "destructive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "checkConstraint",
+        "name": "user_role_cd3d4bd8",
+        "table": "user"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure constraint \"user_role_cd3d4bd8\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "user_role_cd3d4bd8",
+          "public",
+          "\"public\".\"user\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "drop check constraint \"user_role_cd3d4bd8\"",
+        "sql": "ALTER TABLE \"public\".\"user\" DROP CONSTRAINT \"user_role_cd3d4bd8\""
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify constraint \"user_role_cd3d4bd8\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "user_role_cd3d4bd8",
+          "public",
+          "\"public\".\"user\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "data_migration.revoke-obsolete-internal-sessions",
+    "label": "Data transform: revoke-obsolete-internal-sessions",
+    "operationClass": "data",
+    "target": {
+      "id": "postgres"
+    },
+    "precheck": [
+      {
+        "description": "Check revoke-obsolete-internal-sessions has work to do",
+        "sql": "SELECT EXISTS (SELECT 1 AS id WHERE EXISTS (SELECT 1 FROM public.\"authSession\" s JOIN public.\"user\" u ON u.id = s.\"userId\" WHERE u.role <> 'ADMIN')) AS ok",
+        "params": []
+      }
+    ],
+    "execute": [
+      {
+        "description": "Run revoke-obsolete-internal-sessions",
+        "sql": "DELETE FROM public.\"authSession\" s USING public.\"user\" u WHERE u.id = s.\"userId\" AND u.role <> 'ADMIN'",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "Verify revoke-obsolete-internal-sessions resolved all violations",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS id WHERE EXISTS (SELECT 1 FROM public.\"authSession\" s JOIN public.\"user\" u ON u.id = s.\"userId\" WHERE u.role <> 'ADMIN')) AS ok",
+        "params": []
+      }
+    ]
+  },
+  {
+    "id": "data_migration.retain-obsolete-users-as-inactive-admins",
+    "label": "Data transform: retain-obsolete-users-as-inactive-admins",
+    "operationClass": "data",
+    "target": {
+      "id": "postgres"
+    },
+    "precheck": [
+      {
+        "description": "Check retain-obsolete-users-as-inactive-admins has work to do",
+        "sql": "SELECT EXISTS (SELECT id FROM public.\"user\" WHERE role <> 'ADMIN' LIMIT 1) AS ok",
+        "params": []
+      }
+    ],
+    "execute": [
+      {
+        "description": "Run retain-obsolete-users-as-inactive-admins",
+        "sql": "UPDATE public.\"user\" SET role = 'ADMIN', \"isActive\" = false, \"updatedAt\" = now() WHERE role <> 'ADMIN'",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "Verify retain-obsolete-users-as-inactive-admins resolved all violations",
+        "sql": "SELECT NOT EXISTS (SELECT id FROM public.\"user\" WHERE role <> 'ADMIN' LIMIT 1) AS ok",
+        "params": []
+      }
+    ]
+  },
+  {
+    "id": "checkConstraint.user.user_role_570c02ea",
+    "label": "Add check constraint \"user_role_570c02ea\" on \"user\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "checkConstraint",
+        "name": "user_role_570c02ea",
+        "table": "user"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure constraint \"user_role_570c02ea\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "user_role_570c02ea",
+          "public",
+          "\"public\".\"user\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add check constraint \"user_role_570c02ea\"",
+        "sql": "ALTER TABLE \"public\".\"user\" ADD CONSTRAINT \"user_role_570c02ea\" CHECK (role = 'ADMIN')"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify constraint \"user_role_570c02ea\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "user_role_570c02ea",
+          "public",
+          "\"public\".\"user\""
+        ]
+      }
+    ]
+  }
+]

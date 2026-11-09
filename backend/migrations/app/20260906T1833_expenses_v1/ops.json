@@ -1,0 +1,371 @@
+[
+  {
+    "id": "dropCheckConstraint.cashMovement.cash_movement_source_5b454499",
+    "label": "Drop check constraint \"cash_movement_source_5b454499\" on \"cashMovement\"",
+    "operationClass": "destructive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "checkConstraint",
+        "name": "cash_movement_source_5b454499",
+        "table": "cashMovement"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure constraint \"cash_movement_source_5b454499\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "cash_movement_source_5b454499",
+          "public",
+          "\"public\".\"cashMovement\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "drop check constraint \"cash_movement_source_5b454499\"",
+        "sql": "ALTER TABLE \"public\".\"cashMovement\" DROP CONSTRAINT \"cash_movement_source_5b454499\""
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify constraint \"cash_movement_source_5b454499\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "cash_movement_source_5b454499",
+          "public",
+          "\"public\".\"cashMovement\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "table.expense",
+    "label": "Create table \"expense\"",
+    "summary": "Creates table \"expense\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "table",
+        "name": "expense"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure table \"expense\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"expense\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "create table \"expense\"",
+        "sql": "CREATE TABLE \"public\".\"expense\" (\n  \"amount\" numeric NOT NULL,\n  \"category\" text NOT NULL,\n  \"createdAt\" timestamptz DEFAULT (now()) NOT NULL,\n  \"description\" text NOT NULL,\n  \"expenseDate\" text NOT NULL,\n  \"id\" SERIAL NOT NULL,\n  \"notes\" text,\n  \"paymentMethod\" text NOT NULL,\n  \"reference\" text NOT NULL,\n  \"updatedAt\" timestamptz NOT NULL,\n  PRIMARY KEY (\"id\"),\n  CONSTRAINT \"expense_amount_f3043ec0\" CHECK (amount > 0 AND amount < 'Infinity'::numeric),\n  CONSTRAINT \"expense_category_d34e8cde\" CHECK (category IN ('RENT', 'ELECTRICITY', 'WATER', 'SALARY', 'TRANSPORT', 'MAINTENANCE', 'ADMINISTRATIVE', 'TAX', 'OTHER')),\n  CONSTRAINT \"expense_method_7b70b0f1\" CHECK (\"paymentMethod\" IN ('CASH', 'CARD', 'BANK_TRANSFER', 'CHECK', 'OTHER'))\n)",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify table \"expense\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": [
+          "\"public\".\"expense\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "column.public.cashMovement.expenseId",
+    "label": "Add column \"expenseId\" to \"cashMovement\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "column",
+        "name": "expenseId",
+        "table": "cashMovement"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure column \"expenseId\" is missing",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3)) AS \"result\"",
+        "params": [
+          "public",
+          "cashMovement",
+          "expenseId"
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add column \"expenseId\"",
+        "sql": "ALTER TABLE \"public\".\"cashMovement\" ADD COLUMN \"expenseId\" int4"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify column \"expenseId\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3)) AS \"result\"",
+        "params": [
+          "public",
+          "cashMovement",
+          "expenseId"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "checkConstraint.cashMovement.cash_movement_source_2ce79fdb",
+    "label": "Add check constraint \"cash_movement_source_2ce79fdb\" on \"cashMovement\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "checkConstraint",
+        "name": "cash_movement_source_2ce79fdb",
+        "table": "cashMovement"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure constraint \"cash_movement_source_2ce79fdb\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "cash_movement_source_2ce79fdb",
+          "public",
+          "\"public\".\"cashMovement\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add check constraint \"cash_movement_source_2ce79fdb\"",
+        "sql": "ALTER TABLE \"public\".\"cashMovement\" ADD CONSTRAINT \"cash_movement_source_2ce79fdb\" CHECK ((\"sourceType\" = 'SALE_PAYMENT' AND type = 'IN' AND \"sourceId\" IS NOT NULL AND \"salePaymentId\" IS NOT NULL AND \"sourceId\" = \"salePaymentId\" AND \"purchasePaymentId\" IS NULL AND \"expenseId\" IS NULL) OR (\"sourceType\" = 'PURCHASE_PAYMENT' AND type = 'OUT' AND \"sourceId\" IS NOT NULL AND \"purchasePaymentId\" IS NOT NULL AND \"sourceId\" = \"purchasePaymentId\" AND \"salePaymentId\" IS NULL AND \"expenseId\" IS NULL) OR (\"sourceType\" IN ('MANUAL_IN', 'MANUAL_OUT') AND type = CASE WHEN \"sourceType\" = 'MANUAL_IN' THEN 'IN' ELSE 'OUT' END AND \"sourceId\" IS NULL AND \"salePaymentId\" IS NULL AND \"purchasePaymentId\" IS NULL AND \"expenseId\" IS NULL AND \"paymentMethod\" = 'CASH') OR (\"sourceType\" = 'EXPENSE' AND type = 'OUT' AND \"sourceId\" IS NOT NULL AND \"expenseId\" IS NOT NULL AND \"sourceId\" = \"expenseId\" AND \"salePaymentId\" IS NULL AND \"purchasePaymentId\" IS NULL))"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify constraint \"cash_movement_source_2ce79fdb\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "cash_movement_source_2ce79fdb",
+          "public",
+          "\"public\".\"cashMovement\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "unique.cashMovement.cashMovement_expenseId_key",
+    "label": "Add unique constraint on \"cashMovement\" (expenseId)",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "unique",
+        "name": "cashMovement_expenseId_key",
+        "table": "cashMovement"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure constraint \"cashMovement_expenseId_key\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "cashMovement_expenseId_key",
+          "public",
+          "\"public\".\"cashMovement\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add unique constraint \"cashMovement_expenseId_key\"",
+        "sql": "ALTER TABLE \"public\".\"cashMovement\" ADD CONSTRAINT \"cashMovement_expenseId_key\" UNIQUE (\"expenseId\")"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify constraint \"cashMovement_expenseId_key\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "cashMovement_expenseId_key",
+          "public",
+          "\"public\".\"cashMovement\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "unique.expense.expense_reference_key",
+    "label": "Add unique constraint on \"expense\" (reference)",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "unique",
+        "name": "expense_reference_key",
+        "table": "expense"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure constraint \"expense_reference_key\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "expense_reference_key",
+          "public",
+          "\"public\".\"expense\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add unique constraint \"expense_reference_key\"",
+        "sql": "ALTER TABLE \"public\".\"expense\" ADD CONSTRAINT \"expense_reference_key\" UNIQUE (\"reference\")"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify constraint \"expense_reference_key\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "expense_reference_key",
+          "public",
+          "\"public\".\"expense\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "index.expense.expense_category_expenseDate_idx_4ada0e62",
+    "label": "Create index \"expense_category_expenseDate_idx_4ada0e62\" on \"expense\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "index",
+        "name": "expense_category_expenseDate_idx_4ada0e62",
+        "table": "expense"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure index \"expense_category_expenseDate_idx_4ada0e62\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"expense_category_expenseDate_idx_4ada0e62\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "create index \"expense_category_expenseDate_idx_4ada0e62\"",
+        "sql": "CREATE INDEX \"expense_category_expenseDate_idx_4ada0e62\" ON \"public\".\"expense\" (\"category\", \"expenseDate\")",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify index \"expense_category_expenseDate_idx_4ada0e62\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": [
+          "\"public\".\"expense_category_expenseDate_idx_4ada0e62\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "index.expense.expense_expenseDate_idx_4f88c6df",
+    "label": "Create index \"expense_expenseDate_idx_4f88c6df\" on \"expense\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "index",
+        "name": "expense_expenseDate_idx_4f88c6df",
+        "table": "expense"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure index \"expense_expenseDate_idx_4f88c6df\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"expense_expenseDate_idx_4f88c6df\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "create index \"expense_expenseDate_idx_4f88c6df\"",
+        "sql": "CREATE INDEX \"expense_expenseDate_idx_4f88c6df\" ON \"public\".\"expense\" (\"expenseDate\")",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify index \"expense_expenseDate_idx_4f88c6df\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": [
+          "\"public\".\"expense_expenseDate_idx_4f88c6df\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "foreignKey.cashMovement.cashMovement_expenseId_fkey",
+    "label": "Add foreign key \"cashMovement_expenseId_fkey\" on \"cashMovement\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "foreignKey",
+        "name": "cashMovement_expenseId_fkey",
+        "table": "cashMovement"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure FK \"cashMovement_expenseId_fkey\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "cashMovement_expenseId_fkey",
+          "public",
+          "\"public\".\"cashMovement\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add FK \"cashMovement_expenseId_fkey\"",
+        "sql": "ALTER TABLE \"public\".\"cashMovement\"\nADD CONSTRAINT \"cashMovement_expenseId_fkey\"\nFOREIGN KEY (\"expenseId\")\nREFERENCES \"public\".\"expense\" (\"id\")\nON DELETE RESTRICT\nON UPDATE RESTRICT"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify FK \"cashMovement_expenseId_fkey\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "cashMovement_expenseId_fkey",
+          "public",
+          "\"public\".\"cashMovement\""
+        ]
+      }
+    ]
+  }
+]

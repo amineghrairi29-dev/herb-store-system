@@ -1,0 +1,24 @@
+[Unit]
+Description=Herb Store backend
+After=network.target
+
+[Service]
+Type=simple
+User=SERVICE_USER
+Group=SERVICE_GROUP
+WorkingDirectory=/ABSOLUTE_RELEASE_PATH/backend
+EnvironmentFile=/ABSOLUTE_PRIVATE_ENV_PATH/backend.env
+Environment=NODE_ENV=production
+ExecStart=/ABSOLUTE_NODE_PATH/node dist/main.js
+Restart=on-failure
+RestartSec=5
+KillSignal=SIGTERM
+TimeoutStopSec=45
+NoNewPrivileges=true
+PrivateTmp=true
+UMask=0077
+StandardOutput=journal
+StandardError=journal
+
+[Install]
+WantedBy=multi-user.target

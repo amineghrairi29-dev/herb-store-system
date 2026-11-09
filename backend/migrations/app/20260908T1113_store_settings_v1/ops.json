@@ -1,0 +1,41 @@
+[
+  {
+    "id": "table.storeSettings",
+    "label": "Create table \"storeSettings\"",
+    "summary": "Creates table \"storeSettings\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "table",
+        "name": "storeSettings"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure table \"storeSettings\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"storeSettings\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "create table \"storeSettings\"",
+        "sql": "CREATE TABLE \"public\".\"storeSettings\" (\n  \"address\" text,\n  \"city\" text,\n  \"country\" text,\n  \"createdAt\" timestamptz DEFAULT (now()) NOT NULL,\n  \"currency\" text DEFAULT 'TND' NOT NULL,\n  \"email\" text,\n  \"id\" int4 DEFAULT 1 NOT NULL,\n  \"phone\" text,\n  \"reportFooter\" text,\n  \"secondaryPhone\" text,\n  \"storeName\" text DEFAULT 'Herb Store' NOT NULL,\n  \"updatedAt\" timestamptz NOT NULL,\n  \"website\" text,\n  PRIMARY KEY (\"id\"),\n  CONSTRAINT \"store_settings_currency_ea996e0a\" CHECK (currency = 'TND'),\n  CONSTRAINT \"store_settings_name_93a0ca73\" CHECK (length(btrim(\"storeName\")) BETWEEN 1 AND 160),\n  CONSTRAINT \"store_settings_singleton_7faf435e\" CHECK (id = 1)\n)",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify table \"storeSettings\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": [
+          "\"public\".\"storeSettings\""
+        ]
+      }
+    ]
+  }
+]

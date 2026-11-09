@@ -1,0 +1,48 @@
+.botanical-product-grid {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 22px;
+  align-items: stretch;
+}
+.botanical-product-card {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  background: #fffefb;
+  border: 1px solid #e1e7dd;
+  border-radius: 16px;
+  box-shadow: 0 2px 6px #183d2d04;
+  transition: border-color 180ms ease, box-shadow 180ms ease;
+}
+.bpc-image-link { display: block; padding: 8px 12px; background: #f6f7f2; }
+.bpc-image { height: 130px; width: 100%; }
+.bpc-image img { transition: transform 220ms ease; }
+.bpc-placeholder { display: grid; place-items: center; }
+.bpc-placeholder .sf-product-visual { width: 100%; height: 100%; aspect-ratio: auto; background: transparent; border: 0; }
+.bpc-body { padding: 12px 16px 14px; display: flex; flex: 1; flex-direction: column; min-width: 0; }
+.bpc-category { color: #647260; font-size: 11px; line-height: 16px; height: 16px; margin: 0 0 6px; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+.botanical-product-card .bpc-name { color: #183e2e; font-size: 16px; font-weight: 600; line-height: 22px; height: 44px; margin: 0; overflow: hidden; overflow-wrap: anywhere; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; }
+.bpc-price .bpc-unit { font-size: 12px; font-weight: 400; color: #657063; white-space: nowrap; }
+.bpc-price { font-size: 21px; line-height: 27px; font-weight: 650; color: #173f2d; margin: 8px 0 0; overflow-wrap: anywhere; font-variant-numeric: tabular-nums; }
+.bpc-price > span { font-size: 12px; font-weight: 500; }
+.bpc-availability { display: flex; align-items: center; gap: 6px; color: #47633e; font-size: 12px; line-height: 18px; margin: 6px 0 0; }
+.bpc-availability > span { width: 5px; height: 5px; border-radius: 50%; background: currentColor; flex: none; }
+.bpc-unavailable { color: #826b60; }
+.bpc-cart { margin-top: auto; }
+.bpc-cart > div { margin-top: 12px; }
+.bpc-cart button { min-height: 42px; border-radius: 8px; background: #204d37; padding: 10px 8px; font-size: 13px; line-height: 20px; }
+.bpc-cart button:disabled { color: #6d7168; background: #e9ece5; }
+.bpc-cart [role="status"] { color: #365840; font-size: 12px; }
+.botanical-product-card a:focus-visible, .botanical-product-card button:focus-visible { outline: 3px solid #648342; outline-offset: 3px; }
+.bpc-image-link:focus-visible { outline-offset: -4px !important; }
+@media (hover: hover) and (prefers-reduced-motion: no-preference) {
+  .botanical-product-card:hover { border-color: #acbda4; box-shadow: 0 6px 20px #23453112; }
+  .bpc-image-link:hover img { transform: scale(1.03); }
+  .bpc-cart button:hover:not(:disabled) { background: #163b28; }
+}
+@media (max-width: 1439px) { .botanical-product-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 18px; } }
+@media (max-width: 1099px) { .botanical-product-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); } .bpc-image { height: 120px; } }
+@media (max-width: 759px) { .botanical-product-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; } .bpc-body { padding: 12px; } }
+@media (max-width: 479px) { .botanical-product-grid { grid-template-columns: minmax(0, 1fr); } }
+@media (prefers-reduced-motion: reduce) { .botanical-product-card, .bpc-image img { transition: none; } }

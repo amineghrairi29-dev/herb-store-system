@@ -1,0 +1,506 @@
+[
+  {
+    "id": "column.public.product.category",
+    "label": "Add column \"category\" to \"product\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "column",
+        "name": "category",
+        "table": "product"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure column \"category\" is missing",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3)) AS \"result\"",
+        "params": [
+          "public",
+          "product",
+          "category"
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add column \"category\"",
+        "sql": "ALTER TABLE \"public\".\"product\" ADD COLUMN \"category\" text DEFAULT 'À classer' NOT NULL"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify column \"category\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3)) AS \"result\"",
+        "params": [
+          "public",
+          "product",
+          "category"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "column.public.product.conversionFactor",
+    "label": "Add column \"conversionFactor\" to \"product\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "column",
+        "name": "conversionFactor",
+        "table": "product"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure column \"conversionFactor\" is missing",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3)) AS \"result\"",
+        "params": [
+          "public",
+          "product",
+          "conversionFactor"
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add column \"conversionFactor\"",
+        "sql": "ALTER TABLE \"public\".\"product\" ADD COLUMN \"conversionFactor\" numeric DEFAULT '1'::numeric NOT NULL"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify column \"conversionFactor\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3)) AS \"result\"",
+        "params": [
+          "public",
+          "product",
+          "conversionFactor"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "column.public.product.location",
+    "label": "Add column \"location\" to \"product\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "column",
+        "name": "location",
+        "table": "product"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure column \"location\" is missing",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3)) AS \"result\"",
+        "params": [
+          "public",
+          "product",
+          "location"
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add column \"location\"",
+        "sql": "ALTER TABLE \"public\".\"product\" ADD COLUMN \"location\" text"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify column \"location\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3)) AS \"result\"",
+        "params": [
+          "public",
+          "product",
+          "location"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "column.public.product.maxStock",
+    "label": "Add column \"maxStock\" to \"product\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "column",
+        "name": "maxStock",
+        "table": "product"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure column \"maxStock\" is missing",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3)) AS \"result\"",
+        "params": [
+          "public",
+          "product",
+          "maxStock"
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add column \"maxStock\"",
+        "sql": "ALTER TABLE \"public\".\"product\" ADD COLUMN \"maxStock\" numeric"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify column \"maxStock\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3)) AS \"result\"",
+        "params": [
+          "public",
+          "product",
+          "maxStock"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "column.public.product.minStock",
+    "label": "Add column \"minStock\" to \"product\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "column",
+        "name": "minStock",
+        "table": "product"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure column \"minStock\" is missing",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3)) AS \"result\"",
+        "params": [
+          "public",
+          "product",
+          "minStock"
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add column \"minStock\"",
+        "sql": "ALTER TABLE \"public\".\"product\" ADD COLUMN \"minStock\" numeric"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify column \"minStock\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3)) AS \"result\"",
+        "params": [
+          "public",
+          "product",
+          "minStock"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "column.public.product.saleUnit",
+    "label": "Add column \"saleUnit\" to \"product\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "column",
+        "name": "saleUnit",
+        "table": "product"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure column \"saleUnit\" is missing",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3)) AS \"result\"",
+        "params": [
+          "public",
+          "product",
+          "saleUnit"
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add column \"saleUnit\"",
+        "sql": "ALTER TABLE \"public\".\"product\" ADD COLUMN \"saleUnit\" text DEFAULT 'PIECE' NOT NULL"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify column \"saleUnit\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3)) AS \"result\"",
+        "params": [
+          "public",
+          "product",
+          "saleUnit"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "column.public.product.storageUnit",
+    "label": "Add column \"storageUnit\" to \"product\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "column",
+        "name": "storageUnit",
+        "table": "product"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure column \"storageUnit\" is missing",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3)) AS \"result\"",
+        "params": [
+          "public",
+          "product",
+          "storageUnit"
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add column \"storageUnit\"",
+        "sql": "ALTER TABLE \"public\".\"product\" ADD COLUMN \"storageUnit\" text DEFAULT 'PIECE' NOT NULL"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify column \"storageUnit\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3)) AS \"result\"",
+        "params": [
+          "public",
+          "product",
+          "storageUnit"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "column.public.product.subcategory",
+    "label": "Add column \"subcategory\" to \"product\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "column",
+        "name": "subcategory",
+        "table": "product"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure column \"subcategory\" is missing",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3)) AS \"result\"",
+        "params": [
+          "public",
+          "product",
+          "subcategory"
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add column \"subcategory\"",
+        "sql": "ALTER TABLE \"public\".\"product\" ADD COLUMN \"subcategory\" text"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify column \"subcategory\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3)) AS \"result\"",
+        "params": [
+          "public",
+          "product",
+          "subcategory"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "checkConstraint.product.product_conversion_positive_d42822dd",
+    "label": "Add check constraint \"product_conversion_positive_d42822dd\" on \"product\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "checkConstraint",
+        "name": "product_conversion_positive_d42822dd",
+        "table": "product"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure constraint \"product_conversion_positive_d42822dd\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "product_conversion_positive_d42822dd",
+          "public",
+          "\"public\".\"product\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add check constraint \"product_conversion_positive_d42822dd\"",
+        "sql": "ALTER TABLE \"public\".\"product\" ADD CONSTRAINT \"product_conversion_positive_d42822dd\" CHECK (\"conversionFactor\" > 0 AND \"conversionFactor\" < 'Infinity'::numeric)"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify constraint \"product_conversion_positive_d42822dd\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "product_conversion_positive_d42822dd",
+          "public",
+          "\"public\".\"product\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "checkConstraint.product.product_max_stock_nonnegative_0d474a0d",
+    "label": "Add check constraint \"product_max_stock_nonnegative_0d474a0d\" on \"product\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "checkConstraint",
+        "name": "product_max_stock_nonnegative_0d474a0d",
+        "table": "product"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure constraint \"product_max_stock_nonnegative_0d474a0d\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "product_max_stock_nonnegative_0d474a0d",
+          "public",
+          "\"public\".\"product\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add check constraint \"product_max_stock_nonnegative_0d474a0d\"",
+        "sql": "ALTER TABLE \"public\".\"product\" ADD CONSTRAINT \"product_max_stock_nonnegative_0d474a0d\" CHECK (\"maxStock\" >= 0 AND \"maxStock\" < 'Infinity'::numeric)"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify constraint \"product_max_stock_nonnegative_0d474a0d\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "product_max_stock_nonnegative_0d474a0d",
+          "public",
+          "\"public\".\"product\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "checkConstraint.product.product_min_stock_nonnegative_8afd5bbc",
+    "label": "Add check constraint \"product_min_stock_nonnegative_8afd5bbc\" on \"product\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "checkConstraint",
+        "name": "product_min_stock_nonnegative_8afd5bbc",
+        "table": "product"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure constraint \"product_min_stock_nonnegative_8afd5bbc\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "product_min_stock_nonnegative_8afd5bbc",
+          "public",
+          "\"public\".\"product\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add check constraint \"product_min_stock_nonnegative_8afd5bbc\"",
+        "sql": "ALTER TABLE \"public\".\"product\" ADD CONSTRAINT \"product_min_stock_nonnegative_8afd5bbc\" CHECK (\"minStock\" >= 0 AND \"minStock\" < 'Infinity'::numeric)"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify constraint \"product_min_stock_nonnegative_8afd5bbc\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "product_min_stock_nonnegative_8afd5bbc",
+          "public",
+          "\"public\".\"product\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "checkConstraint.product.product_stock_range_c80007e0",
+    "label": "Add check constraint \"product_stock_range_c80007e0\" on \"product\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "checkConstraint",
+        "name": "product_stock_range_c80007e0",
+        "table": "product"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure constraint \"product_stock_range_c80007e0\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "product_stock_range_c80007e0",
+          "public",
+          "\"public\".\"product\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add check constraint \"product_stock_range_c80007e0\"",
+        "sql": "ALTER TABLE \"public\".\"product\" ADD CONSTRAINT \"product_stock_range_c80007e0\" CHECK (\"maxStock\" >= \"minStock\")"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify constraint \"product_stock_range_c80007e0\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "product_stock_range_c80007e0",
+          "public",
+          "\"public\".\"product\""
+        ]
+      }
+    ]
+  }
+]

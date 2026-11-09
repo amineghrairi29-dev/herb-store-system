@@ -1,0 +1,19 @@
+/* The animation wrapper does not change the approved hero/trust layout. */
+.sf-cinematic-top { display: contents; }
+.storefront-home .sf-cinematic-top .sf-top-enter,
+.storefront-home .sf-cinematic-top .sf-hero-banner .sf-hero-visual { animation: none; }
+.sf-headline-masks { position: absolute; pointer-events: none; }
+.sf-headline-mask { position: absolute; inset-inline: 0; overflow: hidden; }
+.sf-headline-mask > div { width: 100%; }
+.storefront-home .sf-cinematic-top .sf-trust { position: relative; }
+.storefront-home .sf-cinematic-top .sf-trust-revealing { border-top-color: transparent; border-bottom-color: transparent; }
+.sf-trust-reveal-line { position: absolute; left: 0; right: 0; height: 1px; background: var(--sf-line); transform-origin: center; }
+.sf-trust-reveal-top { top: -1px; }
+.sf-trust-reveal-bottom { bottom: -1px; }
+.sf-cinematic-top .sf-hero-actions .sf-button > span { display: inline-block; transition: transform 220ms ease; }
+@media (hover: hover) and (prefers-reduced-motion: no-preference) {
+  .sf-cinematic-top .sf-hero-actions .sf-button:hover > span { transform: translateX(3px); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .sf-cinematic-top .sf-hero-actions .sf-button > span { transition: none; transform: none; }
+}

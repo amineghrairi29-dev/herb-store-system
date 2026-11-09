@@ -1,0 +1,29 @@
+// Audit snapshots are historical evidence, never authorization inputs.
+export const auditRoleLabel = (role: string | null) => role === 'ADMIN' ? 'Administrateur' : role ? `${role} (historique)` : '—';
+export const actionLabels = {
+  CLASSIFICATION_CREATE: 'Création classification', CLASSIFICATION_UPDATE: 'Modification classification',
+  CATEGORY_CREATE: 'Création catégorie', CATEGORY_UPDATE: 'Modification catégorie', CATEGORY_ACTIVATE: 'Activation catégorie', CATEGORY_DEACTIVATE: 'Désactivation catégorie',
+  SUBCATEGORY_CREATE: 'Création sous-catégorie', SUBCATEGORY_UPDATE: 'Modification sous-catégorie', SUBCATEGORY_ACTIVATE: 'Activation sous-catégorie', SUBCATEGORY_DEACTIVATE: 'Désactivation sous-catégorie',
+  AUTH_LOGIN_SUCCESS: 'Connexion réussie', AUTH_LOGIN_FAILURE: 'Échec de connexion', AUTH_LOGOUT: 'Déconnexion', USER_CREATE: 'Création utilisateur', USER_UPDATE: 'Modification utilisateur', USER_ROLE_CHANGE: 'Modification du rôle', USER_ACTIVATE: 'Activation utilisateur', USER_DEACTIVATE: 'Désactivation utilisateur', USER_PASSWORD_CHANGE: 'Modification du mot de passe', PRODUCT_CREATE: 'Création produit', PRODUCT_UPDATE: 'Modification produit', PRODUCT_DELETE: 'Suppression produit', STOCK_ENTRY_CREATE: 'Entrée de stock', STOCK_EXIT_CREATE: 'Sortie de stock', STOCK_LOSS_CREATE: 'Perte de stock', STOCK_ADJUSTMENT_IN_CREATE: 'Ajustement de stock +', STOCK_ADJUSTMENT_OUT_CREATE: 'Ajustement de stock −', STOCK_RETURN_IN_CREATE: 'Retour en stock', SUPPLIER_CREATE: 'Création fournisseur', SUPPLIER_UPDATE: 'Modification fournisseur', SUPPLIER_ACTIVATE: 'Activation fournisseur', SUPPLIER_DEACTIVATE: 'Désactivation fournisseur', PURCHASE_CREATE: 'Création achat', PURCHASE_UPDATE: 'Modification achat', PURCHASE_CONFIRM: 'Confirmation achat', PURCHASE_PAYMENT_CREATE: 'Paiement fournisseur', SALE_CREATE: 'Création vente', SALE_UPDATE: 'Modification vente', SALE_CONFIRM: 'Confirmation vente', SALE_PAYMENT_CREATE: 'Encaissement client', EXPENSE_CREATE: 'Création dépense', EXPENSE_UPDATE: 'Modification dépense', CASH_MANUAL_IN_CREATE: 'Entrée manuelle de caisse', CASH_MANUAL_OUT_CREATE: 'Sortie manuelle de caisse', ONLINE_ORDER_CONFIRM: 'Confirmation commande', ONLINE_ORDER_CANCEL: 'Annulation commande', ONLINE_ORDER_CONVERT_TO_SALE: 'Conversion commande en vente', STORE_SETTINGS_UPDATE: 'Modification paramètres magasin',
+} as const;
+export const entityLabels = { CLASSIFICATION: 'Classification', CATEGORY: 'Catégorie', SUBCATEGORY: 'Sous-catégorie', USER: 'Utilisateur', PRODUCT: 'Produit', STOCK_MOVEMENT: 'Mouvement de stock', SUPPLIER: 'Fournisseur', PURCHASE: 'Achat', PURCHASE_PAYMENT: 'Paiement fournisseur', SALE: 'Vente', SALE_PAYMENT: 'Paiement client', EXPENSE: 'Dépense', CASH_MOVEMENT: 'Mouvement de caisse', ONLINE_ORDER: 'Commande en ligne', STORE_SETTINGS: 'Paramètres du magasin', AUTH_SESSION: 'Authentification' } as const;
+export interface AuditEvent { id: number; actorUserId: number | null; actorNameSnapshot: string | null; actorEmailSnapshot: string | null; actorRoleSnapshot: string | null; action: keyof typeof actionLabels; entityType: keyof typeof entityLabels; entityId: number | null; entityReference: string | null; outcome: 'SUCCESS' | 'FAILURE'; metadataJson: Record<string, string | number | boolean | string[]>; ipAddress: string | null; userAgent: string | null; createdAt: string }
+export interface AuditList { data: AuditEvent[]; pagination: { page: number; pageSize: number; totalItems: number; totalPages: number }; timeZone: string }
+export function readAudit(value: unknown): AuditEvent {
+  if (!value || typeof value !== 'object') throw new Error('Événement invalide.');
+  const row = value as Record<string, unknown>;
+  if (!Number.isInteger(row.id) || !Object.hasOwn(actionLabels, String(row.action)) || !Object.hasOwn(entityLabels, String(row.entityType)) || !['SUCCESS', 'FAILURE'].includes(String(row.outcome)) || typeof row.createdAt !== 'string' || !Number.isFinite(Date.parse(row.createdAt))) throw new Error('Événement invalide.');
+  for (const key of ['actorNameSnapshot', 'actorEmailSnapshot', 'actorRoleSnapshot', 'entityReference', 'ipAddress', 'userAgent']) if (row[key] !== null && typeof row[key] !== 'string') throw new Error('Événement invalide.');
+  for (const key of ['actorUserId', 'entityId']) if (row[key] !== null && !Number.isInteger(row[key])) throw new Error('Événement invalide.');
+  if (!row.metadataJson || typeof row.metadataJson !== 'object' || Array.isArray(row.metadataJson) || Object.values(row.metadataJson).some(v => !['string', 'number', 'boolean'].includes(typeof v) && !(Array.isArray(v) && v.every(s => typeof s === 'string')))) throw new Error('Détails invalides.');
+  return row as unknown as AuditEvent;
+}
+export function readAuditList(value: unknown): AuditList {
+  if (!value || typeof value !== 'object') throw new Error('Journal invalide.'); const row = value as Record<string, unknown>;
+  if (!Array.isArray(row.data) || !row.pagination || typeof row.pagination !== 'object' || typeof row.timeZone !== 'string') throw new Error('Journal invalide.');
+  const pagination = row.pagination as Record<string, unknown>;
+  for (const key of ['page', 'pageSize', 'totalItems', 'totalPages']) if (!Number.isSafeInteger(pagination[key]) || Number(pagination[key]) < 0) throw new Error('Pagination invalide.');
+  if (Number(pagination.pageSize) > 100 || Number(pagination.pageSize) < 1 || Number(pagination.page) < 1) throw new Error('Pagination invalide.');
+  return { data: row.data.map(readAudit), pagination: pagination as unknown as AuditList['pagination'], timeZone: row.timeZone };
+}
+export const auditDate = (value: string, timeZone?: string) => new Date(value).toLocaleString('fr-FR', { timeZone, dateStyle: 'short', timeStyle: 'medium' });

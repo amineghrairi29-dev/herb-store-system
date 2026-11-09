@@ -1,0 +1,73 @@
+[
+  {
+    "id": "column.public.category.imagePath",
+    "label": "Add column \"imagePath\" to \"category\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "column",
+        "name": "imagePath",
+        "table": "category"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure column \"imagePath\" is missing",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3)) AS \"result\"",
+        "params": [
+          "public",
+          "category",
+          "imagePath"
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add column \"imagePath\"",
+        "sql": "ALTER TABLE \"public\".\"category\" ADD COLUMN \"imagePath\" text"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify column \"imagePath\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3)) AS \"result\"",
+        "params": [
+          "public",
+          "category",
+          "imagePath"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "data_migration.assign-curated-category-images",
+    "label": "Data transform: assign-curated-category-images",
+    "operationClass": "data",
+    "target": {
+      "id": "postgres"
+    },
+    "precheck": [
+      {
+        "description": "Check assign-curated-category-images has work to do",
+        "sql": "SELECT EXISTS (SELECT id FROM public.category WHERE \"imagePath\" IS NULL AND slug IN ('herbes', 'huiles-et-liquides-naturels', 'epices', 'parfums', 'melanges-speciaux') LIMIT 1) AS ok",
+        "params": []
+      }
+    ],
+    "execute": [
+      {
+        "description": "Run assign-curated-category-images",
+        "sql": "UPDATE public.category c SET \"imagePath\" = images.path\n          FROM (VALUES\n            ('herbes', '/images/categories/herbes.png'),\n            ('huiles-et-liquides-naturels', '/images/categories/huiles-liquides.png'),\n            ('epices', '/images/categories/epices.png'),\n            ('parfums', '/images/categories/parfums.png'),\n            ('melanges-speciaux', '/images/categories/melanges-speciaux.png')\n          ) AS images(slug, path)\n          WHERE c.slug = images.slug AND c.\"imagePath\" IS NULL",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "Verify assign-curated-category-images resolved all violations",
+        "sql": "SELECT NOT EXISTS (SELECT id FROM public.category WHERE \"imagePath\" IS NULL AND slug IN ('herbes', 'huiles-et-liquides-naturels', 'epices', 'parfums', 'melanges-speciaux') LIMIT 1) AS ok",
+        "params": []
+      }
+    ]
+  }
+]

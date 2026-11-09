@@ -1,0 +1,9 @@
+.backLink.backLink { display: inline-flex; align-items: center; gap: 9px; max-width: 100%; min-height: 36px; color: #36533d; font-size: 12px; font-weight: 500; line-height: 1.4; text-decoration: none; border-radius: 6px; vertical-align: middle; transition: color 160ms ease; }
+.icon { display: grid; place-items: center; flex: 0 0 28px; width: 28px; height: 28px; border: 1px solid #d2dccb; border-radius: 50%; background: #fafbf5; transition: transform 160ms ease, background-color 160ms ease, border-color 160ms ease; }
+.backLink.backLink:hover { color: #1e402e; text-decoration: none; }
+.backLink:hover .icon { transform: translateX(-2px); background: #edf2e6; border-color: #a6ba98; }
+.backLink.backLink:focus-visible { outline: 2px solid #6e8e5b; outline-offset: 4px; }
+@media (prefers-reduced-motion: reduce) {
+  .backLink.backLink, .icon { transition: none; }
+  .backLink:hover .icon { transform: none; }
+}

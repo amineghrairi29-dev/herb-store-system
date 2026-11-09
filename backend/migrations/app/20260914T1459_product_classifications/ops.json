@@ -1,0 +1,692 @@
+[
+  {
+    "id": "table.classification",
+    "label": "Create table \"classification\"",
+    "summary": "Creates table \"classification\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "table",
+        "name": "classification"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure table \"classification\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"classification\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "create table \"classification\"",
+        "sql": "CREATE TABLE \"public\".\"classification\" (\n  \"createdAt\" timestamptz DEFAULT (now()) NOT NULL,\n  \"id\" SERIAL NOT NULL,\n  \"imagePath\" text,\n  \"isActive\" bool DEFAULT true NOT NULL,\n  \"legacyCategoryId\" int4,\n  \"legacySubcategoryId\" int4,\n  \"nameAr\" text DEFAULT '' NOT NULL,\n  \"nameFr\" text NOT NULL,\n  \"slug\" text NOT NULL,\n  \"sortOrder\" int4 DEFAULT 0 NOT NULL,\n  \"updatedAt\" timestamptz NOT NULL,\n  PRIMARY KEY (\"id\")\n)",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify table \"classification\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": [
+          "\"public\".\"classification\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "table.productClassification",
+    "label": "Create table \"productClassification\"",
+    "summary": "Creates table \"productClassification\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "table",
+        "name": "productClassification"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure table \"productClassification\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"productClassification\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "create table \"productClassification\"",
+        "sql": "CREATE TABLE \"public\".\"productClassification\" (\n  \"classificationId\" int4 NOT NULL,\n  \"id\" SERIAL NOT NULL,\n  \"productId\" int4 NOT NULL,\n  PRIMARY KEY (\"id\")\n)",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify table \"productClassification\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": [
+          "\"public\".\"productClassification\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "column.public.product.measurementMode",
+    "label": "Add column \"measurementMode\" to \"product\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "column",
+        "name": "measurementMode",
+        "table": "product"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure column \"measurementMode\" is missing",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3)) AS \"result\"",
+        "params": [
+          "public",
+          "product",
+          "measurementMode"
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add column \"measurementMode\"",
+        "sql": "ALTER TABLE \"public\".\"product\" ADD COLUMN \"measurementMode\" text DEFAULT 'FLEXIBLE' NOT NULL"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify column \"measurementMode\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3)) AS \"result\"",
+        "params": [
+          "public",
+          "product",
+          "measurementMode"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "alterNullability.dropNotNull.product.categoryId",
+    "label": "Drop NOT NULL on \"product\".\"categoryId\"",
+    "operationClass": "widening",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "column",
+        "name": "categoryId",
+        "table": "product"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure column \"categoryId\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3)) AS \"result\"",
+        "params": [
+          "public",
+          "product",
+          "categoryId"
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "drop NOT NULL on \"categoryId\"",
+        "sql": "ALTER TABLE \"public\".\"product\" ALTER COLUMN \"categoryId\" DROP NOT NULL"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify column \"categoryId\" is nullable",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3 AND \"is_nullable\" = $4)) AS \"result\"",
+        "params": [
+          "public",
+          "product",
+          "categoryId",
+          "YES"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "unique.classification.classification_slug_key",
+    "label": "Add unique constraint on \"classification\" (slug)",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "unique",
+        "name": "classification_slug_key",
+        "table": "classification"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure constraint \"classification_slug_key\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "classification_slug_key",
+          "public",
+          "\"public\".\"classification\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add unique constraint \"classification_slug_key\"",
+        "sql": "ALTER TABLE \"public\".\"classification\" ADD CONSTRAINT \"classification_slug_key\" UNIQUE (\"slug\")"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify constraint \"classification_slug_key\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "classification_slug_key",
+          "public",
+          "\"public\".\"classification\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "unique.classification.classification_legacyCategoryId_key",
+    "label": "Add unique constraint on \"classification\" (legacyCategoryId)",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "unique",
+        "name": "classification_legacyCategoryId_key",
+        "table": "classification"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure constraint \"classification_legacyCategoryId_key\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "classification_legacyCategoryId_key",
+          "public",
+          "\"public\".\"classification\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add unique constraint \"classification_legacyCategoryId_key\"",
+        "sql": "ALTER TABLE \"public\".\"classification\" ADD CONSTRAINT \"classification_legacyCategoryId_key\" UNIQUE (\"legacyCategoryId\")"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify constraint \"classification_legacyCategoryId_key\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "classification_legacyCategoryId_key",
+          "public",
+          "\"public\".\"classification\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "unique.classification.classification_legacySubcategoryId_key",
+    "label": "Add unique constraint on \"classification\" (legacySubcategoryId)",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "unique",
+        "name": "classification_legacySubcategoryId_key",
+        "table": "classification"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure constraint \"classification_legacySubcategoryId_key\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "classification_legacySubcategoryId_key",
+          "public",
+          "\"public\".\"classification\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add unique constraint \"classification_legacySubcategoryId_key\"",
+        "sql": "ALTER TABLE \"public\".\"classification\" ADD CONSTRAINT \"classification_legacySubcategoryId_key\" UNIQUE (\"legacySubcategoryId\")"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify constraint \"classification_legacySubcategoryId_key\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "classification_legacySubcategoryId_key",
+          "public",
+          "\"public\".\"classification\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "checkConstraint.product.product_measurement_mode_812f2fa6",
+    "label": "Add check constraint \"product_measurement_mode_812f2fa6\" on \"product\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "checkConstraint",
+        "name": "product_measurement_mode_812f2fa6",
+        "table": "product"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure constraint \"product_measurement_mode_812f2fa6\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "product_measurement_mode_812f2fa6",
+          "public",
+          "\"public\".\"product\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add check constraint \"product_measurement_mode_812f2fa6\"",
+        "sql": "ALTER TABLE \"public\".\"product\" ADD CONSTRAINT \"product_measurement_mode_812f2fa6\" CHECK (\"measurementMode\" IN ('WEIGHT', 'VOLUME', 'WEIGHT_AND_VOLUME', 'FLEXIBLE'))"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify constraint \"product_measurement_mode_812f2fa6\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "product_measurement_mode_812f2fa6",
+          "public",
+          "\"public\".\"product\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "unique.productClassification.productClassification_productId_classificationId_key",
+    "label": "Add unique constraint on \"productClassification\" (productId, classificationId)",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "unique",
+        "name": "productClassification_productId_classificationId_key",
+        "table": "productClassification"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure constraint \"productClassification_productId_classificationId_key\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "productClassification_productId_classificationId_key",
+          "public",
+          "\"public\".\"productClassification\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add unique constraint \"productClassification_productId_classificationId_key\"",
+        "sql": "ALTER TABLE \"public\".\"productClassification\" ADD CONSTRAINT \"productClassification_productId_classificationId_key\" UNIQUE (\"productId\", \"classificationId\")"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify constraint \"productClassification_productId_classificationId_key\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "productClassification_productId_classificationId_key",
+          "public",
+          "\"public\".\"productClassification\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "index.productClassification.productClassification_classificationId_idx_d71156a6",
+    "label": "Create index \"productClassification_classificationId_idx_d71156a6\" on \"productClassification\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "index",
+        "name": "productClassification_classificationId_idx_d71156a6",
+        "table": "productClassification"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure index \"productClassification_classificationId_idx_d71156a6\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"productClassification_classificationId_idx_d71156a6\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "create index \"productClassification_classificationId_idx_d71156a6\"",
+        "sql": "CREATE INDEX \"productClassification_classificationId_idx_d71156a6\" ON \"public\".\"productClassification\" (\"classificationId\")",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify index \"productClassification_classificationId_idx_d71156a6\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": [
+          "\"public\".\"productClassification_classificationId_idx_d71156a6\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "index.productClassification.productClassification_classificationId_productId_idx_df17f70e",
+    "label": "Create index \"productClassification_classificationId_productId_idx_df17f70e\" on \"productClassification\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "index",
+        "name": "productClassification_classificationId_productId_idx_df17f70e",
+        "table": "productClassification"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure index \"productClassification_classificationId_productId_idx_df17f70e\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"productClassification_classificationId_productId_idx_df17f70e\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "create index \"productClassification_classificationId_productId_idx_df17f70e\"",
+        "sql": "CREATE INDEX \"productClassification_classificationId_productId_idx_df17f70e\" ON \"public\".\"productClassification\" (\"classificationId\", \"productId\")",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify index \"productClassification_classificationId_productId_idx_df17f70e\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": [
+          "\"public\".\"productClassification_classificationId_productId_idx_df17f70e\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "index.productClassification.productClassification_productId_idx_5858600a",
+    "label": "Create index \"productClassification_productId_idx_5858600a\" on \"productClassification\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "index",
+        "name": "productClassification_productId_idx_5858600a",
+        "table": "productClassification"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure index \"productClassification_productId_idx_5858600a\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"productClassification_productId_idx_5858600a\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "create index \"productClassification_productId_idx_5858600a\"",
+        "sql": "CREATE INDEX \"productClassification_productId_idx_5858600a\" ON \"public\".\"productClassification\" (\"productId\")",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify index \"productClassification_productId_idx_5858600a\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": [
+          "\"public\".\"productClassification_productId_idx_5858600a\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "foreignKey.productClassification.productClassification_productId_fkey",
+    "label": "Add foreign key \"productClassification_productId_fkey\" on \"productClassification\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "foreignKey",
+        "name": "productClassification_productId_fkey",
+        "table": "productClassification"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure FK \"productClassification_productId_fkey\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "productClassification_productId_fkey",
+          "public",
+          "\"public\".\"productClassification\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add FK \"productClassification_productId_fkey\"",
+        "sql": "ALTER TABLE \"public\".\"productClassification\"\nADD CONSTRAINT \"productClassification_productId_fkey\"\nFOREIGN KEY (\"productId\")\nREFERENCES \"public\".\"product\" (\"id\")\nON DELETE CASCADE\nON UPDATE RESTRICT"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify FK \"productClassification_productId_fkey\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "productClassification_productId_fkey",
+          "public",
+          "\"public\".\"productClassification\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "foreignKey.productClassification.productClassification_classificationId_fkey",
+    "label": "Add foreign key \"productClassification_classificationId_fkey\" on \"productClassification\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "foreignKey",
+        "name": "productClassification_classificationId_fkey",
+        "table": "productClassification"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure FK \"productClassification_classificationId_fkey\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "productClassification_classificationId_fkey",
+          "public",
+          "\"public\".\"productClassification\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add FK \"productClassification_classificationId_fkey\"",
+        "sql": "ALTER TABLE \"public\".\"productClassification\"\nADD CONSTRAINT \"productClassification_classificationId_fkey\"\nFOREIGN KEY (\"classificationId\")\nREFERENCES \"public\".\"classification\" (\"id\")\nON DELETE RESTRICT\nON UPDATE RESTRICT"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify FK \"productClassification_classificationId_fkey\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "productClassification_classificationId_fkey",
+          "public",
+          "\"public\".\"productClassification\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "data_migration.copy-categories",
+    "label": "Data transform: copy-categories",
+    "operationClass": "data",
+    "target": {
+      "id": "postgres"
+    },
+    "precheck": [
+      {
+        "description": "Check copy-categories has work to do",
+        "sql": "SELECT EXISTS (SELECT id FROM public.category WHERE id NOT IN (SELECT \"legacyCategoryId\" FROM public.classification WHERE \"legacyCategoryId\" IS NOT NULL) LIMIT 1) AS ok",
+        "params": []
+      }
+    ],
+    "execute": [
+      {
+        "description": "Run copy-categories",
+        "sql": "INSERT INTO public.classification (\"nameFr\",\"nameAr\",slug,\"imagePath\",\"isActive\",\"sortOrder\",\"legacyCategoryId\",\"createdAt\",\"updatedAt\") SELECT \"nameFr\",\"nameAr\",slug,\"imagePath\",(\"isActive\" AND NOT \"isInternal\"),\"sortOrder\",id,\"createdAt\",\"updatedAt\" FROM public.category ON CONFLICT (\"legacyCategoryId\") DO NOTHING",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "Verify copy-categories resolved all violations",
+        "sql": "SELECT NOT EXISTS (SELECT id FROM public.category WHERE id NOT IN (SELECT \"legacyCategoryId\" FROM public.classification WHERE \"legacyCategoryId\" IS NOT NULL) LIMIT 1) AS ok",
+        "params": []
+      }
+    ]
+  },
+  {
+    "id": "data_migration.copy-subcategories",
+    "label": "Data transform: copy-subcategories",
+    "operationClass": "data",
+    "target": {
+      "id": "postgres"
+    },
+    "precheck": [
+      {
+        "description": "Check copy-subcategories has work to do",
+        "sql": "SELECT EXISTS (SELECT id FROM public.subcategory WHERE id NOT IN (SELECT \"legacySubcategoryId\" FROM public.classification WHERE \"legacySubcategoryId\" IS NOT NULL) LIMIT 1) AS ok",
+        "params": []
+      }
+    ],
+    "execute": [
+      {
+        "description": "Run copy-subcategories",
+        "sql": "INSERT INTO public.classification (\"nameFr\",\"nameAr\",slug,\"isActive\",\"sortOrder\",\"legacySubcategoryId\",\"createdAt\",\"updatedAt\") SELECT s.\"nameFr\",s.\"nameAr\",'legacy-subcategory-'||s.id||'-'||md5(s.slug),(s.\"isActive\" AND c.\"isActive\" AND NOT c.\"isInternal\"),s.\"sortOrder\",s.id,s.\"createdAt\",s.\"updatedAt\" FROM public.subcategory s JOIN public.category c ON c.id=s.\"categoryId\" ON CONFLICT (\"legacySubcategoryId\") DO NOTHING",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "Verify copy-subcategories resolved all violations",
+        "sql": "SELECT NOT EXISTS (SELECT id FROM public.subcategory WHERE id NOT IN (SELECT \"legacySubcategoryId\" FROM public.classification WHERE \"legacySubcategoryId\" IS NOT NULL) LIMIT 1) AS ok",
+        "params": []
+      }
+    ]
+  },
+  {
+    "id": "data_migration.link-existing-products",
+    "label": "Data transform: link-existing-products",
+    "operationClass": "data",
+    "target": {
+      "id": "postgres"
+    },
+    "precheck": [
+      {
+        "description": "Check link-existing-products has work to do",
+        "sql": "SELECT EXISTS (SELECT id FROM public.product p WHERE NOT EXISTS (SELECT 1 FROM public.\"productClassification\" pc WHERE pc.\"productId\"=p.id) LIMIT 1) AS ok",
+        "params": []
+      }
+    ],
+    "execute": [
+      {
+        "description": "Run link-existing-products",
+        "sql": "INSERT INTO public.\"productClassification\" (\"productId\",\"classificationId\") SELECT p.id,c.id FROM public.product p JOIN public.classification c ON c.\"legacyCategoryId\"=p.\"categoryId\" OR c.\"legacySubcategoryId\"=p.\"subcategoryId\" ON CONFLICT (\"productId\",\"classificationId\") DO NOTHING",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "Verify link-existing-products resolved all violations",
+        "sql": "SELECT NOT EXISTS (SELECT id FROM public.product p WHERE NOT EXISTS (SELECT 1 FROM public.\"productClassification\" pc WHERE pc.\"productId\"=p.id) LIMIT 1) AS ok",
+        "params": []
+      }
+    ]
+  },
+  {
+    "id": "data_migration.move-measurement-to-product",
+    "label": "Data transform: move-measurement-to-product",
+    "operationClass": "data",
+    "target": {
+      "id": "postgres"
+    },
+    "precheck": [
+      {
+        "description": "Check move-measurement-to-product has work to do",
+        "sql": "SELECT EXISTS (SELECT p.id FROM public.product p JOIN public.category c ON c.id=p.\"categoryId\" WHERE p.\"measurementMode\"<>c.\"measurementMode\" LIMIT 1) AS ok",
+        "params": []
+      }
+    ],
+    "execute": [
+      {
+        "description": "Run move-measurement-to-product",
+        "sql": "UPDATE public.product p SET \"measurementMode\"=c.\"measurementMode\" FROM public.category c WHERE c.id=p.\"categoryId\"",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "Verify move-measurement-to-product resolved all violations",
+        "sql": "SELECT NOT EXISTS (SELECT p.id FROM public.product p JOIN public.category c ON c.id=p.\"categoryId\" WHERE p.\"measurementMode\"<>c.\"measurementMode\" LIMIT 1) AS ok",
+        "params": []
+      }
+    ]
+  }
+]

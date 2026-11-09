@@ -1,0 +1,18 @@
+export const auditActions = ['CLASSIFICATION_CREATE', 'CLASSIFICATION_UPDATE', 'CATEGORY_CREATE', 'CATEGORY_UPDATE', 'CATEGORY_ACTIVATE', 'CATEGORY_DEACTIVATE', 'SUBCATEGORY_CREATE', 'SUBCATEGORY_UPDATE', 'SUBCATEGORY_ACTIVATE', 'SUBCATEGORY_DEACTIVATE', 'AUTH_LOGIN_SUCCESS', 'AUTH_LOGIN_FAILURE', 'AUTH_LOGOUT', 'USER_CREATE', 'USER_UPDATE', 'USER_ROLE_CHANGE', 'USER_ACTIVATE', 'USER_DEACTIVATE', 'USER_PASSWORD_CHANGE', 'PRODUCT_CREATE', 'PRODUCT_UPDATE', 'PRODUCT_DELETE', 'STOCK_ENTRY_CREATE', 'STOCK_EXIT_CREATE', 'STOCK_LOSS_CREATE', 'STOCK_ADJUSTMENT_IN_CREATE', 'STOCK_ADJUSTMENT_OUT_CREATE', 'STOCK_RETURN_IN_CREATE', 'SUPPLIER_CREATE', 'SUPPLIER_UPDATE', 'SUPPLIER_ACTIVATE', 'SUPPLIER_DEACTIVATE', 'PURCHASE_CREATE', 'PURCHASE_UPDATE', 'PURCHASE_CONFIRM', 'PURCHASE_PAYMENT_CREATE', 'SALE_CREATE', 'SALE_UPDATE', 'SALE_CONFIRM', 'SALE_PAYMENT_CREATE', 'EXPENSE_CREATE', 'EXPENSE_UPDATE', 'CASH_MANUAL_IN_CREATE', 'CASH_MANUAL_OUT_CREATE', 'ONLINE_ORDER_CONFIRM', 'ONLINE_ORDER_CANCEL', 'ONLINE_ORDER_CONVERT_TO_SALE', 'STORE_SETTINGS_UPDATE'] as const;
+export const auditEntities = ['CLASSIFICATION', 'CATEGORY', 'SUBCATEGORY', 'USER', 'PRODUCT', 'STOCK_MOVEMENT', 'SUPPLIER', 'PURCHASE', 'PURCHASE_PAYMENT', 'SALE', 'SALE_PAYMENT', 'EXPENSE', 'CASH_MOVEMENT', 'ONLINE_ORDER', 'STORE_SETTINGS', 'AUTH_SESSION'] as const;
+export type AuditAction = typeof auditActions[number];
+export type AuditEntity = typeof auditEntities[number];
+export const auditFields = ['classificationIds', 'mainImagePath', 'categoryId', 'subcategoryId', 'nameAr', 'slug', 'measurementMode', 'sortOrder', 'fullName', 'email', 'role', 'isActive', 'sku', 'name', 'nameFr', 'scientificName', 'barcode', 'productType', 'salePrice', 'category', 'subcategory', 'storageUnit', 'saleUnit', 'conversionFactor', 'minStock', 'maxStock', 'location', 'origin', 'packaging', 'description', 'isSellable', 'isVisibleOnline', 'code', 'phone', 'address', 'city', 'country', 'notes', 'reference', 'supplierId', 'purchaseDate', 'saleDate', 'customerName', 'customerPhone', 'lines', 'amount', 'paymentMethod', 'expenseDate', 'storeName', 'secondaryPhone', 'website', 'currency', 'reportFooter'] as const;
+export function changedFields(value: object): string[] { return Object.keys(value).filter(key => (auditFields as readonly string[]).includes(key)).sort(); }
+export function safeMetadata(input: unknown): Record<string, string | number | boolean | string[]> {
+  if (!input || typeof input !== 'object' || Array.isArray(input)) return {};
+  const row = input as Record<string, unknown>, result: Record<string, string | number | boolean | string[]> = {};
+  if (Array.isArray(row.changedFields)) result.changedFields = [...new Set(row.changedFields.filter((key): key is string => typeof key === 'string' && (auditFields as readonly string[]).includes(key)))].sort();
+  for (const key of ['roleBefore', 'roleAfter']) if (['ADMIN'].includes(String(row[key]))) result[key] = String(row[key]);
+  for (const key of ['activeBefore', 'activeAfter']) if (typeof row[key] === 'boolean') result[key] = row[key];
+  for (const key of ['productId', 'saleId', 'purchaseId']) if (Number.isSafeInteger(row[key]) && Number(row[key]) > 0) result[key] = Number(row[key]);
+  if (typeof row.amount === 'string' && /^\d{1,30}(\.\d{1,36})?$/.test(row.amount)) result.amount = row.amount;
+  if (['CASH', 'CARD', 'BANK_TRANSFER', 'OTHER'].includes(String(row.paymentMethod))) result.paymentMethod = String(row.paymentMethod);
+  if (['ENTRY', 'EXIT', 'LOSS', 'ADJUSTMENT_IN', 'ADJUSTMENT_OUT', 'RETURN_IN'].includes(String(row.movementType))) result.movementType = String(row.movementType);
+  return result;
+}

@@ -1,0 +1,697 @@
+[
+  {
+    "id": "table.category",
+    "label": "Create table \"category\"",
+    "summary": "Creates table \"category\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "table",
+        "name": "category"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure table \"category\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"category\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "create table \"category\"",
+        "sql": "CREATE TABLE \"public\".\"category\" (\n  \"createdAt\" timestamptz DEFAULT (now()) NOT NULL,\n  \"id\" SERIAL NOT NULL,\n  \"isActive\" bool DEFAULT true NOT NULL,\n  \"isInternal\" bool DEFAULT false NOT NULL,\n  \"measurementMode\" text NOT NULL,\n  \"nameAr\" text NOT NULL,\n  \"nameFr\" text NOT NULL,\n  \"slug\" text NOT NULL,\n  \"sortOrder\" int4 DEFAULT 0 NOT NULL,\n  \"updatedAt\" timestamptz NOT NULL,\n  PRIMARY KEY (\"id\"),\n  CONSTRAINT \"category_internal_inactive_1a4cd3b7\" CHECK (NOT \"isInternal\" OR NOT \"isActive\"),\n  CONSTRAINT \"category_measurement_mode_812f2fa6\" CHECK (\"measurementMode\" IN ('WEIGHT', 'VOLUME', 'WEIGHT_AND_VOLUME', 'FLEXIBLE'))\n)",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify table \"category\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": [
+          "\"public\".\"category\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "table.subcategory",
+    "label": "Create table \"subcategory\"",
+    "summary": "Creates table \"subcategory\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "table",
+        "name": "subcategory"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure table \"subcategory\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"subcategory\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "create table \"subcategory\"",
+        "sql": "CREATE TABLE \"public\".\"subcategory\" (\n  \"categoryId\" int4 NOT NULL,\n  \"createdAt\" timestamptz DEFAULT (now()) NOT NULL,\n  \"id\" SERIAL NOT NULL,\n  \"isActive\" bool DEFAULT true NOT NULL,\n  \"nameAr\" text NOT NULL,\n  \"nameFr\" text NOT NULL,\n  \"slug\" text NOT NULL,\n  \"sortOrder\" int4 DEFAULT 0 NOT NULL,\n  \"updatedAt\" timestamptz NOT NULL,\n  PRIMARY KEY (\"id\")\n)",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify table \"subcategory\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": [
+          "\"public\".\"subcategory\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "column.public.product.subcategoryId",
+    "label": "Add column \"subcategoryId\" to \"product\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "column",
+        "name": "subcategoryId",
+        "table": "product"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure column \"subcategoryId\" is missing",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3)) AS \"result\"",
+        "params": [
+          "public",
+          "product",
+          "subcategoryId"
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add column \"subcategoryId\"",
+        "sql": "ALTER TABLE \"public\".\"product\" ADD COLUMN \"subcategoryId\" int4"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify column \"subcategoryId\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3)) AS \"result\"",
+        "params": [
+          "public",
+          "product",
+          "subcategoryId"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "column.public.product.categoryId",
+    "label": "Add column \"categoryId\" to \"product\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "column",
+        "name": "categoryId",
+        "table": "product"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure column \"categoryId\" is missing",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3)) AS \"result\"",
+        "params": [
+          "public",
+          "product",
+          "categoryId"
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add column \"categoryId\"",
+        "sql": "ALTER TABLE \"public\".\"product\" ADD COLUMN \"categoryId\" int4"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify column \"categoryId\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3)) AS \"result\"",
+        "params": [
+          "public",
+          "product",
+          "categoryId"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "data_migration.seed-initial-categories",
+    "label": "Data transform: seed-initial-categories",
+    "operationClass": "data",
+    "target": {
+      "id": "postgres"
+    },
+    "precheck": [
+      {
+        "description": "Check seed-initial-categories has work to do",
+        "sql": "SELECT EXISTS (SELECT 1 AS id WHERE NOT EXISTS (SELECT 1 FROM public.category)) AS ok",
+        "params": []
+      }
+    ],
+    "execute": [
+      {
+        "description": "Run seed-initial-categories",
+        "sql": "INSERT INTO public.category (\"nameAr\", \"nameFr\", slug, \"measurementMode\", \"sortOrder\", \"isActive\", \"isInternal\", \"updatedAt\") VALUES\n          ('أعشاب', 'Herbes', 'herbes', 'WEIGHT', 10, true, false, now()),\n          ('زيوت وسوائل طبيعية', 'Huiles et liquides naturels', 'huiles-et-liquides-naturels', 'VOLUME', 20, true, false, now()),\n          ('بهارات', 'Épices', 'epices', 'WEIGHT', 30, true, false, now()),\n          ('عطورات', 'Parfums', 'parfums', 'WEIGHT_AND_VOLUME', 40, true, false, now()),\n          ('الخلطات الخاصة', 'Mélanges spéciaux', 'melanges-speciaux', 'FLEXIBLE', 50, true, false, now()),\n          ('غير مصنف', 'À classer (migration)', 'internal-unclassified', 'FLEXIBLE', 2147483647, false, true, now())",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "Verify seed-initial-categories resolved all violations",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS id WHERE NOT EXISTS (SELECT 1 FROM public.category)) AS ok",
+        "params": []
+      }
+    ]
+  },
+  {
+    "id": "data_migration.seed-initial-subcategories",
+    "label": "Data transform: seed-initial-subcategories",
+    "operationClass": "data",
+    "target": {
+      "id": "postgres"
+    },
+    "precheck": [
+      {
+        "description": "Check seed-initial-subcategories has work to do",
+        "sql": "SELECT EXISTS (SELECT 1 AS id WHERE NOT EXISTS (SELECT 1 FROM public.subcategory)) AS ok",
+        "params": []
+      }
+    ],
+    "execute": [
+      {
+        "description": "Run seed-initial-subcategories",
+        "sql": "INSERT INTO public.subcategory (\"categoryId\", \"nameAr\", \"nameFr\", slug, \"sortOrder\", \"updatedAt\")\n          SELECT c.id, v.ar, v.fr, v.slug, v.ord, now() FROM public.category c CROSS JOIN (VALUES\n          ('زيوت طبيعية', 'Huiles naturelles', 'huiles-naturelles', 10),\n          ('مياه طبيعية', 'Eaux naturelles', 'eaux-naturelles', 20)) v(ar, fr, slug, ord)\n          WHERE c.slug = 'huiles-et-liquides-naturels'",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "Verify seed-initial-subcategories resolved all violations",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS id WHERE NOT EXISTS (SELECT 1 FROM public.subcategory)) AS ok",
+        "params": []
+      }
+    ]
+  },
+  {
+    "id": "data_migration.backfill-product-categoryId",
+    "label": "Data transform: backfill-product-categoryId",
+    "operationClass": "data",
+    "target": {
+      "id": "postgres"
+    },
+    "precheck": [
+      {
+        "description": "Check backfill-product-categoryId has work to do",
+        "sql": "SELECT EXISTS (SELECT id FROM public.product WHERE \"categoryId\" IS NULL LIMIT 1) AS ok",
+        "params": []
+      }
+    ],
+    "execute": [
+      {
+        "description": "Run backfill-product-categoryId",
+        "sql": "UPDATE public.product p SET \"categoryId\" = COALESCE((\n          SELECT c.id FROM public.category c WHERE NOT c.\"isInternal\" AND p.category IN (c.\"nameAr\", c.\"nameFr\")\n          AND (c.\"measurementMode\" = 'FLEXIBLE'\n            OR (c.\"measurementMode\" = 'WEIGHT' AND p.\"storageUnit\" IN ('G','KG') AND p.\"saleUnit\" IN ('G','KG'))\n            OR (c.\"measurementMode\" = 'VOLUME' AND p.\"storageUnit\" IN ('ML','L') AND p.\"saleUnit\" IN ('ML','L'))\n            OR (c.\"measurementMode\" = 'WEIGHT_AND_VOLUME' AND p.\"storageUnit\" IN ('G','KG','ML','L') AND p.\"saleUnit\" IN ('G','KG','ML','L')))\n          ), (SELECT id FROM public.category WHERE \"isInternal\")) WHERE p.\"categoryId\" IS NULL",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "Verify backfill-product-categoryId resolved all violations",
+        "sql": "SELECT NOT EXISTS (SELECT id FROM public.product WHERE \"categoryId\" IS NULL LIMIT 1) AS ok",
+        "params": []
+      }
+    ]
+  },
+  {
+    "id": "data_migration.backfill-product-subcategoryId",
+    "label": "Data transform: backfill-product-subcategoryId",
+    "operationClass": "data",
+    "target": {
+      "id": "postgres"
+    },
+    "precheck": [
+      {
+        "description": "Check backfill-product-subcategoryId has work to do",
+        "sql": "SELECT EXISTS (SELECT p.id FROM public.product p JOIN public.subcategory s ON s.\"categoryId\" = p.\"categoryId\" AND p.subcategory IN (s.\"nameAr\",s.\"nameFr\") WHERE p.\"subcategoryId\" IS NULL LIMIT 1) AS ok",
+        "params": []
+      }
+    ],
+    "execute": [
+      {
+        "description": "Run backfill-product-subcategoryId",
+        "sql": "UPDATE public.product p SET \"subcategoryId\" = s.id FROM public.subcategory s WHERE s.\"categoryId\" = p.\"categoryId\" AND p.subcategory IN (s.\"nameAr\",s.\"nameFr\") AND p.\"subcategoryId\" IS NULL",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "Verify backfill-product-subcategoryId resolved all violations",
+        "sql": "SELECT NOT EXISTS (SELECT p.id FROM public.product p JOIN public.subcategory s ON s.\"categoryId\" = p.\"categoryId\" AND p.subcategory IN (s.\"nameAr\",s.\"nameFr\") WHERE p.\"subcategoryId\" IS NULL LIMIT 1) AS ok",
+        "params": []
+      }
+    ]
+  },
+  {
+    "id": "alterNullability.setNotNull.product.categoryId",
+    "label": "Set NOT NULL on \"product\".\"categoryId\"",
+    "operationClass": "destructive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "column",
+        "name": "categoryId",
+        "table": "product"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure column \"categoryId\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3)) AS \"result\"",
+        "params": [
+          "public",
+          "product",
+          "categoryId"
+        ]
+      },
+      {
+        "description": "ensure no NULL values in \"categoryId\"",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"public\".\"product\" WHERE \"categoryId\" IS NULL) AS \"result\"",
+        "params": []
+      }
+    ],
+    "execute": [
+      {
+        "description": "set NOT NULL on \"categoryId\"",
+        "sql": "ALTER TABLE \"public\".\"product\" ALTER COLUMN \"categoryId\" SET NOT NULL"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify column \"categoryId\" is NOT NULL",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3 AND \"is_nullable\" = $4)) AS \"result\"",
+        "params": [
+          "public",
+          "product",
+          "categoryId",
+          "NO"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "unique.category.category_slug_key",
+    "label": "Add unique constraint on \"category\" (slug)",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "unique",
+        "name": "category_slug_key",
+        "table": "category"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure constraint \"category_slug_key\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "category_slug_key",
+          "public",
+          "\"public\".\"category\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add unique constraint \"category_slug_key\"",
+        "sql": "ALTER TABLE \"public\".\"category\" ADD CONSTRAINT \"category_slug_key\" UNIQUE (\"slug\")"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify constraint \"category_slug_key\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "category_slug_key",
+          "public",
+          "\"public\".\"category\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "unique.subcategory.subcategory_categoryId_slug_key",
+    "label": "Add unique constraint on \"subcategory\" (categoryId, slug)",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "unique",
+        "name": "subcategory_categoryId_slug_key",
+        "table": "subcategory"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure constraint \"subcategory_categoryId_slug_key\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "subcategory_categoryId_slug_key",
+          "public",
+          "\"public\".\"subcategory\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add unique constraint \"subcategory_categoryId_slug_key\"",
+        "sql": "ALTER TABLE \"public\".\"subcategory\" ADD CONSTRAINT \"subcategory_categoryId_slug_key\" UNIQUE (\"categoryId\", \"slug\")"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify constraint \"subcategory_categoryId_slug_key\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "subcategory_categoryId_slug_key",
+          "public",
+          "\"public\".\"subcategory\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "unique.subcategory.subcategory_categoryId_id_key",
+    "label": "Add unique constraint on \"subcategory\" (categoryId, id)",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "unique",
+        "name": "subcategory_categoryId_id_key",
+        "table": "subcategory"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure constraint \"subcategory_categoryId_id_key\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "subcategory_categoryId_id_key",
+          "public",
+          "\"public\".\"subcategory\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add unique constraint \"subcategory_categoryId_id_key\"",
+        "sql": "ALTER TABLE \"public\".\"subcategory\" ADD CONSTRAINT \"subcategory_categoryId_id_key\" UNIQUE (\"categoryId\", \"id\")"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify constraint \"subcategory_categoryId_id_key\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "subcategory_categoryId_id_key",
+          "public",
+          "\"public\".\"subcategory\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "index.product.product_categoryId_idx_15c304f2",
+    "label": "Create index \"product_categoryId_idx_15c304f2\" on \"product\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "index",
+        "name": "product_categoryId_idx_15c304f2",
+        "table": "product"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure index \"product_categoryId_idx_15c304f2\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"product_categoryId_idx_15c304f2\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "create index \"product_categoryId_idx_15c304f2\"",
+        "sql": "CREATE INDEX \"product_categoryId_idx_15c304f2\" ON \"public\".\"product\" (\"categoryId\")",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify index \"product_categoryId_idx_15c304f2\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": [
+          "\"public\".\"product_categoryId_idx_15c304f2\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "index.product.product_categoryId_subcategoryId_idx_956a843b",
+    "label": "Create index \"product_categoryId_subcategoryId_idx_956a843b\" on \"product\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "index",
+        "name": "product_categoryId_subcategoryId_idx_956a843b",
+        "table": "product"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure index \"product_categoryId_subcategoryId_idx_956a843b\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"product_categoryId_subcategoryId_idx_956a843b\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "create index \"product_categoryId_subcategoryId_idx_956a843b\"",
+        "sql": "CREATE INDEX \"product_categoryId_subcategoryId_idx_956a843b\" ON \"public\".\"product\" (\"categoryId\", \"subcategoryId\")",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify index \"product_categoryId_subcategoryId_idx_956a843b\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": [
+          "\"public\".\"product_categoryId_subcategoryId_idx_956a843b\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "index.subcategory.subcategory_categoryId_idx_15c304f2",
+    "label": "Create index \"subcategory_categoryId_idx_15c304f2\" on \"subcategory\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "index",
+        "name": "subcategory_categoryId_idx_15c304f2",
+        "table": "subcategory"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure index \"subcategory_categoryId_idx_15c304f2\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"subcategory_categoryId_idx_15c304f2\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "create index \"subcategory_categoryId_idx_15c304f2\"",
+        "sql": "CREATE INDEX \"subcategory_categoryId_idx_15c304f2\" ON \"public\".\"subcategory\" (\"categoryId\")",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify index \"subcategory_categoryId_idx_15c304f2\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": [
+          "\"public\".\"subcategory_categoryId_idx_15c304f2\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "foreignKey.product.product_categoryId_fkey",
+    "label": "Add foreign key \"product_categoryId_fkey\" on \"product\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "foreignKey",
+        "name": "product_categoryId_fkey",
+        "table": "product"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure FK \"product_categoryId_fkey\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "product_categoryId_fkey",
+          "public",
+          "\"public\".\"product\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add FK \"product_categoryId_fkey\"",
+        "sql": "ALTER TABLE \"public\".\"product\"\nADD CONSTRAINT \"product_categoryId_fkey\"\nFOREIGN KEY (\"categoryId\")\nREFERENCES \"public\".\"category\" (\"id\")\nON DELETE RESTRICT\nON UPDATE RESTRICT"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify FK \"product_categoryId_fkey\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "product_categoryId_fkey",
+          "public",
+          "\"public\".\"product\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "foreignKey.subcategory.subcategory_categoryId_fkey",
+    "label": "Add foreign key \"subcategory_categoryId_fkey\" on \"subcategory\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "foreignKey",
+        "name": "subcategory_categoryId_fkey",
+        "table": "subcategory"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure FK \"subcategory_categoryId_fkey\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "subcategory_categoryId_fkey",
+          "public",
+          "\"public\".\"subcategory\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add FK \"subcategory_categoryId_fkey\"",
+        "sql": "ALTER TABLE \"public\".\"subcategory\"\nADD CONSTRAINT \"subcategory_categoryId_fkey\"\nFOREIGN KEY (\"categoryId\")\nREFERENCES \"public\".\"category\" (\"id\")\nON DELETE RESTRICT\nON UPDATE RESTRICT"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify FK \"subcategory_categoryId_fkey\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "subcategory_categoryId_fkey",
+          "public",
+          "\"public\".\"subcategory\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "foreignKey.product.product_categoryId_subcategoryId_fkey",
+    "label": "Add foreign key \"product_categoryId_subcategoryId_fkey\" on \"product\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "foreignKey",
+        "name": "product_categoryId_subcategoryId_fkey",
+        "table": "product"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure FK \"product_categoryId_subcategoryId_fkey\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "product_categoryId_subcategoryId_fkey",
+          "public",
+          "\"public\".\"product\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add FK \"product_categoryId_subcategoryId_fkey\"",
+        "sql": "ALTER TABLE \"public\".\"product\"\nADD CONSTRAINT \"product_categoryId_subcategoryId_fkey\"\nFOREIGN KEY (\"categoryId\", \"subcategoryId\")\nREFERENCES \"public\".\"subcategory\" (\"categoryId\", \"id\")\nON DELETE RESTRICT\nON UPDATE RESTRICT"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify FK \"product_categoryId_subcategoryId_fkey\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "product_categoryId_subcategoryId_fkey",
+          "public",
+          "\"public\".\"product\""
+        ]
+      }
+    ]
+  }
+]

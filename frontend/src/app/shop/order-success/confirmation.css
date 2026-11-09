@@ -1,0 +1,17 @@
+.min-h-screen:has(> main > .order-confirmation) { background: #f8f6ef; }
+.order-confirmation { max-width: 540px; margin: 12px auto; padding: 32px; border: 1px solid #e0e5d6; border-radius: 18px; background: #fcfaf3; box-shadow: 0 4px 20px rgb(48 65 37 / 4%); color: #244332; text-align: center; }
+.oc-icon { display: grid; place-items: center; width: 56px; height: 56px; margin: 0 auto 18px; border: 1px solid #cddbbf; border-radius: 50%; background: #edf2e5; color: #37603d; }
+.order-confirmation h1 { font: 400 32px/1.15 Georgia, serif; color: #1e402e; margin: 0; }
+.oc-intro { max-width: 370px; margin: 12px auto 0; font-size: 13px; line-height: 1.7; color: #6e7562; }
+.oc-receipt { display: grid; grid-template-columns: minmax(0,1fr) minmax(0,1fr); gap: 16px; margin: 24px 0 18px; padding: 18px 0; border-block: 1px solid #e0e5d6; }
+.oc-receipt dt { font-size: 11px; color: #6e7562; margin-bottom: 7px; }
+.oc-receipt dd { margin: 0; font-size: 15px; font-weight: 500; overflow-wrap: anywhere; font-variant-numeric: tabular-nums; }
+.oc-receipt .oc-total { font-size: 22px; font-weight: 600; line-height: 1.2; }
+.oc-total span { font-size: 12px; font-weight: 500; }
+.oc-note { font-size: 12px; line-height: 1.6; color: #6e7562; max-width: 340px; margin: 0 auto; }
+.oc-actions { display: flex; flex-direction: column; align-items: center; gap: 12px; margin-top: 24px; }
+.oc-primary { display: inline-block; min-height: 44px; padding: 12px 24px; border-radius: 9px; background: #244e37; color: white; font-size: 13px; font-weight: 500; transition: background-color 160ms ease; }
+.oc-primary:hover { background: #183b29; }
+.oc-primary:focus-visible { outline: 2px solid #6e8e5b; outline-offset: 4px; }
+@media(max-width:479px) { .order-confirmation { padding: 26px 20px; margin-block: 4px; } .order-confirmation h1 { font-size: 28px; } .oc-receipt { grid-template-columns: minmax(0,1fr); gap: 16px; } .oc-primary { width: 100%; } }
+@media(prefers-reduced-motion:reduce) { .oc-primary { transition: none; } }

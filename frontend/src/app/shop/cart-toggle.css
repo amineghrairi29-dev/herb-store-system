@@ -1,0 +1,10 @@
+.cart-toggle[data-cart-state="remove"]:not(:disabled) {
+  background: rgb(174 83 83 / 8%);
+  color: #854848;
+  box-shadow: inset 0 0 0 1px rgb(174 83 83 / 25%);
+}
+.cart-toggle[data-cart-state="remove"]:hover:not(:disabled) {
+  background: rgb(174 83 83 / 14%);
+  color: #743c3c;
+  box-shadow: inset 0 0 0 1px rgb(174 83 83 / 38%);
+}

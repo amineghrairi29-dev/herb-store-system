@@ -1,0 +1,446 @@
+[
+  {
+    "id": "table.purchase",
+    "label": "Create table \"purchase\"",
+    "summary": "Creates table \"purchase\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "table",
+        "name": "purchase"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure table \"purchase\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"purchase\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "create table \"purchase\"",
+        "sql": "CREATE TABLE \"public\".\"purchase\" (\n  \"confirmedAt\" timestamptz,\n  \"createdAt\" timestamptz DEFAULT (now()) NOT NULL,\n  \"id\" SERIAL NOT NULL,\n  \"notes\" text,\n  \"purchaseDate\" text NOT NULL,\n  \"reference\" text NOT NULL,\n  \"status\" text DEFAULT 'DRAFT' NOT NULL,\n  \"supplierId\" int4 NOT NULL,\n  \"updatedAt\" timestamptz NOT NULL,\n  PRIMARY KEY (\"id\"),\n  CONSTRAINT \"purchase_confirmation_date_20364fc4\" CHECK ((status = 'CONFIRMED') = (\"confirmedAt\" IS NOT NULL)),\n  CONSTRAINT \"purchase_status_81ae2bd2\" CHECK (status IN ('DRAFT', 'CONFIRMED', 'CANCELLED'))\n)",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify table \"purchase\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": [
+          "\"public\".\"purchase\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "table.purchaseLine",
+    "label": "Create table \"purchaseLine\"",
+    "summary": "Creates table \"purchaseLine\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "table",
+        "name": "purchaseLine"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure table \"purchaseLine\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"purchaseLine\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "create table \"purchaseLine\"",
+        "sql": "CREATE TABLE \"public\".\"purchaseLine\" (\n  \"createdAt\" timestamptz DEFAULT (now()) NOT NULL,\n  \"id\" SERIAL NOT NULL,\n  \"lineTotal\" numeric NOT NULL,\n  \"productId\" int4 NOT NULL,\n  \"purchaseId\" int4 NOT NULL,\n  \"quantity\" numeric NOT NULL,\n  \"quantityInStorageUnit\" numeric NOT NULL,\n  \"unit\" text NOT NULL,\n  \"unitPurchasePrice\" numeric NOT NULL,\n  PRIMARY KEY (\"id\"),\n  CONSTRAINT \"purchase_line_price_1f6dc554\" CHECK (\"unitPurchasePrice\" > 0 AND \"unitPurchasePrice\" < 'Infinity'::numeric),\n  CONSTRAINT \"purchase_line_quantity_80c93d85\" CHECK (quantity > 0 AND quantity < 'Infinity'::numeric),\n  CONSTRAINT \"purchase_line_storage_quantity_3ecf1744\" CHECK (\"quantityInStorageUnit\" > 0 AND \"quantityInStorageUnit\" < 'Infinity'::numeric),\n  CONSTRAINT \"purchase_line_total_326f0479\" CHECK (\"lineTotal\" = quantity * \"unitPurchasePrice\"),\n  CONSTRAINT \"purchase_line_unit_f6a80600\" CHECK (unit IN ('KG', 'G', 'L', 'ML', 'PIECE'))\n)",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify table \"purchaseLine\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": [
+          "\"public\".\"purchaseLine\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "unique.purchase.purchase_reference_key",
+    "label": "Add unique constraint on \"purchase\" (reference)",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "unique",
+        "name": "purchase_reference_key",
+        "table": "purchase"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure constraint \"purchase_reference_key\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "purchase_reference_key",
+          "public",
+          "\"public\".\"purchase\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add unique constraint \"purchase_reference_key\"",
+        "sql": "ALTER TABLE \"public\".\"purchase\" ADD CONSTRAINT \"purchase_reference_key\" UNIQUE (\"reference\")"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify constraint \"purchase_reference_key\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "purchase_reference_key",
+          "public",
+          "\"public\".\"purchase\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "unique.purchaseLine.purchaseLine_purchaseId_productId_key",
+    "label": "Add unique constraint on \"purchaseLine\" (purchaseId, productId)",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "unique",
+        "name": "purchaseLine_purchaseId_productId_key",
+        "table": "purchaseLine"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure constraint \"purchaseLine_purchaseId_productId_key\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "purchaseLine_purchaseId_productId_key",
+          "public",
+          "\"public\".\"purchaseLine\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add unique constraint \"purchaseLine_purchaseId_productId_key\"",
+        "sql": "ALTER TABLE \"public\".\"purchaseLine\" ADD CONSTRAINT \"purchaseLine_purchaseId_productId_key\" UNIQUE (\"purchaseId\", \"productId\")"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify constraint \"purchaseLine_purchaseId_productId_key\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "purchaseLine_purchaseId_productId_key",
+          "public",
+          "\"public\".\"purchaseLine\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "index.purchase.purchase_status_purchaseDate_idx_686c578a",
+    "label": "Create index \"purchase_status_purchaseDate_idx_686c578a\" on \"purchase\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "index",
+        "name": "purchase_status_purchaseDate_idx_686c578a",
+        "table": "purchase"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure index \"purchase_status_purchaseDate_idx_686c578a\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"purchase_status_purchaseDate_idx_686c578a\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "create index \"purchase_status_purchaseDate_idx_686c578a\"",
+        "sql": "CREATE INDEX \"purchase_status_purchaseDate_idx_686c578a\" ON \"public\".\"purchase\" (\"status\", \"purchaseDate\")",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify index \"purchase_status_purchaseDate_idx_686c578a\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": [
+          "\"public\".\"purchase_status_purchaseDate_idx_686c578a\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "index.purchase.purchase_supplierId_idx_c4d9a8b9",
+    "label": "Create index \"purchase_supplierId_idx_c4d9a8b9\" on \"purchase\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "index",
+        "name": "purchase_supplierId_idx_c4d9a8b9",
+        "table": "purchase"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure index \"purchase_supplierId_idx_c4d9a8b9\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"purchase_supplierId_idx_c4d9a8b9\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "create index \"purchase_supplierId_idx_c4d9a8b9\"",
+        "sql": "CREATE INDEX \"purchase_supplierId_idx_c4d9a8b9\" ON \"public\".\"purchase\" (\"supplierId\")",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify index \"purchase_supplierId_idx_c4d9a8b9\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": [
+          "\"public\".\"purchase_supplierId_idx_c4d9a8b9\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "index.purchaseLine.purchaseLine_productId_idx_5858600a",
+    "label": "Create index \"purchaseLine_productId_idx_5858600a\" on \"purchaseLine\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "index",
+        "name": "purchaseLine_productId_idx_5858600a",
+        "table": "purchaseLine"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure index \"purchaseLine_productId_idx_5858600a\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"purchaseLine_productId_idx_5858600a\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "create index \"purchaseLine_productId_idx_5858600a\"",
+        "sql": "CREATE INDEX \"purchaseLine_productId_idx_5858600a\" ON \"public\".\"purchaseLine\" (\"productId\")",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify index \"purchaseLine_productId_idx_5858600a\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": [
+          "\"public\".\"purchaseLine_productId_idx_5858600a\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "index.purchaseLine.purchaseLine_purchaseId_idx_10cddd2f",
+    "label": "Create index \"purchaseLine_purchaseId_idx_10cddd2f\" on \"purchaseLine\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "index",
+        "name": "purchaseLine_purchaseId_idx_10cddd2f",
+        "table": "purchaseLine"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure index \"purchaseLine_purchaseId_idx_10cddd2f\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"purchaseLine_purchaseId_idx_10cddd2f\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "create index \"purchaseLine_purchaseId_idx_10cddd2f\"",
+        "sql": "CREATE INDEX \"purchaseLine_purchaseId_idx_10cddd2f\" ON \"public\".\"purchaseLine\" (\"purchaseId\")",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify index \"purchaseLine_purchaseId_idx_10cddd2f\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": [
+          "\"public\".\"purchaseLine_purchaseId_idx_10cddd2f\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "foreignKey.purchase.purchase_supplierId_fkey",
+    "label": "Add foreign key \"purchase_supplierId_fkey\" on \"purchase\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "foreignKey",
+        "name": "purchase_supplierId_fkey",
+        "table": "purchase"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure FK \"purchase_supplierId_fkey\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "purchase_supplierId_fkey",
+          "public",
+          "\"public\".\"purchase\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add FK \"purchase_supplierId_fkey\"",
+        "sql": "ALTER TABLE \"public\".\"purchase\"\nADD CONSTRAINT \"purchase_supplierId_fkey\"\nFOREIGN KEY (\"supplierId\")\nREFERENCES \"public\".\"supplier\" (\"id\")\nON DELETE RESTRICT\nON UPDATE RESTRICT"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify FK \"purchase_supplierId_fkey\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "purchase_supplierId_fkey",
+          "public",
+          "\"public\".\"purchase\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "foreignKey.purchaseLine.purchaseLine_purchaseId_fkey",
+    "label": "Add foreign key \"purchaseLine_purchaseId_fkey\" on \"purchaseLine\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "foreignKey",
+        "name": "purchaseLine_purchaseId_fkey",
+        "table": "purchaseLine"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure FK \"purchaseLine_purchaseId_fkey\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "purchaseLine_purchaseId_fkey",
+          "public",
+          "\"public\".\"purchaseLine\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add FK \"purchaseLine_purchaseId_fkey\"",
+        "sql": "ALTER TABLE \"public\".\"purchaseLine\"\nADD CONSTRAINT \"purchaseLine_purchaseId_fkey\"\nFOREIGN KEY (\"purchaseId\")\nREFERENCES \"public\".\"purchase\" (\"id\")\nON DELETE RESTRICT\nON UPDATE RESTRICT"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify FK \"purchaseLine_purchaseId_fkey\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "purchaseLine_purchaseId_fkey",
+          "public",
+          "\"public\".\"purchaseLine\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "foreignKey.purchaseLine.purchaseLine_productId_fkey",
+    "label": "Add foreign key \"purchaseLine_productId_fkey\" on \"purchaseLine\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "foreignKey",
+        "name": "purchaseLine_productId_fkey",
+        "table": "purchaseLine"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure FK \"purchaseLine_productId_fkey\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "purchaseLine_productId_fkey",
+          "public",
+          "\"public\".\"purchaseLine\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add FK \"purchaseLine_productId_fkey\"",
+        "sql": "ALTER TABLE \"public\".\"purchaseLine\"\nADD CONSTRAINT \"purchaseLine_productId_fkey\"\nFOREIGN KEY (\"productId\")\nREFERENCES \"public\".\"product\" (\"id\")\nON DELETE RESTRICT\nON UPDATE RESTRICT"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify FK \"purchaseLine_productId_fkey\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "purchaseLine_productId_fkey",
+          "public",
+          "\"public\".\"purchaseLine\""
+        ]
+      }
+    ]
+  }
+]

@@ -1,0 +1,365 @@
+[
+  {
+    "id": "table.onlineOrder",
+    "label": "Create table \"onlineOrder\"",
+    "summary": "Creates table \"onlineOrder\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "table",
+        "name": "onlineOrder"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure table \"onlineOrder\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"onlineOrder\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "create table \"onlineOrder\"",
+        "sql": "CREATE TABLE \"public\".\"onlineOrder\" (\n  \"cancelledAt\" timestamptz,\n  \"confirmedAt\" timestamptz,\n  \"createdAt\" timestamptz DEFAULT (now()) NOT NULL,\n  \"customerEmail\" text,\n  \"customerName\" text NOT NULL,\n  \"customerPhone\" text NOT NULL,\n  \"id\" SERIAL NOT NULL,\n  \"notes\" text,\n  \"reference\" text NOT NULL,\n  \"status\" text DEFAULT 'PENDING' NOT NULL,\n  \"totalAmount\" numeric NOT NULL,\n  \"updatedAt\" timestamptz NOT NULL,\n  PRIMARY KEY (\"id\"),\n  CONSTRAINT \"online_order_status_e490f5ea\" CHECK ((status = 'PENDING' AND \"confirmedAt\" IS NULL AND \"cancelledAt\" IS NULL) OR (status = 'CONFIRMED' AND \"confirmedAt\" IS NOT NULL AND \"cancelledAt\" IS NULL) OR (status = 'CANCELLED' AND \"cancelledAt\" IS NOT NULL AND \"confirmedAt\" IS NULL)),\n  CONSTRAINT \"online_order_total_cb431b28\" CHECK (\"totalAmount\" > 0 AND \"totalAmount\" < 'Infinity'::numeric)\n)",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify table \"onlineOrder\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": [
+          "\"public\".\"onlineOrder\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "table.onlineOrderLine",
+    "label": "Create table \"onlineOrderLine\"",
+    "summary": "Creates table \"onlineOrderLine\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "table",
+        "name": "onlineOrderLine"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure table \"onlineOrderLine\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"onlineOrderLine\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "create table \"onlineOrderLine\"",
+        "sql": "CREATE TABLE \"public\".\"onlineOrderLine\" (\n  \"createdAt\" timestamptz DEFAULT (now()) NOT NULL,\n  \"id\" SERIAL NOT NULL,\n  \"lineTotal\" numeric NOT NULL,\n  \"orderId\" int4 NOT NULL,\n  \"productId\" int4 NOT NULL,\n  \"productNameSnapshot\" text NOT NULL,\n  \"quantity\" numeric NOT NULL,\n  \"unitPrice\" numeric NOT NULL,\n  \"unitSnapshot\" text NOT NULL,\n  PRIMARY KEY (\"id\"),\n  CONSTRAINT \"online_line_price_c86ef394\" CHECK (\"unitPrice\" > 0 AND \"unitPrice\" < 'Infinity'::numeric),\n  CONSTRAINT \"online_line_quantity_80c93d85\" CHECK (quantity > 0 AND quantity < 'Infinity'::numeric),\n  CONSTRAINT \"online_line_total_0e973f01\" CHECK (\"lineTotal\" = quantity * \"unitPrice\")\n)",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify table \"onlineOrderLine\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": [
+          "\"public\".\"onlineOrderLine\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "unique.onlineOrder.onlineOrder_reference_key",
+    "label": "Add unique constraint on \"onlineOrder\" (reference)",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "unique",
+        "name": "onlineOrder_reference_key",
+        "table": "onlineOrder"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure constraint \"onlineOrder_reference_key\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "onlineOrder_reference_key",
+          "public",
+          "\"public\".\"onlineOrder\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add unique constraint \"onlineOrder_reference_key\"",
+        "sql": "ALTER TABLE \"public\".\"onlineOrder\" ADD CONSTRAINT \"onlineOrder_reference_key\" UNIQUE (\"reference\")"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify constraint \"onlineOrder_reference_key\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "onlineOrder_reference_key",
+          "public",
+          "\"public\".\"onlineOrder\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "unique.onlineOrderLine.onlineOrderLine_orderId_productId_key",
+    "label": "Add unique constraint on \"onlineOrderLine\" (orderId, productId)",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "unique",
+        "name": "onlineOrderLine_orderId_productId_key",
+        "table": "onlineOrderLine"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure constraint \"onlineOrderLine_orderId_productId_key\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "onlineOrderLine_orderId_productId_key",
+          "public",
+          "\"public\".\"onlineOrderLine\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add unique constraint \"onlineOrderLine_orderId_productId_key\"",
+        "sql": "ALTER TABLE \"public\".\"onlineOrderLine\" ADD CONSTRAINT \"onlineOrderLine_orderId_productId_key\" UNIQUE (\"orderId\", \"productId\")"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify constraint \"onlineOrderLine_orderId_productId_key\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "onlineOrderLine_orderId_productId_key",
+          "public",
+          "\"public\".\"onlineOrderLine\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "index.onlineOrder.onlineOrder_status_createdAt_idx_58610442",
+    "label": "Create index \"onlineOrder_status_createdAt_idx_58610442\" on \"onlineOrder\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "index",
+        "name": "onlineOrder_status_createdAt_idx_58610442",
+        "table": "onlineOrder"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure index \"onlineOrder_status_createdAt_idx_58610442\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"onlineOrder_status_createdAt_idx_58610442\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "create index \"onlineOrder_status_createdAt_idx_58610442\"",
+        "sql": "CREATE INDEX \"onlineOrder_status_createdAt_idx_58610442\" ON \"public\".\"onlineOrder\" (\"status\", \"createdAt\")",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify index \"onlineOrder_status_createdAt_idx_58610442\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": [
+          "\"public\".\"onlineOrder_status_createdAt_idx_58610442\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "index.onlineOrderLine.onlineOrderLine_orderId_idx_d284871b",
+    "label": "Create index \"onlineOrderLine_orderId_idx_d284871b\" on \"onlineOrderLine\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "index",
+        "name": "onlineOrderLine_orderId_idx_d284871b",
+        "table": "onlineOrderLine"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure index \"onlineOrderLine_orderId_idx_d284871b\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"onlineOrderLine_orderId_idx_d284871b\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "create index \"onlineOrderLine_orderId_idx_d284871b\"",
+        "sql": "CREATE INDEX \"onlineOrderLine_orderId_idx_d284871b\" ON \"public\".\"onlineOrderLine\" (\"orderId\")",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify index \"onlineOrderLine_orderId_idx_d284871b\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": [
+          "\"public\".\"onlineOrderLine_orderId_idx_d284871b\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "index.onlineOrderLine.onlineOrderLine_productId_idx_5858600a",
+    "label": "Create index \"onlineOrderLine_productId_idx_5858600a\" on \"onlineOrderLine\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "index",
+        "name": "onlineOrderLine_productId_idx_5858600a",
+        "table": "onlineOrderLine"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure index \"onlineOrderLine_productId_idx_5858600a\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"onlineOrderLine_productId_idx_5858600a\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "create index \"onlineOrderLine_productId_idx_5858600a\"",
+        "sql": "CREATE INDEX \"onlineOrderLine_productId_idx_5858600a\" ON \"public\".\"onlineOrderLine\" (\"productId\")",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify index \"onlineOrderLine_productId_idx_5858600a\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": [
+          "\"public\".\"onlineOrderLine_productId_idx_5858600a\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "foreignKey.onlineOrderLine.onlineOrderLine_orderId_fkey",
+    "label": "Add foreign key \"onlineOrderLine_orderId_fkey\" on \"onlineOrderLine\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "foreignKey",
+        "name": "onlineOrderLine_orderId_fkey",
+        "table": "onlineOrderLine"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure FK \"onlineOrderLine_orderId_fkey\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "onlineOrderLine_orderId_fkey",
+          "public",
+          "\"public\".\"onlineOrderLine\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add FK \"onlineOrderLine_orderId_fkey\"",
+        "sql": "ALTER TABLE \"public\".\"onlineOrderLine\"\nADD CONSTRAINT \"onlineOrderLine_orderId_fkey\"\nFOREIGN KEY (\"orderId\")\nREFERENCES \"public\".\"onlineOrder\" (\"id\")\nON DELETE RESTRICT\nON UPDATE RESTRICT"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify FK \"onlineOrderLine_orderId_fkey\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "onlineOrderLine_orderId_fkey",
+          "public",
+          "\"public\".\"onlineOrderLine\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "foreignKey.onlineOrderLine.onlineOrderLine_productId_fkey",
+    "label": "Add foreign key \"onlineOrderLine_productId_fkey\" on \"onlineOrderLine\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "foreignKey",
+        "name": "onlineOrderLine_productId_fkey",
+        "table": "onlineOrderLine"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure FK \"onlineOrderLine_productId_fkey\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "onlineOrderLine_productId_fkey",
+          "public",
+          "\"public\".\"onlineOrderLine\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add FK \"onlineOrderLine_productId_fkey\"",
+        "sql": "ALTER TABLE \"public\".\"onlineOrderLine\"\nADD CONSTRAINT \"onlineOrderLine_productId_fkey\"\nFOREIGN KEY (\"productId\")\nREFERENCES \"public\".\"product\" (\"id\")\nON DELETE RESTRICT\nON UPDATE RESTRICT"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify FK \"onlineOrderLine_productId_fkey\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "onlineOrderLine_productId_fkey",
+          "public",
+          "\"public\".\"onlineOrderLine\""
+        ]
+      }
+    ]
+  }
+]

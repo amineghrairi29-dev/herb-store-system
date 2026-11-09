@@ -1,0 +1,18 @@
+.report-print-view { display: none; }
+@media print {
+  @page { size: landscape; margin: 12mm; }
+  html, body { height: auto !important; background: white !important; color: black !important; }
+  .report-root { display: block !important; padding: 0 !important; min-height: 0 !important; background: white !important; font: 10pt Arial, sans-serif; }
+  .report-root .report-controls { display: none !important; }
+  .report-root.print-ready .report-screen { display: none !important; }
+  .report-root.print-ready .report-print-view { display: block !important; }
+  .report-root h1 { font-size: 18pt; }
+  .report-root .report-summary { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6pt; }
+  .report-root .report-summary > div { break-inside: avoid; padding: 6pt; }
+  .report-root .report-summary dd { font-size: 12pt; }
+  .report-root .report-table { overflow: visible !important; border-radius: 0; }
+  .report-root table { min-width: 0 !important; width: 100%; table-layout: fixed; font-size: 9pt; }
+  .report-root th, .report-root td { padding: 5pt; overflow-wrap: anywhere; }
+  .report-root thead { display: table-header-group; }
+  .report-root tr { break-inside: avoid; }
+}

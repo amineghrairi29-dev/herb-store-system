@@ -1,0 +1,236 @@
+[
+  {
+    "id": "table.auditEvent",
+    "label": "Create table \"auditEvent\"",
+    "summary": "Creates table \"auditEvent\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "table",
+        "name": "auditEvent"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure table \"auditEvent\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"auditEvent\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "create table \"auditEvent\"",
+        "sql": "CREATE TABLE \"public\".\"auditEvent\" (\n  \"action\" text NOT NULL,\n  \"actorEmailSnapshot\" text,\n  \"actorNameSnapshot\" text,\n  \"actorRoleSnapshot\" text,\n  \"actorUserId\" int4,\n  \"createdAt\" timestamptz DEFAULT (now()) NOT NULL,\n  \"entityId\" int4,\n  \"entityReference\" text,\n  \"entityType\" text NOT NULL,\n  \"id\" SERIAL NOT NULL,\n  \"ipAddress\" text,\n  \"metadataJson\" json,\n  \"outcome\" text NOT NULL,\n  \"userAgent\" text,\n  PRIMARY KEY (\"id\"),\n  CONSTRAINT \"audit_outcome_389d9d7d\" CHECK (outcome IN ('SUCCESS', 'FAILURE'))\n)",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify table \"auditEvent\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": [
+          "\"public\".\"auditEvent\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "index.auditEvent.auditEvent_action_createdAt_idx_a6d20b4b",
+    "label": "Create index \"auditEvent_action_createdAt_idx_a6d20b4b\" on \"auditEvent\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "index",
+        "name": "auditEvent_action_createdAt_idx_a6d20b4b",
+        "table": "auditEvent"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure index \"auditEvent_action_createdAt_idx_a6d20b4b\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"auditEvent_action_createdAt_idx_a6d20b4b\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "create index \"auditEvent_action_createdAt_idx_a6d20b4b\"",
+        "sql": "CREATE INDEX \"auditEvent_action_createdAt_idx_a6d20b4b\" ON \"public\".\"auditEvent\" (\"action\", \"createdAt\")",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify index \"auditEvent_action_createdAt_idx_a6d20b4b\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": [
+          "\"public\".\"auditEvent_action_createdAt_idx_a6d20b4b\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "index.auditEvent.auditEvent_actorUserId_createdAt_idx_bdb71afa",
+    "label": "Create index \"auditEvent_actorUserId_createdAt_idx_bdb71afa\" on \"auditEvent\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "index",
+        "name": "auditEvent_actorUserId_createdAt_idx_bdb71afa",
+        "table": "auditEvent"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure index \"auditEvent_actorUserId_createdAt_idx_bdb71afa\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"auditEvent_actorUserId_createdAt_idx_bdb71afa\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "create index \"auditEvent_actorUserId_createdAt_idx_bdb71afa\"",
+        "sql": "CREATE INDEX \"auditEvent_actorUserId_createdAt_idx_bdb71afa\" ON \"public\".\"auditEvent\" (\"actorUserId\", \"createdAt\")",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify index \"auditEvent_actorUserId_createdAt_idx_bdb71afa\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": [
+          "\"public\".\"auditEvent_actorUserId_createdAt_idx_bdb71afa\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "index.auditEvent.auditEvent_createdAt_id_idx_3855cff1",
+    "label": "Create index \"auditEvent_createdAt_id_idx_3855cff1\" on \"auditEvent\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "index",
+        "name": "auditEvent_createdAt_id_idx_3855cff1",
+        "table": "auditEvent"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure index \"auditEvent_createdAt_id_idx_3855cff1\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"auditEvent_createdAt_id_idx_3855cff1\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "create index \"auditEvent_createdAt_id_idx_3855cff1\"",
+        "sql": "CREATE INDEX \"auditEvent_createdAt_id_idx_3855cff1\" ON \"public\".\"auditEvent\" (\"createdAt\", \"id\")",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify index \"auditEvent_createdAt_id_idx_3855cff1\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": [
+          "\"public\".\"auditEvent_createdAt_id_idx_3855cff1\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "index.auditEvent.auditEvent_entityType_createdAt_idx_c2aec402",
+    "label": "Create index \"auditEvent_entityType_createdAt_idx_c2aec402\" on \"auditEvent\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "index",
+        "name": "auditEvent_entityType_createdAt_idx_c2aec402",
+        "table": "auditEvent"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure index \"auditEvent_entityType_createdAt_idx_c2aec402\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"auditEvent_entityType_createdAt_idx_c2aec402\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "create index \"auditEvent_entityType_createdAt_idx_c2aec402\"",
+        "sql": "CREATE INDEX \"auditEvent_entityType_createdAt_idx_c2aec402\" ON \"public\".\"auditEvent\" (\"entityType\", \"createdAt\")",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify index \"auditEvent_entityType_createdAt_idx_c2aec402\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": [
+          "\"public\".\"auditEvent_entityType_createdAt_idx_c2aec402\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "index.auditEvent.auditEvent_outcome_createdAt_idx_f02d4ff3",
+    "label": "Create index \"auditEvent_outcome_createdAt_idx_f02d4ff3\" on \"auditEvent\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "index",
+        "name": "auditEvent_outcome_createdAt_idx_f02d4ff3",
+        "table": "auditEvent"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure index \"auditEvent_outcome_createdAt_idx_f02d4ff3\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"auditEvent_outcome_createdAt_idx_f02d4ff3\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "create index \"auditEvent_outcome_createdAt_idx_f02d4ff3\"",
+        "sql": "CREATE INDEX \"auditEvent_outcome_createdAt_idx_f02d4ff3\" ON \"public\".\"auditEvent\" (\"outcome\", \"createdAt\")",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify index \"auditEvent_outcome_createdAt_idx_f02d4ff3\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": [
+          "\"public\".\"auditEvent_outcome_createdAt_idx_f02d4ff3\""
+        ]
+      }
+    ]
+  }
+]

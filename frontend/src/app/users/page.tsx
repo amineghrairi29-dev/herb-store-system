@@ -1,0 +1,10 @@
+"use client";
+import Link from '@/components/auth-link';
+import { useEffect, useState } from 'react';
+import { authRequest, readManagedUser, roleLabels, type ManagedUser } from '@/lib/auth';
+import { buttonClass, UserShell } from './user-ui';
+export default function UsersPage() {
+  const [users, setUsers] = useState<ManagedUser[] | null>(null), [error, setError] = useState(''), [attempt, setAttempt] = useState(0);
+  useEffect(() => { let active = true; authRequest('/users').then(value => { if (!Array.isArray(value)) throw new Error('Liste invalide.'); if (active) { setUsers(value.map(readManagedUser)); setError(''); } }).catch((e: unknown) => { if (active) setError(e instanceof Error ? e.message : 'Chargement impossible.'); }); return () => { active = false; }; }, [attempt]);
+  return <UserShell title="Gestion des utilisateurs"><Link href="/users/new" className={`${buttonClass} mb-6 inline-block`}>Ajouter un utilisateur</Link>{error ? <div role="alert" className="rounded-lg bg-red-50 p-5 text-red-800">{error}<button onClick={() => setAttempt(v => v + 1)} className="ml-3 underline">Réessayer</button></div> : !users ? <p role="status">Chargement...</p> : <div className="overflow-x-auto rounded-xl border border-slate-200 bg-white"><table className="w-full text-left text-sm"><thead className="bg-slate-100"><tr>{['Nom', 'Email', 'Rôle', 'Statut', 'Dernière connexion', 'Actions'].map(label => <th key={label} className="px-4 py-4">{label}</th>)}</tr></thead><tbody>{users.map(user => <tr key={user.id} className="border-t border-slate-100"><td className="px-4 py-4"><bdi>{user.fullName}</bdi></td><td className="px-4 py-4">{user.email}</td><td className="px-4 py-4">{roleLabels[user.role]}</td><td className="px-4 py-4">{user.isActive ? 'Actif' : 'Inactif'}</td><td className="px-4 py-4">{user.lastLoginAt ? new Date(user.lastLoginAt).toLocaleString('fr-FR') : 'Jamais'}</td><td className="px-4 py-4"><Link href={`/users/${user.id}/edit`} className="text-emerald-800 underline">Modifier</Link></td></tr>)}</tbody></table>{!users.length && <p className="p-6">Aucun utilisateur.</p>}</div>}</UserShell>;
+}

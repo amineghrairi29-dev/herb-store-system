@@ -1,0 +1,161 @@
+[
+  {
+    "id": "table.salePayment",
+    "label": "Create table \"salePayment\"",
+    "summary": "Creates table \"salePayment\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "table",
+        "name": "salePayment"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure table \"salePayment\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"salePayment\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "create table \"salePayment\"",
+        "sql": "CREATE TABLE \"public\".\"salePayment\" (\n  \"amount\" numeric NOT NULL,\n  \"createdAt\" timestamptz DEFAULT (now()) NOT NULL,\n  \"id\" SERIAL NOT NULL,\n  \"notes\" text,\n  \"paymentDate\" text NOT NULL,\n  \"paymentMethod\" text NOT NULL,\n  \"reference\" text,\n  \"saleId\" int4 NOT NULL,\n  PRIMARY KEY (\"id\"),\n  CONSTRAINT \"sale_payment_amount_f3043ec0\" CHECK (amount > 0 AND amount < 'Infinity'::numeric),\n  CONSTRAINT \"sale_payment_method_7b70b0f1\" CHECK (\"paymentMethod\" IN ('CASH', 'CARD', 'BANK_TRANSFER', 'CHECK', 'OTHER'))\n)",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify table \"salePayment\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": [
+          "\"public\".\"salePayment\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "index.salePayment.salePayment_saleId_idx_b4c0fb73",
+    "label": "Create index \"salePayment_saleId_idx_b4c0fb73\" on \"salePayment\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "index",
+        "name": "salePayment_saleId_idx_b4c0fb73",
+        "table": "salePayment"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure index \"salePayment_saleId_idx_b4c0fb73\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"salePayment_saleId_idx_b4c0fb73\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "create index \"salePayment_saleId_idx_b4c0fb73\"",
+        "sql": "CREATE INDEX \"salePayment_saleId_idx_b4c0fb73\" ON \"public\".\"salePayment\" (\"saleId\")",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify index \"salePayment_saleId_idx_b4c0fb73\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": [
+          "\"public\".\"salePayment_saleId_idx_b4c0fb73\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "index.salePayment.salePayment_saleId_paymentDate_idx_b5f0969a",
+    "label": "Create index \"salePayment_saleId_paymentDate_idx_b5f0969a\" on \"salePayment\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "index",
+        "name": "salePayment_saleId_paymentDate_idx_b5f0969a",
+        "table": "salePayment"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure index \"salePayment_saleId_paymentDate_idx_b5f0969a\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"salePayment_saleId_paymentDate_idx_b5f0969a\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "create index \"salePayment_saleId_paymentDate_idx_b5f0969a\"",
+        "sql": "CREATE INDEX \"salePayment_saleId_paymentDate_idx_b5f0969a\" ON \"public\".\"salePayment\" (\"saleId\", \"paymentDate\")",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify index \"salePayment_saleId_paymentDate_idx_b5f0969a\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": [
+          "\"public\".\"salePayment_saleId_paymentDate_idx_b5f0969a\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "foreignKey.salePayment.salePayment_saleId_fkey",
+    "label": "Add foreign key \"salePayment_saleId_fkey\" on \"salePayment\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "foreignKey",
+        "name": "salePayment_saleId_fkey",
+        "table": "salePayment"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure FK \"salePayment_saleId_fkey\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "salePayment_saleId_fkey",
+          "public",
+          "\"public\".\"salePayment\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add FK \"salePayment_saleId_fkey\"",
+        "sql": "ALTER TABLE \"public\".\"salePayment\"\nADD CONSTRAINT \"salePayment_saleId_fkey\"\nFOREIGN KEY (\"saleId\")\nREFERENCES \"public\".\"sale\" (\"id\")\nON DELETE RESTRICT\nON UPDATE RESTRICT"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify FK \"salePayment_saleId_fkey\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "salePayment_saleId_fkey",
+          "public",
+          "\"public\".\"salePayment\""
+        ]
+      }
+    ]
+  }
+]

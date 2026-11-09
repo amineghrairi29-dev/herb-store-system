@@ -1,0 +1,212 @@
+[
+  {
+    "id": "column.public.onlineOrder.convertedAt",
+    "label": "Add column \"convertedAt\" to \"onlineOrder\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "column",
+        "name": "convertedAt",
+        "table": "onlineOrder"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure column \"convertedAt\" is missing",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3)) AS \"result\"",
+        "params": [
+          "public",
+          "onlineOrder",
+          "convertedAt"
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add column \"convertedAt\"",
+        "sql": "ALTER TABLE \"public\".\"onlineOrder\" ADD COLUMN \"convertedAt\" timestamptz"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify column \"convertedAt\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3)) AS \"result\"",
+        "params": [
+          "public",
+          "onlineOrder",
+          "convertedAt"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "column.public.onlineOrder.saleId",
+    "label": "Add column \"saleId\" to \"onlineOrder\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "column",
+        "name": "saleId",
+        "table": "onlineOrder"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure column \"saleId\" is missing",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3)) AS \"result\"",
+        "params": [
+          "public",
+          "onlineOrder",
+          "saleId"
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add column \"saleId\"",
+        "sql": "ALTER TABLE \"public\".\"onlineOrder\" ADD COLUMN \"saleId\" int4"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify column \"saleId\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3)) AS \"result\"",
+        "params": [
+          "public",
+          "onlineOrder",
+          "saleId"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "checkConstraint.onlineOrder.online_order_conversion_35dfc5b6",
+    "label": "Add check constraint \"online_order_conversion_35dfc5b6\" on \"onlineOrder\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "checkConstraint",
+        "name": "online_order_conversion_35dfc5b6",
+        "table": "onlineOrder"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure constraint \"online_order_conversion_35dfc5b6\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "online_order_conversion_35dfc5b6",
+          "public",
+          "\"public\".\"onlineOrder\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add check constraint \"online_order_conversion_35dfc5b6\"",
+        "sql": "ALTER TABLE \"public\".\"onlineOrder\" ADD CONSTRAINT \"online_order_conversion_35dfc5b6\" CHECK ((\"saleId\" IS NULL AND \"convertedAt\" IS NULL) OR (\"saleId\" IS NOT NULL AND \"convertedAt\" IS NOT NULL AND status = 'CONFIRMED'))"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify constraint \"online_order_conversion_35dfc5b6\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "online_order_conversion_35dfc5b6",
+          "public",
+          "\"public\".\"onlineOrder\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "unique.onlineOrder.onlineOrder_saleId_key",
+    "label": "Add unique constraint on \"onlineOrder\" (saleId)",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "unique",
+        "name": "onlineOrder_saleId_key",
+        "table": "onlineOrder"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure constraint \"onlineOrder_saleId_key\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "onlineOrder_saleId_key",
+          "public",
+          "\"public\".\"onlineOrder\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add unique constraint \"onlineOrder_saleId_key\"",
+        "sql": "ALTER TABLE \"public\".\"onlineOrder\" ADD CONSTRAINT \"onlineOrder_saleId_key\" UNIQUE (\"saleId\")"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify constraint \"onlineOrder_saleId_key\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "onlineOrder_saleId_key",
+          "public",
+          "\"public\".\"onlineOrder\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "foreignKey.onlineOrder.onlineOrder_saleId_fkey",
+    "label": "Add foreign key \"onlineOrder_saleId_fkey\" on \"onlineOrder\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "foreignKey",
+        "name": "onlineOrder_saleId_fkey",
+        "table": "onlineOrder"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure FK \"onlineOrder_saleId_fkey\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "onlineOrder_saleId_fkey",
+          "public",
+          "\"public\".\"onlineOrder\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add FK \"onlineOrder_saleId_fkey\"",
+        "sql": "ALTER TABLE \"public\".\"onlineOrder\"\nADD CONSTRAINT \"onlineOrder_saleId_fkey\"\nFOREIGN KEY (\"saleId\")\nREFERENCES \"public\".\"sale\" (\"id\")\nON DELETE RESTRICT\nON UPDATE RESTRICT"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify FK \"onlineOrder_saleId_fkey\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "onlineOrder_saleId_fkey",
+          "public",
+          "\"public\".\"onlineOrder\""
+        ]
+      }
+    ]
+  }
+]

@@ -1,0 +1,365 @@
+[
+  {
+    "id": "table.sale",
+    "label": "Create table \"sale\"",
+    "summary": "Creates table \"sale\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "table",
+        "name": "sale"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure table \"sale\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"sale\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "create table \"sale\"",
+        "sql": "CREATE TABLE \"public\".\"sale\" (\n  \"confirmedAt\" timestamptz,\n  \"createdAt\" timestamptz DEFAULT (now()) NOT NULL,\n  \"customerName\" text,\n  \"customerPhone\" text,\n  \"id\" SERIAL NOT NULL,\n  \"notes\" text,\n  \"reference\" text NOT NULL,\n  \"saleDate\" text NOT NULL,\n  \"status\" text DEFAULT 'DRAFT' NOT NULL,\n  \"updatedAt\" timestamptz NOT NULL,\n  PRIMARY KEY (\"id\"),\n  CONSTRAINT \"sale_confirmation_date_20364fc4\" CHECK ((status = 'CONFIRMED') = (\"confirmedAt\" IS NOT NULL)),\n  CONSTRAINT \"sale_status_81ae2bd2\" CHECK (status IN ('DRAFT', 'CONFIRMED', 'CANCELLED'))\n)",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify table \"sale\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": [
+          "\"public\".\"sale\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "table.saleLine",
+    "label": "Create table \"saleLine\"",
+    "summary": "Creates table \"saleLine\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "table",
+        "name": "saleLine"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure table \"saleLine\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"saleLine\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "create table \"saleLine\"",
+        "sql": "CREATE TABLE \"public\".\"saleLine\" (\n  \"createdAt\" timestamptz DEFAULT (now()) NOT NULL,\n  \"id\" SERIAL NOT NULL,\n  \"lineTotal\" numeric NOT NULL,\n  \"productId\" int4 NOT NULL,\n  \"quantity\" numeric NOT NULL,\n  \"quantityInStorageUnit\" numeric NOT NULL,\n  \"saleId\" int4 NOT NULL,\n  \"unit\" text NOT NULL,\n  \"unitSalePrice\" numeric NOT NULL,\n  PRIMARY KEY (\"id\"),\n  CONSTRAINT \"sale_line_price_73dd1f28\" CHECK (\"unitSalePrice\" > 0 AND \"unitSalePrice\" < 'Infinity'::numeric),\n  CONSTRAINT \"sale_line_quantity_80c93d85\" CHECK (quantity > 0 AND quantity < 'Infinity'::numeric),\n  CONSTRAINT \"sale_line_storage_quantity_3ecf1744\" CHECK (\"quantityInStorageUnit\" > 0 AND \"quantityInStorageUnit\" < 'Infinity'::numeric),\n  CONSTRAINT \"sale_line_total_d576bd61\" CHECK (\"lineTotal\" = quantity * \"unitSalePrice\"),\n  CONSTRAINT \"sale_line_unit_f6a80600\" CHECK (unit IN ('KG', 'G', 'L', 'ML', 'PIECE'))\n)",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify table \"saleLine\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": [
+          "\"public\".\"saleLine\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "unique.sale.sale_reference_key",
+    "label": "Add unique constraint on \"sale\" (reference)",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "unique",
+        "name": "sale_reference_key",
+        "table": "sale"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure constraint \"sale_reference_key\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "sale_reference_key",
+          "public",
+          "\"public\".\"sale\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add unique constraint \"sale_reference_key\"",
+        "sql": "ALTER TABLE \"public\".\"sale\" ADD CONSTRAINT \"sale_reference_key\" UNIQUE (\"reference\")"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify constraint \"sale_reference_key\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "sale_reference_key",
+          "public",
+          "\"public\".\"sale\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "unique.saleLine.saleLine_saleId_productId_key",
+    "label": "Add unique constraint on \"saleLine\" (saleId, productId)",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "unique",
+        "name": "saleLine_saleId_productId_key",
+        "table": "saleLine"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure constraint \"saleLine_saleId_productId_key\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "saleLine_saleId_productId_key",
+          "public",
+          "\"public\".\"saleLine\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add unique constraint \"saleLine_saleId_productId_key\"",
+        "sql": "ALTER TABLE \"public\".\"saleLine\" ADD CONSTRAINT \"saleLine_saleId_productId_key\" UNIQUE (\"saleId\", \"productId\")"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify constraint \"saleLine_saleId_productId_key\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "saleLine_saleId_productId_key",
+          "public",
+          "\"public\".\"saleLine\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "index.sale.sale_status_saleDate_idx_c45ae1dc",
+    "label": "Create index \"sale_status_saleDate_idx_c45ae1dc\" on \"sale\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "index",
+        "name": "sale_status_saleDate_idx_c45ae1dc",
+        "table": "sale"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure index \"sale_status_saleDate_idx_c45ae1dc\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"sale_status_saleDate_idx_c45ae1dc\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "create index \"sale_status_saleDate_idx_c45ae1dc\"",
+        "sql": "CREATE INDEX \"sale_status_saleDate_idx_c45ae1dc\" ON \"public\".\"sale\" (\"status\", \"saleDate\")",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify index \"sale_status_saleDate_idx_c45ae1dc\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": [
+          "\"public\".\"sale_status_saleDate_idx_c45ae1dc\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "index.saleLine.saleLine_productId_idx_5858600a",
+    "label": "Create index \"saleLine_productId_idx_5858600a\" on \"saleLine\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "index",
+        "name": "saleLine_productId_idx_5858600a",
+        "table": "saleLine"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure index \"saleLine_productId_idx_5858600a\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"saleLine_productId_idx_5858600a\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "create index \"saleLine_productId_idx_5858600a\"",
+        "sql": "CREATE INDEX \"saleLine_productId_idx_5858600a\" ON \"public\".\"saleLine\" (\"productId\")",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify index \"saleLine_productId_idx_5858600a\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": [
+          "\"public\".\"saleLine_productId_idx_5858600a\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "index.saleLine.saleLine_saleId_idx_b4c0fb73",
+    "label": "Create index \"saleLine_saleId_idx_b4c0fb73\" on \"saleLine\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "index",
+        "name": "saleLine_saleId_idx_b4c0fb73",
+        "table": "saleLine"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure index \"saleLine_saleId_idx_b4c0fb73\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"saleLine_saleId_idx_b4c0fb73\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "create index \"saleLine_saleId_idx_b4c0fb73\"",
+        "sql": "CREATE INDEX \"saleLine_saleId_idx_b4c0fb73\" ON \"public\".\"saleLine\" (\"saleId\")",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify index \"saleLine_saleId_idx_b4c0fb73\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": [
+          "\"public\".\"saleLine_saleId_idx_b4c0fb73\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "foreignKey.saleLine.saleLine_saleId_fkey",
+    "label": "Add foreign key \"saleLine_saleId_fkey\" on \"saleLine\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "foreignKey",
+        "name": "saleLine_saleId_fkey",
+        "table": "saleLine"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure FK \"saleLine_saleId_fkey\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "saleLine_saleId_fkey",
+          "public",
+          "\"public\".\"saleLine\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add FK \"saleLine_saleId_fkey\"",
+        "sql": "ALTER TABLE \"public\".\"saleLine\"\nADD CONSTRAINT \"saleLine_saleId_fkey\"\nFOREIGN KEY (\"saleId\")\nREFERENCES \"public\".\"sale\" (\"id\")\nON DELETE RESTRICT\nON UPDATE RESTRICT"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify FK \"saleLine_saleId_fkey\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "saleLine_saleId_fkey",
+          "public",
+          "\"public\".\"saleLine\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "foreignKey.saleLine.saleLine_productId_fkey",
+    "label": "Add foreign key \"saleLine_productId_fkey\" on \"saleLine\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "foreignKey",
+        "name": "saleLine_productId_fkey",
+        "table": "saleLine"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure FK \"saleLine_productId_fkey\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "saleLine_productId_fkey",
+          "public",
+          "\"public\".\"saleLine\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add FK \"saleLine_productId_fkey\"",
+        "sql": "ALTER TABLE \"public\".\"saleLine\"\nADD CONSTRAINT \"saleLine_productId_fkey\"\nFOREIGN KEY (\"productId\")\nREFERENCES \"public\".\"product\" (\"id\")\nON DELETE RESTRICT\nON UPDATE RESTRICT"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify FK \"saleLine_productId_fkey\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "saleLine_productId_fkey",
+          "public",
+          "\"public\".\"saleLine\""
+        ]
+      }
+    ]
+  }
+]

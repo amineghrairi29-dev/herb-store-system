@@ -1,0 +1,430 @@
+// use prisma-next
+
+model AuditEvent {
+  id Int @id @default(autoincrement())
+  actorUserId Int?
+  actorNameSnapshot String?
+  actorEmailSnapshot String?
+  actorRoleSnapshot String?
+  action String
+  entityType String
+  entityId Int?
+  entityReference String?
+  outcome String
+  metadataJson Json?
+  ipAddress String?
+  userAgent String?
+  createdAt TimestamptzString @default(now())
+  @@index([createdAt, id])
+  @@index([actorUserId, createdAt])
+  @@index([action, createdAt])
+  @@index([entityType, createdAt])
+  @@index([outcome, createdAt])
+  @@check(expression: "outcome IN ('SUCCESS', 'FAILURE')", name: "audit_outcome")
+}
+
+model User {
+  id Int @id @default(autoincrement())
+  email String @unique
+  passwordHash String
+  fullName String
+  role String
+  isActive Boolean @default(true)
+  lastLoginAt TimestamptzString?
+  createdAt TimestamptzString @default(now())
+  updatedAt temporal.updatedAtString()
+  @@check(expression: "role = 'ADMIN'", name: "user_role")
+  @@check(expression: "email = lower(trim(email)) AND length(email) > 0", name: "user_email_normalized")
+}
+
+model AuthSession {
+  id Int @id @default(autoincrement())
+  tokenHash String @unique
+  userId Int
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Restrict)
+  expiresAt TimestamptzString
+  createdAt TimestamptzString @default(now())
+  @@index([userId])
+  @@index([expiresAt])
+}
+
+model OnlineOrder {
+  id Int @id @default(autoincrement())
+  customerId Int?
+  customer Customer? @relation(fields: [customerId], references: [id], onDelete: Restrict, onUpdate: Restrict)
+  saleId Int? @unique
+  sale Sale? @relation(fields: [saleId], references: [id], onDelete: Restrict, onUpdate: Restrict)
+  convertedAt TimestamptzString?
+  reference String @unique
+  status String @default("PENDING")
+  customerName String
+  customerPhone String
+  customerEmail String?
+  deliveryAddress String?
+  notes String?
+  totalAmount Decimal
+  createdAt TimestamptzString @default(now())
+  updatedAt temporal.updatedAtString()
+  confirmedAt TimestamptzString?
+  cancelledAt TimestamptzString?
+
+  @@index([status, createdAt])
+  @@index([customerId])
+  @@check(expression: "(\"saleId\" IS NULL AND \"convertedAt\" IS NULL) OR (\"saleId\" IS NOT NULL AND \"convertedAt\" IS NOT NULL AND status = 'CONFIRMED')", name: "online_order_conversion")
+  @@check(expression: "\"totalAmount\" > 0 AND \"totalAmount\" < 'Infinity'::numeric", name: "online_order_total")
+  @@check(expression: "(status = 'PENDING' AND \"confirmedAt\" IS NULL AND \"cancelledAt\" IS NULL) OR (status = 'CONFIRMED' AND \"confirmedAt\" IS NOT NULL AND \"cancelledAt\" IS NULL) OR (status = 'CANCELLED' AND \"cancelledAt\" IS NOT NULL AND \"confirmedAt\" IS NULL)", name: "online_order_status")
+}
+
+model OnlineOrderLine {
+  id Int @id @default(autoincrement())
+  orderId Int
+  order OnlineOrder @relation(fields: [orderId], references: [id], onDelete: Restrict, onUpdate: Restrict)
+  productId Int
+  product Product @relation(fields: [productId], references: [id], onDelete: Restrict, onUpdate: Restrict)
+  productNameSnapshot String
+  unitSnapshot String
+  quantity Decimal
+  unitPrice Decimal
+  lineTotal Decimal
+  createdAt TimestamptzString @default(now())
+
+  @@unique([orderId, productId])
+  @@index([productId])
+  @@check(expression: "quantity > 0 AND quantity < 'Infinity'::numeric", name: "online_line_quantity")
+  @@check(expression: "\"unitPrice\" > 0 AND \"unitPrice\" < 'Infinity'::numeric", name: "online_line_price")
+  @@check(expression: "\"lineTotal\" = quantity * \"unitPrice\"", name: "online_line_total")
+}
+
+model Expense {
+  id Int @id @default(autoincrement())
+  reference String @unique
+  category String
+  description String
+  amount Decimal
+  paymentMethod String
+  expenseDate String
+  notes String?
+  createdAt TimestamptzString @default(now())
+  updatedAt temporal.updatedAtString()
+
+  @@index([expenseDate])
+  @@index([category, expenseDate])
+  @@check(expression: "amount > 0 AND amount < 'Infinity'::numeric", name: "expense_amount")
+  @@check(expression: "category IN ('RENT', 'ELECTRICITY', 'WATER', 'SALARY', 'TRANSPORT', 'MAINTENANCE', 'ADMINISTRATIVE', 'TAX', 'OTHER')", name: "expense_category")
+  @@check(expression: "\"paymentMethod\" IN ('CASH', 'CARD', 'BANK_TRANSFER', 'CHECK', 'OTHER')", name: "expense_method")
+}
+
+model CashMovement {
+  id Int @id @default(autoincrement())
+  type String
+  sourceType String
+  sourceId Int?
+  expenseId Int? @unique
+  expense Expense? @relation(fields: [expenseId], references: [id], onDelete: Restrict, onUpdate: Restrict)
+  salePaymentId Int? @unique
+  salePayment SalePayment? @relation(fields: [salePaymentId], references: [id], onDelete: Restrict, onUpdate: Restrict)
+  purchasePaymentId Int? @unique
+  purchasePayment PurchasePayment? @relation(fields: [purchasePaymentId], references: [id], onDelete: Restrict, onUpdate: Restrict)
+  amount Decimal
+  paymentMethod String
+  movementDate String
+  reference String?
+  description String
+  notes String?
+  createdAt TimestamptzString @default(now())
+
+  @@unique([sourceType, sourceId])
+  @@index([movementDate])
+  @@index([paymentMethod, movementDate])
+  @@check(expression: "amount > 0 AND amount < 'Infinity'::numeric", name: "cash_movement_amount")
+  @@check(expression: "\"paymentMethod\" IN ('CASH', 'CARD', 'BANK_TRANSFER', 'CHECK', 'OTHER')", name: "cash_movement_method")
+  @@check(expression: "(\"sourceType\" = 'SALE_PAYMENT' AND type = 'IN' AND \"sourceId\" IS NOT NULL AND \"salePaymentId\" IS NOT NULL AND \"sourceId\" = \"salePaymentId\" AND \"purchasePaymentId\" IS NULL AND \"expenseId\" IS NULL) OR (\"sourceType\" = 'PURCHASE_PAYMENT' AND type = 'OUT' AND \"sourceId\" IS NOT NULL AND \"purchasePaymentId\" IS NOT NULL AND \"sourceId\" = \"purchasePaymentId\" AND \"salePaymentId\" IS NULL AND \"expenseId\" IS NULL) OR (\"sourceType\" IN ('MANUAL_IN', 'MANUAL_OUT') AND type = CASE WHEN \"sourceType\" = 'MANUAL_IN' THEN 'IN' ELSE 'OUT' END AND \"sourceId\" IS NULL AND \"salePaymentId\" IS NULL AND \"purchasePaymentId\" IS NULL AND \"expenseId\" IS NULL AND \"paymentMethod\" = 'CASH') OR (\"sourceType\" = 'EXPENSE' AND type = 'OUT' AND \"sourceId\" IS NOT NULL AND \"expenseId\" IS NOT NULL AND \"sourceId\" = \"expenseId\" AND \"salePaymentId\" IS NULL AND \"purchasePaymentId\" IS NULL)", name: "cash_movement_source")
+}
+
+model SalePayment {
+  id Int @id @default(autoincrement())
+  saleId Int
+  sale Sale @relation(fields: [saleId], references: [id], onDelete: Restrict, onUpdate: Restrict)
+  amount Decimal
+  paymentMethod String
+  paymentDate String
+  reference String?
+  notes String?
+  createdAt TimestamptzString @default(now())
+
+  @@index([saleId, paymentDate])
+  @@check(expression: "amount > 0 AND amount < 'Infinity'::numeric", name: "sale_payment_amount")
+  @@check(expression: "\"paymentMethod\" IN ('CASH', 'CARD', 'BANK_TRANSFER', 'CHECK', 'OTHER')", name: "sale_payment_method")
+}
+
+model Sale {
+  id Int @id @default(autoincrement())
+  reference String @unique
+  status String @default("DRAFT")
+  customerName String?
+  customerPhone String?
+  notes String?
+  saleDate String
+  confirmedAt TimestamptzString?
+  createdAt TimestamptzString @default(now())
+  updatedAt temporal.updatedAtString()
+
+  @@index([status, saleDate])
+  @@check(expression: "status IN ('DRAFT', 'CONFIRMED', 'CANCELLED')", name: "sale_status")
+  @@check(expression: "(status = 'CONFIRMED') = (\"confirmedAt\" IS NOT NULL)", name: "sale_confirmation_date")
+}
+
+model SaleLine {
+  id Int @id @default(autoincrement())
+  saleId Int
+  sale Sale @relation(fields: [saleId], references: [id], onDelete: Restrict, onUpdate: Restrict)
+  productId Int
+  product Product @relation(fields: [productId], references: [id], onDelete: Restrict, onUpdate: Restrict)
+  quantity Decimal
+  unit String
+  quantityInStorageUnit Decimal
+  unitSalePrice Decimal
+  lineTotal Decimal
+  createdAt TimestamptzString @default(now())
+
+  @@unique([saleId, productId])
+  @@index([productId])
+  @@check(expression: "quantity > 0 AND quantity < 'Infinity'::numeric", name: "sale_line_quantity")
+  @@check(expression: "\"quantityInStorageUnit\" > 0 AND \"quantityInStorageUnit\" < 'Infinity'::numeric", name: "sale_line_storage_quantity")
+  @@check(expression: "\"unitSalePrice\" > 0 AND \"unitSalePrice\" < 'Infinity'::numeric", name: "sale_line_price")
+  @@check(expression: "\"lineTotal\" = quantity * \"unitSalePrice\"", name: "sale_line_total")
+  @@check(expression: "unit IN ('KG', 'G', 'L', 'ML', 'PIECE')", name: "sale_line_unit")
+}
+
+model PurchasePayment {
+  id Int @id @default(autoincrement())
+  purchaseId Int
+  purchase Purchase @relation(fields: [purchaseId], references: [id], onDelete: Restrict, onUpdate: Restrict)
+  amount Decimal
+  paymentMethod String
+  paymentDate String
+  reference String?
+  notes String?
+  createdAt TimestamptzString @default(now())
+
+  @@index([purchaseId, paymentDate])
+  @@check(expression: "amount > 0 AND amount < 'Infinity'::numeric", name: "purchase_payment_amount")
+  @@check(expression: "\"paymentMethod\" IN ('CASH', 'BANK_TRANSFER', 'CARD', 'CHECK', 'OTHER')", name: "purchase_payment_method")
+}
+
+model Purchase {
+  id Int @id @default(autoincrement())
+  reference String @unique
+  supplierId Int
+  supplier Supplier @relation(fields: [supplierId], references: [id], onDelete: Restrict, onUpdate: Restrict)
+  status String @default("DRAFT")
+  notes String?
+  purchaseDate String
+  confirmedAt TimestamptzString?
+  createdAt TimestamptzString @default(now())
+  updatedAt temporal.updatedAtString()
+
+  @@index([supplierId])
+  @@index([status, purchaseDate])
+  @@check(expression: "status IN ('DRAFT', 'CONFIRMED', 'CANCELLED')", name: "purchase_status")
+  @@check(expression: "(status = 'CONFIRMED') = (\"confirmedAt\" IS NOT NULL)", name: "purchase_confirmation_date")
+}
+
+model PurchaseLine {
+  id Int @id @default(autoincrement())
+  purchaseId Int
+  purchase Purchase @relation(fields: [purchaseId], references: [id], onDelete: Restrict, onUpdate: Restrict)
+  productId Int
+  product Product @relation(fields: [productId], references: [id], onDelete: Restrict, onUpdate: Restrict)
+  quantity Decimal
+  unit String
+  quantityInStorageUnit Decimal
+  unitPurchasePrice Decimal
+  lineTotal Decimal
+  createdAt TimestamptzString @default(now())
+
+  @@unique([purchaseId, productId])
+  @@index([productId])
+  @@check(expression: "quantity > 0 AND quantity < 'Infinity'::numeric", name: "purchase_line_quantity")
+  @@check(expression: "\"quantityInStorageUnit\" > 0 AND \"quantityInStorageUnit\" < 'Infinity'::numeric", name: "purchase_line_storage_quantity")
+  @@check(expression: "\"unitPurchasePrice\" > 0 AND \"unitPurchasePrice\" < 'Infinity'::numeric", name: "purchase_line_price")
+  @@check(expression: "\"lineTotal\" = quantity * \"unitPurchasePrice\"", name: "purchase_line_total")
+  @@check(expression: "unit IN ('KG', 'G', 'L', 'ML', 'PIECE')", name: "purchase_line_unit")
+}
+
+model Supplier {
+  id          Int @id @default(autoincrement())
+  code        String @unique
+  name        String
+  contactName String?
+  phone       String?
+  email       String?
+  address     String?
+  city        String?
+  country     String?
+  taxId       String?
+  notes       String?
+  isActive    Boolean @default(true)
+  createdAt   TimestamptzString @default(now())
+  updatedAt   temporal.updatedAtString()
+}
+
+model StoreSettings {
+  id             Int @id @default(1)
+  storeName      String @default("Herb Store")
+  phone          String?
+  secondaryPhone String?
+  email          String?
+  address        String?
+  city           String?
+  country        String?
+  website        String?
+  currency       String @default("TND")
+  reportFooter   String?
+  createdAt      TimestamptzString @default(now())
+  updatedAt      temporal.updatedAtString()
+
+  @@check(expression: "id = 1", name: "store_settings_singleton")
+  @@check(expression: "currency = 'TND'", name: "store_settings_currency")
+  @@check(expression: "length(btrim(\"storeName\")) BETWEEN 1 AND 160", name: "store_settings_name")
+}
+
+model Category {
+  id Int @id @default(autoincrement())
+  imagePath String?
+  nameAr String
+  nameFr String
+  slug String @unique
+  measurementMode String
+  isActive Boolean @default(true)
+  isInternal Boolean @default(false)
+  sortOrder Int @default(0)
+  createdAt TimestamptzString @default(now())
+  updatedAt temporal.updatedAtString()
+  @@check(expression: "\"measurementMode\" IN ('WEIGHT', 'VOLUME', 'WEIGHT_AND_VOLUME', 'FLEXIBLE')", name: "category_measurement_mode")
+  @@check(expression: "NOT \"isInternal\" OR NOT \"isActive\"", name: "category_internal_inactive")
+}
+
+model Subcategory {
+  id Int @id @default(autoincrement())
+  categoryId Int
+  parent Category @relation(fields: [categoryId], references: [id], onDelete: Restrict, onUpdate: Restrict)
+  nameAr String
+  nameFr String
+  slug String
+  isActive Boolean @default(true)
+  sortOrder Int @default(0)
+  createdAt TimestamptzString @default(now())
+  updatedAt temporal.updatedAtString()
+  @@unique([categoryId, slug])
+  @@unique([categoryId, id])
+}
+
+model Classification {
+  id Int @id @default(autoincrement())
+  nameFr String
+  nameAr String @default("")
+  slug String @unique
+  imagePath String?
+  isActive Boolean @default(true)
+  sortOrder Int @default(0)
+  legacyCategoryId Int? @unique
+  legacySubcategoryId Int? @unique
+  createdAt TimestamptzString @default(now())
+  updatedAt temporal.updatedAtString()
+}
+
+model ProductClassification {
+  id Int @id @default(autoincrement())
+  productId Int
+  classificationId Int
+  product Product @relation(fields: [productId], references: [id], onDelete: Cascade, onUpdate: Restrict)
+  classification Classification @relation(fields: [classificationId], references: [id], onDelete: Restrict, onUpdate: Restrict)
+  @@unique([productId, classificationId])
+  @@index([classificationId, productId])
+}
+
+model Product {
+  measurementMode String @default("FLEXIBLE")
+  mainImagePath String?
+  categoryId Int?
+  categoryRecord Category? @relation(fields: [categoryId], references: [id], onDelete: Restrict, onUpdate: Restrict)
+  subcategoryId Int?
+  subcategoryRecord Subcategory? @relation(fields: [categoryId, subcategoryId], references: [categoryId, id], onDelete: Restrict, onUpdate: Restrict)
+  id              Int      @id @default(autoincrement())
+  sku             String   @unique
+  name            String
+  nameFr          String?
+  scientificName  String?
+  barcode         String?  @unique
+  productType     String
+  salePrice       Decimal
+  category        String
+  subcategory     String?
+  storageUnit     String
+  saleUnit        String
+  conversionFactor Decimal
+  minStock        Decimal?
+  maxStock        Decimal?
+  location        String?
+  origin          String?
+  packaging       String?
+  description     String?
+  isActive        Boolean  @default(true)
+  isSellable      Boolean  @default(true)
+  isVisibleOnline Boolean  @default(false)
+  createdAt       TimestamptzString @default(now())
+  updatedAt       temporal.updatedAtString()
+
+  @@check(expression: "\"conversionFactor\" > 0 AND \"conversionFactor\" < 'Infinity'::numeric", name: "product_conversion_positive")
+  @@check(expression: "\"measurementMode\" IN ('WEIGHT', 'VOLUME', 'WEIGHT_AND_VOLUME', 'FLEXIBLE')", name: "product_measurement_mode")
+  @@check(expression: "\"minStock\" >= 0 AND \"minStock\" < 'Infinity'::numeric", name: "product_min_stock_nonnegative")
+  @@check(expression: "\"maxStock\" >= 0 AND \"maxStock\" < 'Infinity'::numeric", name: "product_max_stock_nonnegative")
+  @@check(expression: "\"maxStock\" >= \"minStock\"", name: "product_stock_range")
+}
+
+model StockMovement {
+  id                    Int @id @default(autoincrement())
+  productId             Int
+  product               Product @relation(fields: [productId], references: [id], onDelete: Restrict, onUpdate: Restrict)
+  type                  String
+  quantity              Decimal
+  unit                  String
+  quantityInStorageUnit Decimal
+  reason                String?
+  reference             String?
+  notes                 String?
+  createdAt             TimestamptzString @default(now())
+
+  @@index([productId, createdAt])
+  @@check(expression: "type IN ('ENTRY', 'EXIT', 'ADJUSTMENT_IN', 'ADJUSTMENT_OUT', 'LOSS', 'RETURN_IN')", name: "stock_movement_type")
+  @@check(expression: "unit IN ('KG', 'G', 'L', 'ML', 'PIECE')", name: "stock_movement_unit")
+  @@check(expression: "quantity > 0 AND quantity < 'Infinity'::numeric", name: "stock_movement_quantity")
+  @@check(expression: "\"quantityInStorageUnit\" > 0 AND \"quantityInStorageUnit\" < 'Infinity'::numeric", name: "stock_movement_storage_quantity")
+}
+
+model Customer {
+  id Int @id @default(autoincrement())
+  email String @unique
+  passwordHash String?
+  fullName String?
+  phone String?
+  deliveryAddress String?
+  googleSubject String? @unique
+  isActive Boolean @default(true)
+  lastLoginAt TimestamptzString?
+  createdAt TimestamptzString @default(now())
+  updatedAt temporal.updatedAtString()
+  @@check(expression: "email = lower(trim(email)) AND length(email) > 0", name: "customer_email_normalized")
+}
+
+model CustomerSession {
+  id Int @id @default(autoincrement())
+  tokenHash String @unique
+  customerId Int
+  customer Customer @relation(fields: [customerId], references: [id], onDelete: Cascade, onUpdate: Restrict)
+  expiresAt TimestamptzString
+  createdAt TimestamptzString @default(now())
+  @@index([customerId])
+  @@index([expiresAt])
+}

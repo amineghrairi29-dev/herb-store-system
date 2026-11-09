@@ -1,0 +1,170 @@
+[
+  {
+    "id": "dropDefault.product.category",
+    "label": "Drop default on \"product\".\"category\"",
+    "operationClass": "destructive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "column",
+        "name": "category",
+        "table": "product"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure column \"category\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3)) AS \"result\"",
+        "params": [
+          "public",
+          "product",
+          "category"
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "drop default on \"category\"",
+        "sql": "ALTER TABLE \"public\".\"product\" ALTER COLUMN \"category\" DROP DEFAULT"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify column \"category\" has no default",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3 AND \"column_default\" IS NULL)) AS \"result\"",
+        "params": [
+          "public",
+          "product",
+          "category"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "dropDefault.product.conversionFactor",
+    "label": "Drop default on \"product\".\"conversionFactor\"",
+    "operationClass": "destructive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "column",
+        "name": "conversionFactor",
+        "table": "product"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure column \"conversionFactor\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3)) AS \"result\"",
+        "params": [
+          "public",
+          "product",
+          "conversionFactor"
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "drop default on \"conversionFactor\"",
+        "sql": "ALTER TABLE \"public\".\"product\" ALTER COLUMN \"conversionFactor\" DROP DEFAULT"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify column \"conversionFactor\" has no default",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3 AND \"column_default\" IS NULL)) AS \"result\"",
+        "params": [
+          "public",
+          "product",
+          "conversionFactor"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "dropDefault.product.saleUnit",
+    "label": "Drop default on \"product\".\"saleUnit\"",
+    "operationClass": "destructive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "column",
+        "name": "saleUnit",
+        "table": "product"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure column \"saleUnit\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3)) AS \"result\"",
+        "params": [
+          "public",
+          "product",
+          "saleUnit"
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "drop default on \"saleUnit\"",
+        "sql": "ALTER TABLE \"public\".\"product\" ALTER COLUMN \"saleUnit\" DROP DEFAULT"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify column \"saleUnit\" has no default",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3 AND \"column_default\" IS NULL)) AS \"result\"",
+        "params": [
+          "public",
+          "product",
+          "saleUnit"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "dropDefault.product.storageUnit",
+    "label": "Drop default on \"product\".\"storageUnit\"",
+    "operationClass": "destructive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "column",
+        "name": "storageUnit",
+        "table": "product"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure column \"storageUnit\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3)) AS \"result\"",
+        "params": [
+          "public",
+          "product",
+          "storageUnit"
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "drop default on \"storageUnit\"",
+        "sql": "ALTER TABLE \"public\".\"product\" ALTER COLUMN \"storageUnit\" DROP DEFAULT"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify column \"storageUnit\" has no default",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3 AND \"column_default\" IS NULL)) AS \"result\"",
+        "params": [
+          "public",
+          "product",
+          "storageUnit"
+        ]
+      }
+    ]
+  }
+]

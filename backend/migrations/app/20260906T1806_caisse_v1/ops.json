@@ -1,0 +1,329 @@
+[
+  {
+    "id": "table.cashMovement",
+    "label": "Create table \"cashMovement\"",
+    "summary": "Creates table \"cashMovement\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "table",
+        "name": "cashMovement"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure table \"cashMovement\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"cashMovement\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "create table \"cashMovement\"",
+        "sql": "CREATE TABLE \"public\".\"cashMovement\" (\n  \"amount\" numeric NOT NULL,\n  \"createdAt\" timestamptz DEFAULT (now()) NOT NULL,\n  \"description\" text NOT NULL,\n  \"id\" SERIAL NOT NULL,\n  \"movementDate\" text NOT NULL,\n  \"notes\" text,\n  \"paymentMethod\" text NOT NULL,\n  \"purchasePaymentId\" int4,\n  \"reference\" text,\n  \"salePaymentId\" int4,\n  \"sourceId\" int4,\n  \"sourceType\" text NOT NULL,\n  \"type\" text NOT NULL,\n  PRIMARY KEY (\"id\"),\n  CONSTRAINT \"cash_movement_amount_f3043ec0\" CHECK (amount > 0 AND amount < 'Infinity'::numeric),\n  CONSTRAINT \"cash_movement_method_7b70b0f1\" CHECK (\"paymentMethod\" IN ('CASH', 'CARD', 'BANK_TRANSFER', 'CHECK', 'OTHER')),\n  CONSTRAINT \"cash_movement_source_5b454499\" CHECK ((\"sourceType\" = 'SALE_PAYMENT' AND type = 'IN' AND \"sourceId\" IS NOT NULL AND \"salePaymentId\" IS NOT NULL AND \"sourceId\" = \"salePaymentId\" AND \"purchasePaymentId\" IS NULL) OR (\"sourceType\" = 'PURCHASE_PAYMENT' AND type = 'OUT' AND \"sourceId\" IS NOT NULL AND \"purchasePaymentId\" IS NOT NULL AND \"sourceId\" = \"purchasePaymentId\" AND \"salePaymentId\" IS NULL) OR (\"sourceType\" IN ('MANUAL_IN', 'MANUAL_OUT') AND type = CASE WHEN \"sourceType\" = 'MANUAL_IN' THEN 'IN' ELSE 'OUT' END AND \"sourceId\" IS NULL AND \"salePaymentId\" IS NULL AND \"purchasePaymentId\" IS NULL AND \"paymentMethod\" = 'CASH'))\n)",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify table \"cashMovement\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": [
+          "\"public\".\"cashMovement\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "unique.cashMovement.cashMovement_salePaymentId_key",
+    "label": "Add unique constraint on \"cashMovement\" (salePaymentId)",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "unique",
+        "name": "cashMovement_salePaymentId_key",
+        "table": "cashMovement"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure constraint \"cashMovement_salePaymentId_key\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "cashMovement_salePaymentId_key",
+          "public",
+          "\"public\".\"cashMovement\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add unique constraint \"cashMovement_salePaymentId_key\"",
+        "sql": "ALTER TABLE \"public\".\"cashMovement\" ADD CONSTRAINT \"cashMovement_salePaymentId_key\" UNIQUE (\"salePaymentId\")"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify constraint \"cashMovement_salePaymentId_key\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "cashMovement_salePaymentId_key",
+          "public",
+          "\"public\".\"cashMovement\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "unique.cashMovement.cashMovement_purchasePaymentId_key",
+    "label": "Add unique constraint on \"cashMovement\" (purchasePaymentId)",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "unique",
+        "name": "cashMovement_purchasePaymentId_key",
+        "table": "cashMovement"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure constraint \"cashMovement_purchasePaymentId_key\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "cashMovement_purchasePaymentId_key",
+          "public",
+          "\"public\".\"cashMovement\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add unique constraint \"cashMovement_purchasePaymentId_key\"",
+        "sql": "ALTER TABLE \"public\".\"cashMovement\" ADD CONSTRAINT \"cashMovement_purchasePaymentId_key\" UNIQUE (\"purchasePaymentId\")"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify constraint \"cashMovement_purchasePaymentId_key\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "cashMovement_purchasePaymentId_key",
+          "public",
+          "\"public\".\"cashMovement\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "unique.cashMovement.cashMovement_sourceType_sourceId_key",
+    "label": "Add unique constraint on \"cashMovement\" (sourceType, sourceId)",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "unique",
+        "name": "cashMovement_sourceType_sourceId_key",
+        "table": "cashMovement"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure constraint \"cashMovement_sourceType_sourceId_key\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "cashMovement_sourceType_sourceId_key",
+          "public",
+          "\"public\".\"cashMovement\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add unique constraint \"cashMovement_sourceType_sourceId_key\"",
+        "sql": "ALTER TABLE \"public\".\"cashMovement\" ADD CONSTRAINT \"cashMovement_sourceType_sourceId_key\" UNIQUE (\"sourceType\", \"sourceId\")"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify constraint \"cashMovement_sourceType_sourceId_key\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "cashMovement_sourceType_sourceId_key",
+          "public",
+          "\"public\".\"cashMovement\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "index.cashMovement.cashMovement_movementDate_idx_ae2ac201",
+    "label": "Create index \"cashMovement_movementDate_idx_ae2ac201\" on \"cashMovement\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "index",
+        "name": "cashMovement_movementDate_idx_ae2ac201",
+        "table": "cashMovement"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure index \"cashMovement_movementDate_idx_ae2ac201\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"cashMovement_movementDate_idx_ae2ac201\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "create index \"cashMovement_movementDate_idx_ae2ac201\"",
+        "sql": "CREATE INDEX \"cashMovement_movementDate_idx_ae2ac201\" ON \"public\".\"cashMovement\" (\"movementDate\")",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify index \"cashMovement_movementDate_idx_ae2ac201\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": [
+          "\"public\".\"cashMovement_movementDate_idx_ae2ac201\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "index.cashMovement.cashMovement_paymentMethod_movementDate_idx_9b5898ec",
+    "label": "Create index \"cashMovement_paymentMethod_movementDate_idx_9b5898ec\" on \"cashMovement\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "index",
+        "name": "cashMovement_paymentMethod_movementDate_idx_9b5898ec",
+        "table": "cashMovement"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure index \"cashMovement_paymentMethod_movementDate_idx_9b5898ec\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"cashMovement_paymentMethod_movementDate_idx_9b5898ec\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "create index \"cashMovement_paymentMethod_movementDate_idx_9b5898ec\"",
+        "sql": "CREATE INDEX \"cashMovement_paymentMethod_movementDate_idx_9b5898ec\" ON \"public\".\"cashMovement\" (\"paymentMethod\", \"movementDate\")",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify index \"cashMovement_paymentMethod_movementDate_idx_9b5898ec\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": [
+          "\"public\".\"cashMovement_paymentMethod_movementDate_idx_9b5898ec\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "foreignKey.cashMovement.cashMovement_salePaymentId_fkey",
+    "label": "Add foreign key \"cashMovement_salePaymentId_fkey\" on \"cashMovement\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "foreignKey",
+        "name": "cashMovement_salePaymentId_fkey",
+        "table": "cashMovement"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure FK \"cashMovement_salePaymentId_fkey\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "cashMovement_salePaymentId_fkey",
+          "public",
+          "\"public\".\"cashMovement\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add FK \"cashMovement_salePaymentId_fkey\"",
+        "sql": "ALTER TABLE \"public\".\"cashMovement\"\nADD CONSTRAINT \"cashMovement_salePaymentId_fkey\"\nFOREIGN KEY (\"salePaymentId\")\nREFERENCES \"public\".\"salePayment\" (\"id\")\nON DELETE RESTRICT\nON UPDATE RESTRICT"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify FK \"cashMovement_salePaymentId_fkey\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "cashMovement_salePaymentId_fkey",
+          "public",
+          "\"public\".\"cashMovement\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "foreignKey.cashMovement.cashMovement_purchasePaymentId_fkey",
+    "label": "Add foreign key \"cashMovement_purchasePaymentId_fkey\" on \"cashMovement\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "foreignKey",
+        "name": "cashMovement_purchasePaymentId_fkey",
+        "table": "cashMovement"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure FK \"cashMovement_purchasePaymentId_fkey\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "cashMovement_purchasePaymentId_fkey",
+          "public",
+          "\"public\".\"cashMovement\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add FK \"cashMovement_purchasePaymentId_fkey\"",
+        "sql": "ALTER TABLE \"public\".\"cashMovement\"\nADD CONSTRAINT \"cashMovement_purchasePaymentId_fkey\"\nFOREIGN KEY (\"purchasePaymentId\")\nREFERENCES \"public\".\"purchasePayment\" (\"id\")\nON DELETE RESTRICT\nON UPDATE RESTRICT"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify FK \"cashMovement_purchasePaymentId_fkey\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "cashMovement_purchasePaymentId_fkey",
+          "public",
+          "\"public\".\"cashMovement\""
+        ]
+      }
+    ]
+  }
+]

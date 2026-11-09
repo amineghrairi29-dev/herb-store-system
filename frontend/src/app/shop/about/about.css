@@ -1,0 +1,34 @@
+.storefront:has(.shop-about) { background: #f8f6ef; }
+.shop-about { max-width: 1120px; margin: 0 auto; color: #244332; }
+.about-intro { max-width: 650px; margin-bottom: 28px; }
+.about-eyebrow { display: flex; align-items: center; gap: 9px; font-size: 10px; line-height: 1.4; letter-spacing: .14em; text-transform: uppercase; color: #728065; margin: 0 0 10px; }
+.about-eyebrow::before { content: ""; width: 24px; height: 1px; background: #95a47e; flex-shrink: 0; }
+.about-intro h1 { font: 400 42px/1.08 Georgia, serif; letter-spacing: -.025em; color: #203f30; margin: 0 0 14px; }
+.about-intro > p:last-child, .about-story-copy > p:not(.about-eyebrow) { font-size: 14px; line-height: 1.75; color: #65715b; }
+.about-story { display: grid; grid-template-columns: minmax(0,1fr) minmax(0,1fr); gap: 36px; align-items: center; }
+.about-image { position: relative; height: 290px; border-radius: 14px; overflow: hidden; background: #eeefe3; }
+.about-image img { object-fit: cover; object-position: center 58%; }
+.about-story-copy { min-width: 0; }
+.about-story-copy h2 { font: 400 30px/1.15 Georgia, serif; margin: 0 0 14px; }
+.about-story-copy > p:not(.about-eyebrow) { margin: 0 0 12px; }
+.about-link { display: inline-flex; align-items: center; gap: 12px; margin-top: 6px; padding: 8px 0; border-bottom: 1px solid #a4b597; font-size: 13px; font-weight: 500; color: #244e37; }
+.about-link:hover { color: #102f1d; border-color: #244e37; }
+.about-link:focus-visible { outline: 2px solid #6e8e5b; outline-offset: 4px; }
+.about-values { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: 28px; border-top: 1px solid #dfe4d4; margin-top: 30px; padding-top: 22px; }
+.about-value-number { font-size: 10px; letter-spacing: .1em; color: #78866b; }
+.about-values h2 { font: 400 21px/1.2 Georgia, serif; margin: 8px 0; }
+.about-values p { font-size: 12px; line-height: 1.65; color: #65715b; margin: 0; max-width: 280px; }
+@media(max-width:759px) {
+  .about-intro h1 { font-size: 34px; }
+  .about-story { grid-template-columns: minmax(0,1fr); gap: 22px; }
+  .about-image { height: 230px; }
+  .about-story-copy h2 { font-size: 28px; }
+  .about-values { gap: 20px; }
+}
+@media(max-width:479px) {
+  .about-intro h1 { font-size: 32px; }
+  .about-image { height: 210px; }
+  .about-values { grid-template-columns: minmax(0,1fr); gap: 16px; }
+  .about-values > div + div { border-top: 1px solid #e4e8dd; padding-top: 16px; }
+  .about-values p { max-width: none; }
+}
