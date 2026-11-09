@@ -1,6 +1,6 @@
 import { categoryFixture } from './category-fixture.js';
 const classification = categoryFixture();
-import { CustomerGuard } from '../src/customer-auth/customer.guard.js';
+import { OptionalCustomerGuard } from '../src/customer-auth/customer.guard.js';
 import type { ExecutionContext } from '@nestjs/common';
 import 'dotenv/config';
 import { Test } from '@nestjs/testing';
@@ -38,7 +38,7 @@ describe.skipIf(process.env.RUN_DATABASE_TESTS !== '1')('OnlineOrder -> Sale lif
   beforeAll(async () => {
     for (const controller of [OnlineOrdersController, PublicOrdersController]) Reflect.defineMetadata('design:paramtypes', [OnlineOrdersService], controller);
     Reflect.defineMetadata('design:paramtypes', [OrderFulfillmentService], OrderFulfillmentController); Reflect.defineMetadata('design:paramtypes', [SalesService], OrderFulfillmentService); Reflect.defineMetadata('design:paramtypes', [SalesService], SalesController);
-    const module = await Test.createTestingModule({ controllers: [OnlineOrdersController, PublicOrdersController, OrderFulfillmentController, SalesController], providers: [OnlineOrdersService, OrderFulfillmentService, SalesService] }).overrideGuard(CustomerGuard).useValue({ canActivate(context: ExecutionContext) { context.switchToHttp().getRequest().customer = { id: null }; return true; } }).compile(); app = module.createNestApplication(); app.useLogger(false); await app.init(); before = await snapshot();
+    const module = await Test.createTestingModule({ controllers: [OnlineOrdersController, PublicOrdersController, OrderFulfillmentController, SalesController], providers: [OnlineOrdersService, OrderFulfillmentService, SalesService] }).overrideGuard(OptionalCustomerGuard).useValue({ canActivate(context: ExecutionContext) { context.switchToHttp().getRequest().customer = null; return true; } }).compile(); app = module.createNestApplication(); app.useLogger(false); await app.init(); before = await snapshot();
   });
   afterAll(async () => {
     vi.restoreAllMocks(); await app?.close(); const client = new Client({ connectionString: process.env.DATABASE_URL }); await client.connect();

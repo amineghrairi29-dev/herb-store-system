@@ -1,0 +1,23 @@
+.sf-contact-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 16px;
+  margin: 30px 0 36px;
+}
+.sf-contact-card {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 24px;
+  border: 1px solid var(--sf-line);
+  border-radius: var(--sf-radius);
+  background: var(--sf-white);
+  color: var(--sf-ink);
+  transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+}
+.sf-contact-card:hover { transform: translateY(-3px); border-color: var(--sf-green); box-shadow: 0 10px 24px rgb(23 63 50 / 0.08); }
+.sf-contact-card strong { font: 400 22px/1.3 Georgia, serif; }
+.sf-contact-card > span:last-child { color: var(--sf-muted); font-size: 14px; }
+.sf-contact-label { font-size: 12px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--sf-green); }
+.sf-contact-primary { background: var(--sf-sage); }
+@media (prefers-reduced-motion: reduce) { .sf-contact-card { transition: none; } .sf-contact-card:hover { transform: none; } }
