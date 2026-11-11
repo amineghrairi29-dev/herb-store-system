@@ -50,7 +50,8 @@ export class ProductsService {
       const product = await tx.orm.public.Product.first({ id });
       if (!product) throw new NotFoundException('Produit introuvable.');
       const classifications = await productClassifications(tx, id);
-      return { ...product, category: classifications.map(c => c.nameFr).join(' · '), subcategory: null, classifications, classificationIds: classifications.map(c => c.id) };
+      const gallery = (await tx.orm.public.ProductImage.where({ productId: id }).all()).sort((a, b) => a.sortOrder - b.sortOrder || a.id - b.id).map(({ id: imageId, path }) => ({ id: imageId, path }));
+      return { ...product, category: classifications.map(c => c.nameFr).join(' · '), subcategory: null, classifications, classificationIds: classifications.map(c => c.id), gallery };
     }, true);
   }
 
@@ -80,14 +81,17 @@ export class ProductsService {
   }
 
   remove(id: number) {
-    let imagePath: string | null = null;
+    let imagePath: string | null = null, galleryPaths: string[] = [];
     return withProductTransaction(id, async (tx) => {
       if (await tx.orm.public.StockMovement.where({ productId: id }).first()) {
         throw new ConflictException('Ce produit possède des mouvements de stock et ne peut pas être supprimé.');
       }
       const product = await tx.orm.public.Product.first({ id });
       imagePath = product?.mainImagePath ?? null;
+      // Gallery rows reference the product (ON DELETE RESTRICT): remove them first, files after commit.
+      galleryPaths = (await tx.orm.public.ProductImage.where({ productId: id }).all()).map(row => row.path);
+      await tx.client.query('DELETE FROM public."productImage" WHERE "productId" = $1', [id]);
       return audited(tx, 'PRODUCT_DELETE', 'PRODUCT', await tx.orm.public.Product.where({ id }).delete(), undefined, id, product?.sku);
-    }).then(async result => { await discardUnreferencedImage(imagePath); return result; }).catch(productWriteError);
+    }).then(async result => { await discardUnreferencedImage(imagePath); for (const path of galleryPaths) await discardUnreferencedImage(path); return result; }).catch(productWriteError);
   }
 }
