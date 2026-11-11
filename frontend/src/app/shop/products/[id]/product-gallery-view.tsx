@@ -4,7 +4,7 @@ import ProductImage from "@/components/product-image";
 import { LeafIcon } from "../../storefront/visuals";
 
 /**
- * Main photo + thumbnails. The selected photo fades in; on a computer the photo
+ * Main photo in the shop's arch shape (same as the home hero) + thumbnails. The selected photo fades in; on a computer the photo
  * zooms in under the mouse (loupe) so the texture of the herbs can be seen.
  */
 export default function ProductGalleryView({ images, name }: { images: string[]; name: string }) {
@@ -19,8 +19,10 @@ export default function ProductGalleryView({ images, name }: { images: string[];
   const fallback = <div className="pp-main-image pp-placeholder" aria-label="Image du produit non disponible"><LeafIcon /><span>Photo à venir</span></div>;
   return (
     <div className="pp-gallery">
-      <div className="pp-main" onPointerMove={follow} data-zoom={current ? true : undefined}>
-        <ProductImage key={current ?? "none"} imagePath={current} name={name} className="pp-main-image" sizes="(max-width: 899px) calc(100vw - 32px), 560px" fallback={fallback} />
+      <div className="pp-stage">
+        <div className="pp-main" onPointerMove={follow} data-zoom={current ? true : undefined}>
+          <ProductImage key={current ?? "none"} imagePath={current} name={name} className="pp-main-image" sizes="(max-width: 899px) calc(100vw - 48px), 520px" fallback={fallback} />
+        </div>
       </div>
       {images.length > 1 && (
         <div className="pp-thumbs" role="group" aria-label="Photos du produit">
