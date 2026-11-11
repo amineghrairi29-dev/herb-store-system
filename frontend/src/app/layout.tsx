@@ -14,7 +14,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: { default: "Herboristerie Slouma", template: "%s | Herboristerie Slouma" },
+  title: { default: "Dar Slouma", template: "%s | Dar Slouma" },
   description: "Plantes, herbes, épices et produits naturels sélectionnés avec soin.",
   // Back-office pages stay out of search engines; the shop layout opts back in.
   robots: { index: false, follow: false },

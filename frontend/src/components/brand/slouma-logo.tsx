@@ -20,7 +20,7 @@ export function SloumaStamp({ size = 96, tone = "leaf", className }: { size?: nu
   const arc = useId().replace(/:/g, "");
   const fill = tone === "leaf" ? leaf : cream, ink = tone === "leaf" ? cream : leaf;
   return (
-    <svg className={className} width={size} height={size} viewBox="0 0 220 220" role="img" aria-label="Herboristerie Slouma, Ghannouch Gabès, depuis 2006">
+    <svg className={className} width={size} height={size} viewBox="0 0 220 220" role="img" aria-label="Dar Slouma, herboristerie à Ghannouch Gabès, depuis 2006">
       <defs><path id={arc} d="M28,110 A82,82 0 0,1 192,110" /></defs>
       <circle cx="110" cy="110" r="108" fill={fill} />
       <circle cx="110" cy="110" r="100" fill="none" stroke={ink} strokeWidth="2" />

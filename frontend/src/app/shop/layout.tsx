@@ -13,7 +13,7 @@ const body = Inter({ subsets: ["latin"], variable: "--font-body", display: "swap
 const arabic = Aref_Ruqaa({ subsets: ["arabic", "latin"], weight: ["400", "700"], variable: "--font-arabic", display: "swap" });
 
 export const metadata: Metadata = {
-  title: { default: "Herboristerie Slouma · Recettes éprouvées depuis 2006", template: "%s | Herboristerie Slouma" },
+  title: { default: "دار سلومة · Dar Slouma, herboristerie à Gabès depuis 2006", template: "%s | دار سلومة" },
   description: "Herboristerie à Ghannouch (Gabès) depuis 2006 : plantes, mélanges et épices, conseils personnalisés, livraison et paiement à la réception.",
   robots: { index: true, follow: true },
 };
