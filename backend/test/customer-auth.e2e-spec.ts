@@ -91,12 +91,19 @@ describe.skipIf(process.env.RUN_DATABASE_TESTS !== '1')(
       await db.end();
       await app?.close();
     });
-    it('keeps catalogue/cart public and rejects visitor order creation', async () => {
+    it('keeps catalogue/cart public and accepts guest orders without linking an account', async () => {
       await request(app.getHttpServer()).get('/public/products').expect(200);
       await post('/public/cart/validate')
         .send({ items: [{ productId, quantity: '1' }] })
         .expect(200);
-      await post('/public/orders').send(order()).expect(401);
+      const guest = await post('/public/orders').send(order()).expect(201);
+      const guestRow = (
+        await db.query(
+          'SELECT "customerId" FROM public."onlineOrder" WHERE reference=$1',
+          [guest.body.reference],
+        )
+      ).rows[0];
+      expect(guestRow.customerId).toBeNull();
       await post('/public/auth/register')
         .set('Origin', 'https://evil.test')
         .send({ email, password })
@@ -290,10 +297,19 @@ describe.skipIf(process.env.RUN_DATABASE_TESTS !== '1')(
         .get('/public/auth/me')
         .set('Cookie', staff)
         .expect(401);
-      await post('/public/orders')
+      // A staff cookie is not a customer session: the order is placed as a guest.
+      const staffOrder = await post('/public/orders')
         .set('Cookie', staff)
         .send(order())
-        .expect(401);
+        .expect(201);
+      expect(
+        (
+          await db.query(
+            'SELECT "customerId" FROM public."onlineOrder" WHERE reference=$1',
+            [staffOrder.body.reference],
+          )
+        ).rows[0].customerId,
+      ).toBeNull();
     });
     it('completes the Google callback with a customer-only cookie and checkout redirect', async () => {
       vi.stubEnv('GOOGLE_CLIENT_ID', 'test-client'); vi.stubEnv('GOOGLE_CLIENT_SECRET', 'test-secret');

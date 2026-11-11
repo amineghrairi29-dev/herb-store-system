@@ -7,6 +7,7 @@ import "./storefront/homepage-layout.css";
 export const metadata: Metadata = {
   title: { default: "La boutique | Herb Store", template: "%s | Herb Store" },
   description: "Des plantes et des produits naturels à découvrir au quotidien.",
+  robots: { index: true, follow: true },
 };
 export default function ShopLayout({
   children,

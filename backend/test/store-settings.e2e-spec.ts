@@ -76,8 +76,10 @@ describe.skipIf(process.env.RUN_DATABASE_TESTS !== '1')('Store settings (real SQ
     await expect(client.query(`UPDATE ${testTable} SET currency = 'EUR'`)).rejects.toMatchObject({ code: '23514' });
     expect((await client.query(`SELECT * FROM ${testTable}`)).rowCount).toBe(1);
   });
-  it('public output contains only storeName; report identity is permission protected', async () => {
-    expect((await request(app.getHttpServer()).get('/public/store-info').expect(200)).body).toEqual({ storeName: 'أعشاب تونس' });
+  it('public output contains only storefront contact fields; report identity is permission protected', async () => {
+    const publicInfo = (await request(app.getHttpServer()).get('/public/store-info').expect(200)).body as Record<string, unknown>;
+    expect(Object.keys(publicInfo).sort()).toEqual(['address', 'city', 'email', 'phone', 'secondaryPhone', 'storeName']);
+    expect(publicInfo).toMatchObject({ storeName: 'أعشاب تونس', address: 'شارع الأعشاب · Tunis', email: 'contact@example.com' });
     await request(app.getHttpServer()).patch('/public/store-info').set('Cookie', cookies.ADMIN).set('Origin', 'http://localhost:3000').send({}).expect(404);
     await request(app.getHttpServer()).get('/reports/store-info/identity').expect(401);
     for (const role of ['ADMIN'] as const) {

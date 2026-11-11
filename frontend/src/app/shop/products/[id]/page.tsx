@@ -45,6 +45,6 @@ export default async function ProductPage({ params }: { params: Promise<{ id: st
     </article>
     {product.description && <section className="pd-description" aria-labelledby="description-title"><h2 id="description-title">À propos de ce produit</h2><p dir="auto">{product.description}</p></section>}
     {related.length > 0 && <section className="pd-related" aria-labelledby="related-title"><div className="pd-related-heading"><h2 id="related-title">Pour les mêmes besoins</h2><Link href={`/shop/besoins/${encodeURIComponent(product.category.slug)}`}>Voir les produits ↗</Link></div><div className="botanical-product-grid pd-related-grid">{related.map(item => <ProductCard key={item.id} product={item} />)}</div></section>}
-    <BackLink href="/shop#products" className="mt-7">Retour ? la boutique</BackLink>
+    <BackLink href="/shop#products" className="mt-7">Retour à la boutique</BackLink>
   </div>;
 }
