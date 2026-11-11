@@ -1,0 +1,18 @@
+/* Order steps, shared by cart, checkout and confirmation. */
+.ck-steps { --progress: 0; width: min(100%, 560px); margin: 0 auto 32px; }
+.ck-steps ol { position: relative; display: flex; justify-content: space-between; margin: 0; padding: 0; list-style: none; }
+.ck-steps ol::before, .ck-steps ol::after { content: ""; position: absolute; top: 19px; left: 40px; right: 40px; height: 3px; border-radius: 3px; background: var(--c-line); }
+.ck-steps ol::after { right: auto; width: calc((100% - 80px) * var(--progress)); background: var(--c-leaf); transform-origin: left; animation: ck-grow 900ms var(--ease-out) 200ms both; }
+@keyframes ck-grow { from { transform: scaleX(0); } }
+.ck-steps li { position: relative; z-index: 1; flex: 0 0 80px; }
+.ck-steps li > * { display: flex; flex-direction: column; align-items: center; gap: 8px; color: var(--c-muted); text-decoration: none; }
+.ck-dot { display: grid; place-items: center; width: 40px; height: 40px; border-radius: 50%; border: 2px solid var(--c-line); background: var(--c-cream); font-weight: 700; font-size: 15px; transition: transform var(--t-base) var(--ease-out); }
+.ck-label { font-size: 13px; font-weight: 500; white-space: nowrap; }
+[data-state="done"] .ck-dot { border-color: var(--c-leaf); background: var(--c-leaf); color: #fff; }
+[data-state="current"] .ck-dot { border-color: var(--c-honey); background: var(--c-honey); color: var(--c-honey-ink); box-shadow: 0 0 0 6px rgb(217 154 43 / 0.2); animation: ck-pulse 2.4s ease-in-out infinite; }
+[data-state="current"] .ck-label { color: var(--c-forest); font-weight: 600; }
+.ck-steps a:hover .ck-dot { transform: scale(1.08); }
+.ck-steps a:focus-visible { outline: 3px solid var(--c-leaf); outline-offset: 4px; border-radius: 12px; }
+@keyframes ck-pulse { 50% { box-shadow: 0 0 0 10px rgb(217 154 43 / 0.08); } }
+@media (max-width: 520px) { .ck-steps { margin-bottom: 24px; } .ck-label { font-size: 12px; } }
+@media (prefers-reduced-motion: reduce) { .ck-steps ol::after, [data-state="current"] .ck-dot { animation: none; } .ck-steps a:hover .ck-dot { transform: none; } }
