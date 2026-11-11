@@ -32,6 +32,10 @@
       "model": "CustomerSession",
       "namespace": "public"
     },
+    "deliveryZone": {
+      "model": "DeliveryZone",
+      "namespace": "public"
+    },
     "expense": {
       "model": "Expense",
       "namespace": "public"
@@ -966,6 +970,107 @@
               "table": "customerSession"
             }
           },
+          "DeliveryZone": {
+            "fields": {
+              "createdAt": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/timestamptz-string@1",
+                  "kind": "scalar"
+                }
+              },
+              "delay": {
+                "nullable": true,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                }
+              },
+              "fee": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/numeric@1",
+                  "kind": "scalar"
+                }
+              },
+              "freeAbove": {
+                "nullable": true,
+                "type": {
+                  "codecId": "pg/numeric@1",
+                  "kind": "scalar"
+                }
+              },
+              "governorate": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                }
+              },
+              "id": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/int4@1",
+                  "kind": "scalar"
+                }
+              },
+              "isActive": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/bool@1",
+                  "kind": "scalar"
+                }
+              },
+              "sortOrder": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/int4@1",
+                  "kind": "scalar"
+                }
+              },
+              "updatedAt": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/timestamptz-string@1",
+                  "kind": "scalar"
+                }
+              }
+            },
+            "relations": {},
+            "storage": {
+              "fields": {
+                "createdAt": {
+                  "column": "createdAt"
+                },
+                "delay": {
+                  "column": "delay"
+                },
+                "fee": {
+                  "column": "fee"
+                },
+                "freeAbove": {
+                  "column": "freeAbove"
+                },
+                "governorate": {
+                  "column": "governorate"
+                },
+                "id": {
+                  "column": "id"
+                },
+                "isActive": {
+                  "column": "isActive"
+                },
+                "sortOrder": {
+                  "column": "sortOrder"
+                },
+                "updatedAt": {
+                  "column": "updatedAt"
+                }
+              },
+              "namespaceId": "public",
+              "table": "deliveryZone"
+            }
+          },
           "Expense": {
             "fields": {
               "amount": {
@@ -1142,6 +1247,27 @@
                   "kind": "scalar"
                 }
               },
+              "deliveryCity": {
+                "nullable": true,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                }
+              },
+              "deliveryFee": {
+                "nullable": true,
+                "type": {
+                  "codecId": "pg/numeric@1",
+                  "kind": "scalar"
+                }
+              },
+              "deliveryGovernorate": {
+                "nullable": true,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                }
+              },
               "id": {
                 "nullable": false,
                 "type": {
@@ -1252,6 +1378,15 @@
                 },
                 "deliveryAddress": {
                   "column": "deliveryAddress"
+                },
+                "deliveryCity": {
+                  "column": "deliveryCity"
+                },
+                "deliveryFee": {
+                  "column": "deliveryFee"
+                },
+                "deliveryGovernorate": {
+                  "column": "deliveryGovernorate"
                 },
                 "id": {
                   "column": "id"
@@ -3983,6 +4118,107 @@
                 }
               ]
             },
+            "deliveryZone": {
+              "checks": [
+                {
+                  "expression": "delay IS NULL OR length(delay) <= 80",
+                  "name": "delivery_zone_delay_f0704b23",
+                  "prefix": "delivery_zone_delay"
+                },
+                {
+                  "expression": "fee >= 0 AND fee < 1000",
+                  "name": "delivery_zone_fee_fb4159c8",
+                  "prefix": "delivery_zone_fee"
+                },
+                {
+                  "expression": "\"freeAbove\" IS NULL OR (\"freeAbove\" > 0 AND \"freeAbove\" < 1000000)",
+                  "name": "delivery_zone_free_above_e057d75c",
+                  "prefix": "delivery_zone_free_above"
+                },
+                {
+                  "expression": "length(btrim(governorate)) BETWEEN 1 AND 80",
+                  "name": "delivery_zone_governorate_c0cc3d26",
+                  "prefix": "delivery_zone_governorate"
+                }
+              ],
+              "columns": {
+                "createdAt": {
+                  "codecId": "pg/timestamptz-string@1",
+                  "default": {
+                    "expression": "now()",
+                    "kind": "function"
+                  },
+                  "nativeType": "timestamptz",
+                  "nullable": false
+                },
+                "delay": {
+                  "codecId": "pg/text@1",
+                  "nativeType": "text",
+                  "nullable": true
+                },
+                "fee": {
+                  "codecId": "pg/numeric@1",
+                  "nativeType": "numeric",
+                  "nullable": false
+                },
+                "freeAbove": {
+                  "codecId": "pg/numeric@1",
+                  "nativeType": "numeric",
+                  "nullable": true
+                },
+                "governorate": {
+                  "codecId": "pg/text@1",
+                  "nativeType": "text",
+                  "nullable": false
+                },
+                "id": {
+                  "codecId": "pg/int4@1",
+                  "default": {
+                    "expression": "autoincrement()",
+                    "kind": "function"
+                  },
+                  "nativeType": "int4",
+                  "nullable": false
+                },
+                "isActive": {
+                  "codecId": "pg/bool@1",
+                  "default": {
+                    "kind": "literal",
+                    "value": false
+                  },
+                  "nativeType": "bool",
+                  "nullable": false
+                },
+                "sortOrder": {
+                  "codecId": "pg/int4@1",
+                  "default": {
+                    "kind": "literal",
+                    "value": 0
+                  },
+                  "nativeType": "int4",
+                  "nullable": false
+                },
+                "updatedAt": {
+                  "codecId": "pg/timestamptz-string@1",
+                  "nativeType": "timestamptz",
+                  "nullable": false
+                }
+              },
+              "foreignKeys": [],
+              "indexes": [],
+              "primaryKey": {
+                "columns": [
+                  "id"
+                ]
+              },
+              "uniques": [
+                {
+                  "columns": [
+                    "governorate"
+                  ]
+                }
+              ]
+            },
             "expense": {
               "checks": [
                 {
@@ -4102,6 +4338,11 @@
                   "prefix": "online_order_conversion"
                 },
                 {
+                  "expression": "\"deliveryFee\" IS NULL OR (\"deliveryFee\" >= 0 AND \"deliveryFee\" < 1000)",
+                  "name": "online_order_delivery_fee_77848000",
+                  "prefix": "online_order_delivery_fee"
+                },
+                {
                   "expression": "(status = 'PENDING' AND \"confirmedAt\" IS NULL AND \"cancelledAt\" IS NULL) OR (status = 'CONFIRMED' AND \"confirmedAt\" IS NOT NULL AND \"cancelledAt\" IS NULL) OR (status = 'CANCELLED' AND \"cancelledAt\" IS NOT NULL AND \"confirmedAt\" IS NULL)",
                   "name": "online_order_status_e490f5ea",
                   "prefix": "online_order_status"
@@ -4158,6 +4399,21 @@
                   "nullable": false
                 },
                 "deliveryAddress": {
+                  "codecId": "pg/text@1",
+                  "nativeType": "text",
+                  "nullable": true
+                },
+                "deliveryCity": {
+                  "codecId": "pg/text@1",
+                  "nativeType": "text",
+                  "nullable": true
+                },
+                "deliveryFee": {
+                  "codecId": "pg/numeric@1",
+                  "nativeType": "numeric",
+                  "nullable": true
+                },
+                "deliveryGovernorate": {
                   "codecId": "pg/text@1",
                   "nativeType": "text",
                   "nullable": true
@@ -6092,10 +6348,10 @@
         "kind": "postgres-schema"
       }
     },
-    "storageHash": "a08fc9b25a03ed9e8730184da9e2acacb001b1592fcd169c6069c5efae29010f"
+    "storageHash": "041bfee8d1354cc639e224ee75a14e805f9844af58ec4a30bb19970a43b01e51"
   },
   "execution": {
-    "executionHash": "666c785f720c4485e99263d01d130eb9e360950a50d4b76591af7ee961cabb16",
+    "executionHash": "61c9271858a528765fde510b4abf69c10396ea3942af7d5f8941f810942342de",
     "mutations": {
       "defaults": [
         {
@@ -6141,6 +6397,21 @@
             "column": "updatedAt",
             "namespace": "public",
             "table": "customer"
+          }
+        },
+        {
+          "onCreate": {
+            "id": "timestampNow",
+            "kind": "generator"
+          },
+          "onUpdate": {
+            "id": "timestampNow",
+            "kind": "generator"
+          },
+          "ref": {
+            "column": "updatedAt",
+            "namespace": "public",
+            "table": "deliveryZone"
           }
         },
         {
