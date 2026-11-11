@@ -115,7 +115,7 @@ export default function PublicHeader() {
           ) : (
             <Link href="/shop/auth" className={styles.iconButton} aria-label="Se connecter"><Icon kind="user" /></Link>
           )}
-          <Link href="/shop/cart" className={styles.cart} aria-label={`Panier${cart.hydrated ? `, ${count} article${count > 1 ? "s" : ""}` : ""}`}>
+          <Link href="/shop/cart" data-cart-target className={styles.cart} aria-label={`Panier${cart.hydrated ? `, ${count} article${count > 1 ? "s" : ""}` : ""}`}>
             <Icon kind="cart" />
             <span className={styles.cartLabel}>Panier</span>
             {/* key restarts the bounce animation each time the count changes */}
