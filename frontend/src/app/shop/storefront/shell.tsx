@@ -11,6 +11,7 @@ const links = [
   ["/shop", "Accueil"],
   ["/shop/about", "À propos"],
   ["/shop/contact", "Contact"],
+  ["/shop/suivi", "Suivre ma commande"],
 ] as const;
 export default function StorefrontShell({
   children,

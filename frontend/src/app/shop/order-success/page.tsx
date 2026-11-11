@@ -1,6 +1,7 @@
 "use client";
 import "./confirmation.css";
 import BackLink from "../back-link";
+import Link from "next/link";
 import { useEffect, useState } from "react";
 import { useCart } from "../cart-provider";
 import { displayAmount } from "@/lib/purchase-decimal";
@@ -22,6 +23,6 @@ export default function Success() {
       <dl className="oc-receipt"><div><dt>Votre référence</dt><dd><bdi>{order.reference}</bdi></dd></div><div><dt>Total de la commande</dt><dd className="oc-total">{displayAmount(order.totalAmount)} <span>TND</span></dd></div></dl>
       <p className="oc-note">Conservez votre référence. Aucun paiement n’a été effectué à cette étape.</p>
     </> : <p className="oc-intro">Aucune confirmation disponible dans cet onglet. Une actualisation ne crée pas de nouvelle commande.</p>}
-    <div className="oc-actions"><BackLink href="/shop">Retour à la boutique</BackLink></div>
+    <div className="oc-actions">{order && <Link href="/shop/suivi" className="oc-track">Suivre ma commande</Link>}<BackLink href="/shop">Retour à la boutique</BackLink></div>
   </section>;
 }

@@ -6,6 +6,7 @@ import { useCustomerAuth } from '../customer-auth-provider';
 import BackLink from '../back-link';
 import AccountSecurity from '@/components/account-security';
 import styles from './profile.module.css';
+import CustomerOrders from './customer-orders';
 
 export default function ProfilePage() {
   const auth = useCustomerAuth(), router = useRouter(), pending = useRef(false);
@@ -55,6 +56,7 @@ export default function ProfilePage() {
       </div>
     </aside>
     <div className={styles.content}>
+    <CustomerOrders />
     <section className={styles.card} aria-labelledby="profile-title">
       <h2 id="profile-title">Informations du compte</h2>
       <form onSubmit={save}>
