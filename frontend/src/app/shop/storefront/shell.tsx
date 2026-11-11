@@ -1,104 +1,39 @@
 "use client";
-import Link from "next/link";
 import { usePathname } from "next/navigation";
-import StoreName from "@/components/store-name";
 import PublicHeader from "./public-header";
-import "./footer.css";
-import { LeafIcon } from "./visuals";
+import SiteFooter from "./site-footer";
 import WhatsAppButton from "./whatsapp-button";
+import "./announcement.css";
 
-const links = [
-  ["/shop", "Accueil"],
-  ["/shop/about", "À propos"],
-  ["/shop/contact", "Contact"],
-  ["/shop/suivi", "Suivre ma commande"],
-  ["/shop/faq", "Questions fréquentes"],
-  ["/shop/livraison", "Livraison et paiement"],
-] as const;
-const legal = [
-  ["/shop/cgv", "Conditions de vente"],
-  ["/shop/confidentialite", "Confidentialité"],
-] as const;
-export default function StorefrontShell({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
-  const pathname = usePathname();
-  const redesigned = [...links, ...legal].some(([href]) => href === pathname);
-  // Preserve the original visual shell for routes awaiting their design review.
-  if (!redesigned)
-    return (
-      <div lang="fr" className="min-h-screen bg-[#fafaf7] text-stone-800">
-        {pathname !== "/shop/auth" && pathname !== "/auth" && <PublicHeader key={pathname} />}
-        <main className="mx-auto max-w-7xl px-5 py-8 sm:py-12">{children}</main>
-        <footer className="mx-auto max-w-7xl px-5 py-8 text-sm text-stone-500">
-          Notre catalogue · Commandes soumises à confirmation du magasin
-        </footer>
-        {pathname !== "/shop/auth" && <WhatsAppButton />}
-      </div>
-    );
+// Pages already restyled on the new storefront layout; the others keep their own container until their turn.
+const redesignedPages = ["/shop", "/shop/about", "/shop/contact", "/shop/suivi", "/shop/faq", "/shop/livraison", "/shop/cgv", "/shop/confidentialite"];
+const messages = ["Livraison à domicile", "Paiement à la réception", "Conseil gratuit sur WhatsApp"];
+
+function Announcement() {
   return (
-    <div
-      className={
-        pathname === "/shop" ? "storefront storefront-home" : "storefront"
-      }
-      lang="fr"
-    >
-      <a className="sf-skip" href="#shop-main">
-        Aller au contenu
-      </a>
-      <div className="sf-announcement">
-        Une sélection de nature, pour chaque jour.
+    <div className="sf-announce" role="note" aria-label={messages.join(" · ")}>
+      {/* Desktop: all three in a row. Phone: they take turns (CSS animation). */}
+      <div className="sf-announce-track" aria-hidden="true">
+        {messages.map((message) => <span key={message}>{message}</span>)}
       </div>
-      <PublicHeader key={pathname} />
-      <main
-        id="shop-main"
-        className={pathname === "/shop" ? "" : "sf-container sf-inner-page"}
-      >
+    </div>
+  );
+}
+
+export default function StorefrontShell({ children }: { children: React.ReactNode }) {
+  const pathname = usePathname();
+  const authPage = pathname === "/shop/auth" || pathname === "/auth";
+  const redesigned = redesignedPages.includes(pathname);
+  return (
+    <div className={redesigned ? (pathname === "/shop" ? "storefront storefront-home" : "storefront") : "sf-legacy"} lang="fr">
+      <a className="sf-skip" href="#shop-main">Aller au contenu</a>
+      {!authPage && <Announcement />}
+      {!authPage && <PublicHeader key={pathname} />}
+      <main id="shop-main" className={redesigned ? (pathname === "/shop" ? "" : "sf-container sf-inner-page") : "sf-legacy-main"}>
         {children}
       </main>
-      <footer className="sf-footer">
-        <div className="sf-container sf-footer-grid">
-          <div>
-            <Link href="/shop" className="sf-footer-brand">
-              <LeafIcon />
-              <StoreName />
-            </Link>
-            <p>
-              Des plantes et des produits naturels à découvrir, simplement, à
-              votre rythme.
-            </p>
-          </div>
-          <div>
-            <h2>Liens utiles</h2>
-            <nav aria-label="Pied de page">
-              {links.map(([href, label]) => (
-                <Link href={href} key={href}>
-                  {label}
-                </Link>
-              ))}
-            </nav>
-          </div>
-          <div>
-            <h2>Informations</h2>
-            <p>Une question sur notre boutique ou un produit ?</p>
-            <Link href="/shop/contact" className="sf-footer-contact">
-              Restons en contact ↗
-            </Link>
-            <p className="sf-footer-note">
-              Commandes soumises à confirmation du magasin.
-            </p>
-          </div>
-        </div>
-        <div className="sf-container sf-footer-bottom">
-          <span>
-            © {new Date().getFullYear()} <StoreName />
-          </span>
-          <nav aria-label="Informations légales" className="sf-footer-legal">{legal.map(([href, label]) => <Link key={href} href={href}>{label}</Link>)}</nav>
-        </div>
-      </footer>
-      <WhatsAppButton />
+      {!authPage && <SiteFooter />}
+      {!authPage && <WhatsAppButton />}
     </div>
   );
 }

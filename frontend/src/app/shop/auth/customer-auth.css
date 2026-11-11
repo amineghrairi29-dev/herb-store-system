@@ -6,8 +6,8 @@
 .ca-visual::after { content: ''; position: absolute; inset: 0; background: linear-gradient(180deg, rgb(245 243 228 / 97%), rgb(245 243 228 / 75%) 32%, rgb(210 222 194 / 7%) 68%); }
 .ca-visual-copy { position: relative; z-index: 1; padding: 44px 38px; }
 .ca-brand::after { content: ""; display: inline-block; width: 28px; height: 1px; margin-left: 14px; vertical-align: middle; background: #a4a07b; opacity: .65; }
-.ca-brand { font: 22px/1.2 Georgia, serif; margin: 0 0 38px; letter-spacing: .01em; }
-.ca-visual-title { font: 38px/1.15 Georgia, serif; margin: 0 0 16px; }
+.ca-brand { font: 22px/1.2 var(--font-display), Georgia, serif; margin: 0 0 38px; letter-spacing: .01em; }
+.ca-visual-title { font: 38px/1.15 var(--font-display), Georgia, serif; margin: 0 0 16px; }
 .ca-visual-title em { font-weight: 400; color: #59714d; }
 .ca-visual-copy > span { font-size: 13px; color: #617059; }
 .ca-form-panel { display: flex; align-items: flex-start; min-width: 0; padding: 30px 40px; background: #fdfbf6; animation: ca-enter 650ms 100ms cubic-bezier(.22,.61,.36,1) both; }

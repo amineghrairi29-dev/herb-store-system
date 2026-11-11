@@ -1,7 +1,7 @@
 .shop-cart { color: #203f30; min-width: 0; }
 .sc-heading { margin-bottom: 24px; }
 .sc-eyebrow { font-size: 11px; letter-spacing: .1em; text-transform: uppercase; color: #708064; margin-bottom: 6px; }
-.sc-heading h1 { font: 400 32px/1.15 Georgia, serif; margin: 0 0 10px; }
+.sc-heading h1 { font: 400 32px/1.15 var(--font-display), Georgia, serif; margin: 0 0 10px; }
 .sc-heading > p:last-child { font-size: 12px; color: #6a7567; line-height: 1.6; }
 .sc-layout { display: grid; grid-template-columns: minmax(0, 1fr) 300px; gap: 28px; align-items: start; }
 .sc-items, .sc-info { min-width: 0; }
@@ -12,7 +12,7 @@
 .sc-image img { object-fit: contain; }
 .sc-placeholder { display: grid; place-items: center; color: #839276; }
 .sc-placeholder svg { width: 32px; height: 32px; }
-.sc-info h2 { font: 400 19px/1.25 Georgia, serif; margin: 0; overflow-wrap: anywhere; }
+.sc-info h2 { font: 400 19px/1.25 var(--font-display), Georgia, serif; margin: 0; overflow-wrap: anywhere; }
 .sc-meta { font-size: 11px; color: #718067; margin-top: 5px; overflow-wrap: anywhere; }
 .sc-unit-price { font-size: 12px; margin-top: 6px; font-variant-numeric: tabular-nums; overflow-wrap: anywhere; }
 .sc-status { font-size: 11px; line-height: 1.5; margin-top: 5px; color: #58704a; overflow-wrap: anywhere; }
@@ -29,7 +29,7 @@
 .sc-line-error { grid-column: 1 / -1; color: #973f30; font-size: 12px; }
 .sc-list-actions { display: flex; justify-content: space-between; flex-wrap: wrap; gap: 16px; margin-top: 18px; font-size: 12px; }
 .sc-summary { min-width: 0; border: 1px solid #dfe5d9; border-radius: 12px; padding: 22px; background: #f3f4ed; }
-.sc-summary h2 { font: 400 22px/1.2 Georgia, serif; margin: 0 0 22px; }
+.sc-summary h2 { font: 400 22px/1.2 var(--font-display), Georgia, serif; margin: 0 0 22px; }
 .sc-summary dl > div { display: flex; justify-content: space-between; gap: 12px; font-size: 12px; }
 .sc-summary dd { margin: 0; text-align: right; overflow-wrap: anywhere; min-width: 0; }
 .sc-summary .sc-total { border-top: 1px solid #dce3d3; padding-top: 16px; margin-top: 14px; align-items: baseline; }
@@ -45,7 +45,7 @@
 .sc-notice button { text-decoration: underline; margin-top: 6px; }
 .sc-empty { padding: 44px 20px; border: 1px solid #e0e6d9; border-radius: 12px; text-align: center; background: #f3f4ed; }
 .sc-empty > svg { width: 36px; height: 36px; margin: 0 auto 16px; color: #718364; }
-.sc-empty h2 { font: 400 25px/1.2 Georgia, serif; }
+.sc-empty h2 { font: 400 25px/1.2 var(--font-display), Georgia, serif; }
 .sc-empty p { font-size: 13px; color: #718067; margin: 12px 0 20px; }
 .sc-empty .sc-primary { display: inline-block; }
 .shop-cart button:disabled { cursor: not-allowed; }
