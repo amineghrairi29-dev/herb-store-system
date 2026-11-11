@@ -67,11 +67,15 @@ model OnlineOrder {
   updatedAt temporal.updatedAtString()
   confirmedAt TimestamptzString?
   cancelledAt TimestamptzString?
+  deliveryGovernorate String?
+  deliveryCity String?
+  deliveryFee Decimal?
 
   @@index([status, createdAt])
   @@index([customerId])
   @@check(expression: "(\"saleId\" IS NULL AND \"convertedAt\" IS NULL) OR (\"saleId\" IS NOT NULL AND \"convertedAt\" IS NOT NULL AND status = 'CONFIRMED')", name: "online_order_conversion")
   @@check(expression: "\"totalAmount\" > 0 AND \"totalAmount\" < 'Infinity'::numeric", name: "online_order_total")
+  @@check(expression: "\"deliveryFee\" IS NULL OR (\"deliveryFee\" >= 0 AND \"deliveryFee\" < 1000)", name: "online_order_delivery_fee")
   @@check(expression: "(status = 'PENDING' AND \"confirmedAt\" IS NULL AND \"cancelledAt\" IS NULL) OR (status = 'CONFIRMED' AND \"confirmedAt\" IS NOT NULL AND \"cancelledAt\" IS NULL) OR (status = 'CANCELLED' AND \"cancelledAt\" IS NOT NULL AND \"confirmedAt\" IS NULL)", name: "online_order_status")
 }
 
@@ -427,4 +431,22 @@ model CustomerSession {
   createdAt TimestamptzString @default(now())
   @@index([customerId])
   @@index([expiresAt])
+}
+
+// Delivery price per governorate. Only active zones are offered at checkout.
+model DeliveryZone {
+  id Int @id @default(autoincrement())
+  governorate String @unique
+  fee Decimal
+  freeAbove Decimal?
+  delay String?
+  isActive Boolean @default(false)
+  sortOrder Int @default(0)
+  createdAt TimestamptzString @default(now())
+  updatedAt temporal.updatedAtString()
+
+  @@check(expression: "fee >= 0 AND fee < 1000", name: "delivery_zone_fee")
+  @@check(expression: "\"freeAbove\" IS NULL OR (\"freeAbove\" > 0 AND \"freeAbove\" < 1000000)", name: "delivery_zone_free_above")
+  @@check(expression: "length(btrim(governorate)) BETWEEN 1 AND 80", name: "delivery_zone_governorate")
+  @@check(expression: "delay IS NULL OR length(delay) <= 80", name: "delivery_zone_delay")
 }

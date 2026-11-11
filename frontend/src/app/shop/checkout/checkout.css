@@ -15,8 +15,8 @@
 .co-fields label { display: block; min-width: 0; font-size: 12px; font-weight: 500; }
 .co-fields label span { font-size: 11px; font-weight: 400; color: #77836d; }
 .co-wide { grid-column: 1 / -1; }
-.co-fields input, .co-fields textarea { display: block; width: 100%; min-width: 0; border: 1px solid #cfd6c7; border-radius: 10px; background: #fffef9; padding: 9px 12px; margin-top: 6px; font-size: 14px; font-weight: 400; }
-.co-fields input { min-height: 40px; }
+.co-fields input, .co-fields textarea, .co-fields select { display: block; width: 100%; min-width: 0; border: 1px solid #cfd6c7; border-radius: 10px; background: #fffef9; padding: 9px 12px; margin-top: 6px; font-size: 14px; font-weight: 400; }
+.co-fields input, .co-fields select { min-height: 40px; }
 .co-fields textarea { min-height: 60px; resize: vertical; }
 .co-fields input:user-invalid { border-color: #a54c39; }
 .co-payment { font-size: 12px; color: #6e7562; border-top: 1px solid #e1e7da; margin-top: 20px; padding-top: 16px; }
@@ -42,7 +42,7 @@
 .shop-checkout :is(a,button,input,textarea):focus-visible, .co-session button:focus-visible { outline: 3px solid #819b66; outline-offset: 3px; }
 .co-heading h1, .co-form legend, .co-summary > h2 { color: #1e402e; }
 .co-heading p, .co-hint, .co-fields label span, .co-payment p, .co-line p, .co-refresh, .co-session { color: #6e7562; }
-.co-fields :is(input,textarea):focus-visible { border-color: #6c8a5e; outline: 2px solid #90a580; outline-offset: 1px; box-shadow: 0 0 0 4px rgb(108 138 94 / 8%); }
+.co-fields :is(input,textarea,select):focus-visible { border-color: #6c8a5e; outline: 2px solid #90a580; outline-offset: 1px; box-shadow: 0 0 0 4px rgb(108 138 94 / 8%); }
 @media(max-width: 900px) { .co-layout { grid-template-columns: minmax(0,1fr); gap: 24px; } }
 @media(max-width: 479px) { .co-heading h1 { font-size: 28px; } .co-fields { grid-template-columns: minmax(0,1fr); } .co-fields input, .co-fields textarea { font-size: 16px; } .co-summary { padding: 18px; } .co-primary { width: 100%; } .co-line { grid-template-columns: minmax(0,1fr) minmax(0,110px); } }
 
@@ -50,3 +50,6 @@
 .co-honeypot { position: absolute; left: -10000px; width: 1px; height: 1px; overflow: hidden; }
 .co-account-hint { margin: 0 0 4px; font-size: 0.92em; }
 .co-account-hint a { text-decoration: underline; }
+
+.co-subtotal { display: flex; justify-content: space-between; gap: 12px; padding: 6px 0; font-size: 0.95em; color: #637268; }
+.co-free-hint, .co-delay { margin: 6px 0 0; font-size: 0.88em; color: #2e6149; }

@@ -1,5 +1,6 @@
 import { BadRequestException } from '@nestjs/common';
 import { cartInput } from '../public-catalogue/cart-validation.js';
+import { isGovernorate } from '../delivery/delivery-values.js';
 
 export function orderObject(body: unknown, keys: string[]): Record<string, unknown> {
   if (!body || typeof body !== 'object' || Array.isArray(body) || Object.keys(body).some((key) => !keys.includes(key))) throw new BadRequestException('Données de commande invalides.');
@@ -11,7 +12,7 @@ export function tunisianPhone(raw: string): string | null {
   return match ? match[1] : null;
 }
 export function orderInput(body: unknown) {
-  const value = orderObject(body, ['customerName', 'customerPhone', 'customerEmail', 'deliveryAddress', 'notes', 'items', 'website']);
+  const value = orderObject(body, ['customerName', 'customerPhone', 'customerEmail', 'deliveryAddress', 'deliveryGovernorate', 'deliveryCity', 'notes', 'items', 'website']);
   // Honeypot: the field is hidden from people, so only bots fill it in.
   if (value.website !== undefined && value.website !== null && value.website !== '') throw new BadRequestException('Données de commande invalides.');
   const text = (key: string, max: number, required = false) => {
@@ -24,11 +25,13 @@ export function orderInput(body: unknown) {
   const customerPhone = tunisianPhone(text('customerPhone', 40, true)!);
   if (!customerPhone) throw new BadRequestException('Numéro de téléphone invalide : 8 chiffres attendus (ex. 98 123 456).');
   const deliveryAddress = text('deliveryAddress', 500, true)!;
-  const customerEmail = text('customerEmail', 254), notes = text('notes', 2000);
+  const customerEmail = text('customerEmail', 254), notes = text('notes', 2000), deliveryCity = text('deliveryCity', 80);
+  const deliveryGovernorate = text('deliveryGovernorate', 80);
+  if (deliveryGovernorate !== null && !isGovernorate(deliveryGovernorate)) throw new BadRequestException('Gouvernorat inconnu.');
   if (customerEmail && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(customerEmail)) throw new BadRequestException('Email invalide.');
   const items = cartInput({ items: value.items });
   if (!items.length) throw new BadRequestException('Le panier est vide.');
-  return { customerName, customerPhone, customerEmail, deliveryAddress, notes, items };
+  return { customerName, customerPhone, customerEmail, deliveryAddress, deliveryGovernorate, deliveryCity, notes, items };
 }
 // Dynamic decimal scales preserve even prices with more than 18 fractional digits.
 function parts(value: string) { const [whole, fraction = ''] = value.split('.'); return { value: BigInt(whole + fraction), scale: fraction.length }; }

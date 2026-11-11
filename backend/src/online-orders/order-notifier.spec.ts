@@ -9,6 +9,11 @@ describe('Order notifier', () => {
     expect(text).toContain('Menthe — 0.250 KG');
     expect(text).not.toContain('Note');
   });
+  it('shows delivery fee and amount to collect', () => {
+    const text = orderNoticeText({ ...order, deliveryFee: '7.000', grandTotal: '32.500' });
+    expect(text).toContain('Livraison : 7.000 TND');
+    expect(text).toContain('Total à encaisser : 32.500 TND');
+  });
   it('does nothing without Telegram settings', async () => {
     vi.stubEnv('TELEGRAM_BOT_TOKEN', ''); vi.stubEnv('TELEGRAM_CHAT_ID', '');
     const fetchMock = vi.fn(); vi.stubGlobal('fetch', fetchMock);
