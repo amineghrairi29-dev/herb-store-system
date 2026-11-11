@@ -1,0 +1,128 @@
+[
+  {
+    "id": "column.public.onlineOrder.deliveryStatus",
+    "label": "Add column \"deliveryStatus\" to \"onlineOrder\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "column",
+        "name": "deliveryStatus",
+        "table": "onlineOrder"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure column \"deliveryStatus\" is missing",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3)) AS \"result\"",
+        "params": [
+          "public",
+          "onlineOrder",
+          "deliveryStatus"
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add column \"deliveryStatus\"",
+        "sql": "ALTER TABLE \"public\".\"onlineOrder\" ADD COLUMN \"deliveryStatus\" text"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify column \"deliveryStatus\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3)) AS \"result\"",
+        "params": [
+          "public",
+          "onlineOrder",
+          "deliveryStatus"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "column.public.onlineOrder.deliveryStatusAt",
+    "label": "Add column \"deliveryStatusAt\" to \"onlineOrder\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "column",
+        "name": "deliveryStatusAt",
+        "table": "onlineOrder"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure column \"deliveryStatusAt\" is missing",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3)) AS \"result\"",
+        "params": [
+          "public",
+          "onlineOrder",
+          "deliveryStatusAt"
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add column \"deliveryStatusAt\"",
+        "sql": "ALTER TABLE \"public\".\"onlineOrder\" ADD COLUMN \"deliveryStatusAt\" timestamptz"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify column \"deliveryStatusAt\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3)) AS \"result\"",
+        "params": [
+          "public",
+          "onlineOrder",
+          "deliveryStatusAt"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "checkConstraint.onlineOrder.online_order_delivery_status_c57d254c",
+    "label": "Add check constraint \"online_order_delivery_status_c57d254c\" on \"onlineOrder\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "checkConstraint",
+        "name": "online_order_delivery_status_c57d254c",
+        "table": "onlineOrder"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure constraint \"online_order_delivery_status_c57d254c\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "online_order_delivery_status_c57d254c",
+          "public",
+          "\"public\".\"onlineOrder\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add check constraint \"online_order_delivery_status_c57d254c\"",
+        "sql": "ALTER TABLE \"public\".\"onlineOrder\" ADD CONSTRAINT \"online_order_delivery_status_c57d254c\" CHECK ((\"deliveryStatus\" IS NULL AND \"deliveryStatusAt\" IS NULL) OR (status = 'CONFIRMED' AND \"deliveryStatus\" IN ('PREPARING', 'SHIPPED', 'DELIVERED', 'RETURNED') AND \"deliveryStatusAt\" IS NOT NULL))"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify constraint \"online_order_delivery_status_c57d254c\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "online_order_delivery_status_c57d254c",
+          "public",
+          "\"public\".\"onlineOrder\""
+        ]
+      }
+    ]
+  }
+]
