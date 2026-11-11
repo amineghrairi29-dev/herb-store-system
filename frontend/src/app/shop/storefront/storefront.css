@@ -1,15 +1,16 @@
 .storefront {
-  --sf-ink: #173f32;
-  --sf-green: #2e6149;
-  --sf-sage: #edf3e9;
-  --sf-cream: #fafbf7;
-  --sf-white: #fff;
-  --sf-muted: #637268;
-  --sf-line: #dce5da;
-  --sf-radius: 20px;
-  background: var(--sf-white);
+  /* Mapped to the "Feuille et miel" theme tokens (theme.css). */
+  --sf-ink: var(--c-forest);
+  --sf-green: var(--c-leaf);
+  --sf-sage: var(--c-sprout);
+  --sf-cream: var(--c-cream);
+  --sf-white: var(--c-paper);
+  --sf-muted: var(--c-muted);
+  --sf-line: var(--c-line);
+  --sf-radius: var(--r-card);
+  background: var(--c-cream);
   color: var(--sf-ink);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-body), system-ui, sans-serif;
   line-height: 1.6;
 }
 .storefront * {
@@ -71,7 +72,7 @@
 }
 .sf-brand strong {
   display: block;
-  font-family: Georgia, "Times New Roman", serif;
+  font-family: var(--font-display), var(--font-display), Georgia, serif;
   font-size: 25px;
   font-weight: 500;
   line-height: 1.2;
@@ -164,7 +165,7 @@
   margin: 0 0 18px;
 }
 .sf-hero h1 {
-  font-family: Georgia, "Times New Roman", serif;
+  font-family: var(--font-display), var(--font-display), Georgia, serif;
   font-size: clamp(42px, 4.7vw, 68px);
   font-weight: 400;
   line-height: 1.08;
@@ -324,7 +325,7 @@
 }
 .sf-section-heading h2,
 .sf-service-intro h2 {
-  font-family: Georgia, "Times New Roman", serif;
+  font-family: var(--font-display), var(--font-display), Georgia, serif;
   font-size: 36px;
   line-height: 1.2;
   font-weight: 400;
@@ -357,7 +358,7 @@
 }
 .sf-category-card h3 {
   font-size: 18px;
-  font-family: Georgia, "Times New Roman", serif;
+  font-family: var(--font-display), var(--font-display), Georgia, serif;
   overflow-wrap: anywhere;
   margin-bottom: 8px;
 }
@@ -508,7 +509,7 @@
 }
 .sf-service-number {
   display: block;
-  font-family: Georgia, serif;
+  font-family: var(--font-display), Georgia, serif;
   color: #698061;
   font-size: 26px;
   margin-bottom: 20px;
@@ -539,7 +540,7 @@
   align-items: center;
   gap: 12px;
   font-size: 26px;
-  font-family: Georgia, serif;
+  font-family: var(--font-display), Georgia, serif;
 }
 .sf-footer-brand svg {
   width: 30px;
@@ -597,7 +598,7 @@
 }
 .sf-information-page h1 {
   font:
-    400 clamp(38px, 5vw, 60px)/1.1 Georgia,
+    400 clamp(38px, 5vw, 60px)/1.1 var(--font-display), Georgia,
     serif;
   letter-spacing: -0.03em;
   margin-bottom: 30px;
@@ -618,7 +619,7 @@
   margin: 30px 0;
 }
 .sf-information-note h2 {
-  font-family: Georgia, serif;
+  font-family: var(--font-display), Georgia, serif;
   font-size: 24px;
   margin-bottom: 12px;
 }

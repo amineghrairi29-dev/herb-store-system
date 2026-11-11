@@ -1,7 +1,7 @@
 .min-h-screen:has(> main > .order-confirmation) { background: #f8f6ef; }
 .order-confirmation { max-width: 540px; margin: 12px auto; padding: 32px; border: 1px solid #e0e5d6; border-radius: 18px; background: #fcfaf3; box-shadow: 0 4px 20px rgb(48 65 37 / 4%); color: #244332; text-align: center; }
 .oc-icon { display: grid; place-items: center; width: 56px; height: 56px; margin: 0 auto 18px; border: 1px solid #cddbbf; border-radius: 50%; background: #edf2e5; color: #37603d; }
-.order-confirmation h1 { font: 400 32px/1.15 Georgia, serif; color: #1e402e; margin: 0; }
+.order-confirmation h1 { font: 400 32px/1.15 var(--font-display), Georgia, serif; color: #1e402e; margin: 0; }
 .oc-intro { max-width: 370px; margin: 12px auto 0; font-size: 13px; line-height: 1.7; color: #6e7562; }
 .oc-receipt { display: grid; grid-template-columns: minmax(0,1fr) minmax(0,1fr); gap: 16px; margin: 24px 0 18px; padding: 18px 0; border-block: 1px solid #e0e5d6; }
 .oc-receipt dt { font-size: 11px; color: #6e7562; margin-bottom: 7px; }
