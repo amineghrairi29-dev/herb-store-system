@@ -6,6 +6,7 @@ import { HealthController } from './health.controller.js';
 import { DatabaseLifecycle } from './prisma/database-lifecycle.js';
 import { AuditModule } from './audit/audit.module.js';
 import { StoreSettingsModule } from './settings/store-settings.module.js';
+import { DeliveryZonesModule } from './delivery/delivery-zones.module.js';
 import { AuthModule } from './auth/auth.module.js';
 import { DashboardModule } from './dashboard/dashboard.module.js';
 import { AppController } from './app.controller.js';
@@ -23,7 +24,7 @@ import { PublicCatalogueModule } from './public-catalogue/public-catalogue.modul
 import { OnlineOrdersModule } from './online-orders/online-orders.module.js';
 
 @Module({
-  imports: [ClassificationsModule, ProductImagesModule, CategoriesModule, AuthModule, AuditModule, StoreSettingsModule, DashboardModule, ProductsModule, StockMovementsModule, SuppliersModule, PurchasesModule, SalesModule, CashModule, ExpensesModule, FinanceModule, ReportsModule, PublicCatalogueModule, OnlineOrdersModule],
+  imports: [ClassificationsModule, ProductImagesModule, CategoriesModule, AuthModule, AuditModule, StoreSettingsModule, DeliveryZonesModule, DashboardModule, ProductsModule, StockMovementsModule, SuppliersModule, PurchasesModule, SalesModule, CashModule, ExpensesModule, FinanceModule, ReportsModule, PublicCatalogueModule, OnlineOrdersModule],
   controllers: [AppController, HealthController],
   providers: [AppService, DatabaseLifecycle],
 })
