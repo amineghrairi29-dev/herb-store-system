@@ -27,6 +27,8 @@ export function configureHttpSecurity(app: INestApplication) {
   // Public orders: a general ceiling (cart preview, order lookup) and a stricter one on order creation.
   app.use('/public/orders', rateLimit({ windowMs: 15 * 60 * 1000, limit: 300, standardHeaders: 'draft-8', legacyHeaders: false, message: { message: 'Trop de requêtes. Réessayez dans quelques minutes.' } }));
   app.use('/public/orders', rateLimit({ windowMs: 60 * 60 * 1000, limit: 20, skip: (req) => req.method !== 'POST' || (req.path !== '/' && req.path !== ''), standardHeaders: 'draft-8', legacyHeaders: false, message: { message: 'Trop de commandes envoyées. Réessayez plus tard ou appelez la boutique.' } }));
+  // Order tracking by reference + phone: slow down guessing.
+  app.use('/public/orders', rateLimit({ windowMs: 15 * 60 * 1000, limit: 30, skip: (req) => req.method !== 'GET' || !req.path.startsWith('/ORD-'), standardHeaders: 'draft-8', legacyHeaders: false, message: { message: 'Trop de tentatives. Réessayez dans quelques minutes.' } }));
   app.useGlobalPipes(new InputBoundsPipe());
   app.enableCors({ origin: frontendOrigin(), methods: ['GET', 'POST', 'PATCH', 'DELETE', 'OPTIONS'], allowedHeaders: ['Content-Type', 'Authorization'], credentials: true });
   app.use(['/auth/login', '/public/auth/sign-in'], rateLimit({ windowMs: 15 * 60 * 1000, limit: 10, skipSuccessfulRequests: true, standardHeaders: 'draft-8', legacyHeaders: false, message: { message: 'Trop de tentatives. Réessayez dans 15 minutes.' } }));

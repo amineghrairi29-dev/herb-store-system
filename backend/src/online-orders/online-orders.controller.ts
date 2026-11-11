@@ -1,6 +1,6 @@
 import { Access } from '../auth/auth-policy.js';
 import { Inject, Req, UseGuards } from '@nestjs/common';
-import { OptionalCustomerGuard, type OptionalCustomerRequest } from '../customer-auth/customer.guard.js';
+import { CustomerGuard, OptionalCustomerGuard, type CustomerRequest, type OptionalCustomerRequest } from '../customer-auth/customer.guard.js';
 import { Body, Controller, Get, Param, ParseIntPipe, Patch, Post, Query, Header, HttpCode } from '@nestjs/common';
 import { OnlineOrdersService } from './online-orders.service.js';
 @Access('PUBLIC')
@@ -19,4 +19,11 @@ export class OnlineOrdersController {
   @Get() list(@Query() query: Record<string, unknown>) { return this.orders.list(query); }
   @Get(':id') detail(@Param('id', ParseIntPipe) id: number) { return this.orders.detail(id); }
   @Patch(':id/status') status(@Param('id', ParseIntPipe) id: number, @Body() body: unknown) { return this.orders.status(id, body); }
+  @Patch(':id/delivery') delivery(@Param('id', ParseIntPipe) id: number, @Body() body: unknown) { return this.orders.delivery(id, body); }
+}
+@Access('PUBLIC_AUTH')
+@Controller('public/customer')
+export class CustomerOrdersController {
+  constructor(@Inject(OnlineOrdersService) private readonly orders: OnlineOrdersService) {}
+  @UseGuards(CustomerGuard) @Get('orders') @Header('Cache-Control', 'no-store') list(@Req() request: CustomerRequest) { return this.orders.customerOrders(request.customer.id); }
 }

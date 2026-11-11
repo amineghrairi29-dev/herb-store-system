@@ -15,3 +15,4 @@
 .oc-primary:focus-visible { outline: 2px solid #6e8e5b; outline-offset: 4px; }
 @media(max-width:479px) { .order-confirmation { padding: 26px 20px; margin-block: 4px; } .order-confirmation h1 { font-size: 28px; } .oc-receipt { grid-template-columns: minmax(0,1fr); gap: 16px; } .oc-primary { width: 100%; } }
 @media(prefers-reduced-motion:reduce) { .oc-primary { transition: none; } }
+.oc-track { display: inline-flex; align-items: center; min-height: 44px; padding: 0 18px; margin-inline-end: 14px; border-radius: 999px; background: #173f32; color: #fff; font-weight: 500; }
