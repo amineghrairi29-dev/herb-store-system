@@ -12,6 +12,12 @@ const links = [
   ["/shop/about", "À propos"],
   ["/shop/contact", "Contact"],
   ["/shop/suivi", "Suivre ma commande"],
+  ["/shop/faq", "Questions fréquentes"],
+  ["/shop/livraison", "Livraison et paiement"],
+] as const;
+const legal = [
+  ["/shop/cgv", "Conditions de vente"],
+  ["/shop/confidentialite", "Confidentialité"],
 ] as const;
 export default function StorefrontShell({
   children,
@@ -19,7 +25,7 @@ export default function StorefrontShell({
   children: React.ReactNode;
 }) {
   const pathname = usePathname();
-  const redesigned = links.some(([href]) => href === pathname);
+  const redesigned = [...links, ...legal].some(([href]) => href === pathname);
   // Preserve the original visual shell for routes awaiting their design review.
   if (!redesigned)
     return (
@@ -89,7 +95,7 @@ export default function StorefrontShell({
           <span>
             © {new Date().getFullYear()} <StoreName />
           </span>
-          <span>Le naturel, tout simplement.</span>
+          <nav aria-label="Informations légales" className="sf-footer-legal">{legal.map(([href, label]) => <Link key={href} href={href}>{label}</Link>)}</nav>
         </div>
       </footer>
       <WhatsAppButton />
