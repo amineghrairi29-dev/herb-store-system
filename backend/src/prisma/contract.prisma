@@ -377,6 +377,9 @@ model Product {
   origin          String?
   packaging       String?
   description     String?
+  benefits        String?
+  usage           String?
+  precautions     String?
   isActive        Boolean  @default(true)
   isSellable      Boolean  @default(true)
   isVisibleOnline Boolean  @default(false)
@@ -388,6 +391,19 @@ model Product {
   @@check(expression: "\"minStock\" >= 0 AND \"minStock\" < 'Infinity'::numeric", name: "product_min_stock_nonnegative")
   @@check(expression: "\"maxStock\" >= 0 AND \"maxStock\" < 'Infinity'::numeric", name: "product_max_stock_nonnegative")
   @@check(expression: "\"maxStock\" >= \"minStock\"", name: "product_stock_range")
+}
+
+// Extra product photos shown in the storefront gallery, after mainImagePath.
+model ProductImage {
+  id Int @id @default(autoincrement())
+  productId Int
+  product Product @relation(fields: [productId], references: [id], onDelete: Restrict, onUpdate: Restrict)
+  path String @unique
+  sortOrder Int @default(0)
+  createdAt TimestamptzString @default(now())
+
+  @@index([productId, sortOrder])
+  @@check(expression: "path LIKE '/uploads/products/%'", name: "product_image_path")
 }
 
 model StockMovement {

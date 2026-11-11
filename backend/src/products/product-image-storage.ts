@@ -50,6 +50,7 @@ export async function discardUnreferencedImage(path: string | null | undefined):
   try {
     // Also handles ambiguous commit failures: never remove a referenced image.
     if (await db.orm.public.Product.first({ mainImagePath: path })) return;
+    if (await db.orm.public.ProductImage.first({ path })) return;
     const target = join(imageDirectory(), filename);
     const stat = await lstat(target);
     if (stat.isFile() && !stat.isSymbolicLink()) await unlink(target);

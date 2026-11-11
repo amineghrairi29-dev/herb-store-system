@@ -31,7 +31,10 @@ export class PublicCatalogueService {
   async detail(id: string) {
     if (!/^[1-9]\d*$/.test(id) || Number(id) > 2147483647) throw new NotFoundException('Produit introuvable.');
     return withPurchaseTransaction(async ({ client }) => {
-      const result = await client.query<PublicProductDto>(`${catalogue} SELECT ${fields} FROM catalogue WHERE id = $2`, [positiveTypes, Number(id)]);
+      // Detail only: long texts and the photo gallery are not needed by catalogue cards.
+      const result = await client.query<PublicProductDto>(`${catalogue} SELECT ${fields}, benefits, usage, precautions,
+        (SELECT COALESCE(jsonb_agg(pi.path ORDER BY pi."sortOrder", pi.id), '[]'::jsonb) FROM public."productImage" pi WHERE pi."productId" = catalogue.id) AS gallery
+        FROM catalogue WHERE id = $2`, [positiveTypes, Number(id)]);
       if (!result.rows[0]) throw new NotFoundException('Produit introuvable.');
       return result.rows[0];
     }, true);
