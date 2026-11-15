@@ -9,11 +9,11 @@ import AdminIcon, { type AdminIconName } from './admin-icon';
 import styles from './admin-shell.module.css';
 
 const groups: { label: string; links: [string, string, AdminIconName][] }[] = [
-  { label: 'Principal', links: [['/dashboard', 'Tableau de bord', 'dashboard']] },
-  { label: 'Commerce', links: [['/products', 'Produits', 'products'], ['/stock', 'Stock', 'stock'], ['/online-orders', 'Commandes en ligne', 'orders'], ['/sales', 'Ventes', 'sales']] },
-  { label: 'Approvisionnement', links: [['/purchases', 'Achats', 'purchases'], ['/suppliers', 'Fournisseurs', 'suppliers']] },
-  { label: 'Finance', links: [['/cash', 'Caisse', 'cash'], ['/expenses', 'Dépenses', 'expenses'], ['/finance', 'Finance', 'finance'], ['/reports', 'Rapports', 'reports']] },
-  { label: 'Administration', links: [['/users', 'Utilisateurs', 'users'], ['/settings/store', 'Paramètres', 'settings'], ['/settings/delivery', 'Livraison', 'orders'], ['/audit', 'Journal d’audit', 'audit']] },
+  { label: 'Principal', links: [['/admin/dashboard', 'Tableau de bord', 'dashboard']] },
+  { label: 'Commerce', links: [['/admin/products', 'Produits', 'products'], ['/admin/stock', 'Stock', 'stock'], ['/admin/online-orders', 'Commandes en ligne', 'orders'], ['/admin/sales', 'Ventes', 'sales']] },
+  { label: 'Approvisionnement', links: [['/admin/purchases', 'Achats', 'purchases'], ['/admin/suppliers', 'Fournisseurs', 'suppliers']] },
+  { label: 'Finance', links: [['/admin/cash', 'Caisse', 'cash'], ['/admin/expenses', 'Dépenses', 'expenses'], ['/admin/finance', 'Finance', 'finance'], ['/admin/reports', 'Rapports', 'reports']] },
+  { label: 'Administration', links: [['/admin/users', 'Utilisateurs', 'users'], ['/admin/settings/store', 'Paramètres', 'settings'], ['/admin/settings/delivery', 'Livraison', 'orders'], ['/admin/audit', 'Journal d’audit', 'audit']] },
 ];
 const matches = (path: string, href: string) => path === href || path.startsWith(`${href}/`);
 
@@ -26,7 +26,7 @@ export default function AdminShell({ user, busy, logout, children }: { user: Cur
   const [open, setOpen] = useState(false);
   const dialog = useRef<HTMLDialogElement>(null);
   const trigger = useRef<HTMLButtonElement>(null);
-  const title = pathname === '/account' ? 'Mon compte' : groups.flatMap(group => group.links).find(([href]) => matches(pathname, href))?.[1] ?? 'Gestion du magasin';
+  const title = pathname === '/admin/account' ? 'Mon compte' : groups.flatMap(group => group.links).find(([href]) => matches(pathname, href))?.[1] ?? 'Gestion du magasin';
   useEffect(() => {
     if (!open) return;
     const panel = dialog.current;
@@ -39,7 +39,7 @@ export default function AdminShell({ user, busy, logout, children }: { user: Cur
     desktop.addEventListener('change', resize);
     return () => { panel?.close(); document.body.style.overflow = previous; desktop.removeEventListener('change', resize); opener?.focus(); };
   }, [open]);
-  const brand = <Link href="/dashboard" className={styles.brand} onClick={() => setOpen(false)} aria-label="دار سلومة, tableau de bord"><SloumaIcon size={42} className={styles.brandIcon} /><span className={styles.brandText}><span lang="ar" dir="rtl" className={styles.brandName}>دار سلومة</span><span className={styles.brandSub}>Gestion du magasin</span></span></Link>;
+  const brand = <Link href="/admin/dashboard" className={styles.brand} onClick={() => setOpen(false)} aria-label="دار سلومة, tableau de bord"><SloumaIcon size={42} className={styles.brandIcon} /><span className={styles.brandText}><span lang="ar" dir="rtl" className={styles.brandName}>دار سلومة</span><span className={styles.brandSub}>Gestion du magasin</span></span></Link>;
   return <div lang="fr" className={styles.shell}>
     <a href="#admin-content" className={styles.skip}>Aller au contenu</a>
     <aside className={styles.sidebar}>{brand}<Navigation pathname={pathname} user={user} /></aside>

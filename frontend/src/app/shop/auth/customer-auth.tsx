@@ -108,7 +108,8 @@ export default function CustomerAuth({
         if (!result || typeof result !== 'object' || !('redirectTo' in result) || typeof result.redirectTo !== 'string')
           throw new Error('Connexion impossible. Réessayez.');
         // Reload providers from their separate session cookies; keep the browser cart intact.
-        window.location.assign(result.redirectTo === '/dashboard' ? '/dashboard' : safeCustomerReturn(result.redirectTo));
+        // The back office now lives under /admin; the API still answers "/dashboard" for an admin.
+        window.location.assign(result.redirectTo === '/dashboard' || result.redirectTo === '/admin/dashboard' ? '/admin/dashboard' : safeCustomerReturn(result.redirectTo));
         return;
       }
       if (!(await auth.refresh()))

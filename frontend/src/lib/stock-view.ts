@@ -1,7 +1,7 @@
 import { compareDecimals, normalizeDecimal } from "./decimal";
 import type { ProductDetails } from "../types/product";
 import type { ProductStock } from "./stock-api";
-import type { MovementType } from "../app/stock/movement-config";
+import type { MovementType } from "../app/admin/stock/movement-config";
 
 export interface StockMovement {
   id: number; productId: number; type: MovementType; quantity: string; unit: string;
