@@ -1,6 +1,9 @@
 /** Shared bulk stock/status query. $1 is always the authoritative positiveTypes array. */
 export function stockCatalogue(scope: 'public' | 'all') {
-  const filter = scope === 'public' ? 'WHERE "isActive" = true AND "isSellable" = true AND "isVisibleOnline" = true AND EXISTS (SELECT 1 FROM public."productClassification" pc JOIN public.classification c ON c.id=pc."classificationId" WHERE pc."productId"=product.id AND c."isActive")' : '';
+  const filter =
+    scope === 'public'
+      ? 'WHERE "isActive" = true AND "isSellable" = true AND "isVisibleOnline" = true AND EXISTS (SELECT 1 FROM public."productClassification" pc JOIN public.classification c ON c.id=pc."classificationId" WHERE pc."productId"=product.id AND c."isActive")'
+      : '';
   return `WITH visible AS (SELECT * FROM public.product ${filter}),
  balances AS (SELECT m."productId", SUM(CASE WHEN m.type = ANY($1::text[]) THEN m."quantityInStorageUnit" ELSE -m."quantityInStorageUnit" END) AS stock
  FROM public."stockMovement" m JOIN visible p ON p.id = m."productId" GROUP BY m."productId"),

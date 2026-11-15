@@ -6,5 +6,14 @@ import { AuthService } from './auth.service.js';
 import { AuthController } from './auth.controller.js';
 import { UsersService } from './users.service.js';
 import { UsersController } from './users.controller.js';
-@Module({ controllers: [AuthController, UsersController], providers: [SelfAccountService, AuthService, UsersService, { provide: APP_GUARD, useClass: AuthGuard }], exports: [AuthService, SelfAccountService] })
+@Module({
+  controllers: [AuthController, UsersController],
+  providers: [
+    SelfAccountService,
+    AuthService,
+    UsersService,
+    { provide: APP_GUARD, useClass: AuthGuard },
+  ],
+  exports: [AuthService, SelfAccountService],
+})
 export class AuthModule {}

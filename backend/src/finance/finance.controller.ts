@@ -5,5 +5,7 @@ import { FinanceService } from './finance.service.js';
 @Controller('finance')
 export class FinanceController {
   constructor(private readonly finance: FinanceService) {}
-  @Get('summary') summary(@Query() query: Record<string, unknown>) { return this.finance.summary(query); }
+  @Get('summary') summary(@Query() query: Record<string, unknown>) {
+    return this.finance.summary(query);
+  }
 }

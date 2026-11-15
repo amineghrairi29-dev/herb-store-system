@@ -9,8 +9,17 @@
    tokens on .slouma-theme). Tailwind's emerald and amber scales are remapped to the leaf
    green and the honey, so every admin page follows the brand without touching its markup. */
 :root {
-  --c-leaf: #3e7b3a; --c-leaf-dark: #2e5e2b; --c-honey: #d99a2b; --c-honey-light: #f2c46b; --c-honey-ink: #1f2a1a;
-  --c-forest: #1f3a24; --c-sage: #a9c68f; --c-sprout: #eef4e4; --c-cream: #fbfaf5; --c-line: #dce3d2; --c-muted: #5d6b57;
+  --c-leaf: #3e7b3a;
+  --c-leaf-dark: #2e5e2b;
+  --c-honey: #d99a2b;
+  --c-honey-light: #f2c46b;
+  --c-honey-ink: #1f2a1a;
+  --c-forest: #1f3a24;
+  --c-sage: #a9c68f;
+  --c-sprout: #eef4e4;
+  --c-cream: #fbfaf5;
+  --c-line: #dce3d2;
+  --c-muted: #5d6b57;
 }
 
 @theme {

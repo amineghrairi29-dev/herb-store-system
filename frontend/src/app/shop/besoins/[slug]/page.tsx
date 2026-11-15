@@ -14,7 +14,9 @@ import "../needs.css";
 const allowed = ["q", "sort", "availability", "page", "pageSize"];
 
 async function loadNeeds(withProducts: boolean): Promise<PublicClassification[]> {
-  const response = await fetch(`${apiBase}/public/classifications${withProducts ? "?withProducts=true" : ""}`, { next: { revalidate: 120 } });
+  const response = await fetch(`${apiBase}/public/classifications${withProducts ? "?withProducts=true" : ""}`, {
+    next: { revalidate: 120 },
+  });
   if (!response.ok) throw new Error(`Public needs HTTP ${response.status}`);
   return response.json() as Promise<PublicClassification[]>;
 }
@@ -23,9 +25,12 @@ async function loadNeeds(withProducts: boolean): Promise<PublicClassification[]>
 async function loadPreview(slug: string): Promise<{ products: PublicProduct[]; total: number }> {
   try {
     const params = new URLSearchParams({ classification: slug, pageSize: "12", page: "1", sort: "name_asc" });
-    const response = await fetch(`${apiBase}/public/products?${params}`, { next: { revalidate: 120 }, signal: AbortSignal.timeout(5000) });
+    const response = await fetch(`${apiBase}/public/products?${params}`, {
+      next: { revalidate: 120 },
+      signal: AbortSignal.timeout(5000),
+    });
     if (!response.ok) return { products: [], total: 0 };
-    const result = await response.json() as CatalogueResponse;
+    const result = (await response.json()) as CatalogueResponse;
     return { products: result.data, total: result.pagination.totalItems };
   } catch {
     return { products: [], total: 0 };
@@ -37,15 +42,28 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   const need = (await loadNeeds(false).catch((): PublicClassification[] => [])).find((item) => item.slug === slug);
   if (!need) return { title: "Besoin introuvable" };
   const description = `Plantes, mélanges et recettes de دار سلومة pour : ${need.nameFr}. Conseil gratuit, paiement à la livraison.`;
-  return { title: `${need.nameFr} · ${need.nameAr}`, description, alternates: { canonical: `/shop/besoins/${encodeURIComponent(need.slug)}` }, openGraph: { title: need.nameFr, description } };
+  return {
+    title: `${need.nameFr} · ${need.nameAr}`,
+    description,
+    alternates: { canonical: `/shop/besoins/${encodeURIComponent(need.slug)}` },
+    openGraph: { title: need.nameFr, description },
+  };
 }
 
-export default async function NeedPage({ params, searchParams }: {
+export default async function NeedPage({
+  params,
+  searchParams,
+}: {
   params: Promise<{ slug: string }>;
   searchParams: Promise<Record<string, string | string[] | undefined>>;
 }) {
   const { slug } = await params;
-  const [needs, shelf, preview, store] = await Promise.all([loadNeeds(false), loadNeeds(true).catch((): PublicClassification[] => []), loadPreview(slug), getStoreInfo()]);
+  const [needs, shelf, preview, store] = await Promise.all([
+    loadNeeds(false),
+    loadNeeds(true).catch((): PublicClassification[] => []),
+    loadPreview(slug),
+    getStoreInfo(),
+  ]);
   const need = needs.find((item) => item.slug === slug);
   if (!need) notFound();
   const query = new URLSearchParams();
@@ -56,13 +74,26 @@ export default async function NeedPage({ params, searchParams }: {
   }
   const position = shelf.findIndex((item) => item.id === need.id);
   const [tint, ink] = needTint(position);
-  const photos = preview.products.filter((product) => product.mainImagePath).slice(0, 3).map((product) => ({ id: product.id, name: product.name, nameFr: product.nameFr, path: product.mainImagePath as string }));
+  const photos = preview.products
+    .filter((product) => product.mainImagePath)
+    .slice(0, 3)
+    .map((product) => ({
+      id: product.id,
+      name: product.name,
+      nameFr: product.nameFr,
+      path: product.mainImagePath as string,
+    }));
   const whatsapp = whatsappLink(store?.phone, `Bonjour, je cherche un conseil pour : ${need.nameFr}`);
   const others = shelf.filter((item) => item.id !== need.id);
 
   return (
     <div className="nd" style={{ "--tile": tint, "--tile-ink": ink } as React.CSSProperties}>
-      <JsonLd data={breadcrumbJsonLd([["Boutique", "/shop"], [need.nameFr, `/shop/besoins/${encodeURIComponent(need.slug)}`]])} />
+      <JsonLd
+        data={breadcrumbJsonLd([
+          ["Boutique", "/shop"],
+          [need.nameFr, `/shop/besoins/${encodeURIComponent(need.slug)}`],
+        ])}
+      />
       <NeedHero need={need} total={preview.total} photos={photos} />
 
       {others.length > 0 && (
@@ -73,8 +104,15 @@ export default async function NeedPage({ params, searchParams }: {
               const [bg, color] = needTint(shelf.indexOf(item));
               return (
                 <li key={item.id}>
-                  <Link href={`/shop/besoins/${encodeURIComponent(item.slug)}`} className="nd-chip" style={{ "--chip": bg, "--chip-ink": color } as React.CSSProperties}>
-                    <span lang="ar" dir="rtl">{item.nameAr}</span><bdi>{item.nameFr}</bdi>
+                  <Link
+                    href={`/shop/besoins/${encodeURIComponent(item.slug)}`}
+                    className="nd-chip"
+                    style={{ "--chip": bg, "--chip-ink": color } as React.CSSProperties}
+                  >
+                    <span lang="ar" dir="rtl">
+                      {item.nameAr}
+                    </span>
+                    <bdi>{item.nameFr}</bdi>
                   </Link>
                 </li>
               );
@@ -88,11 +126,23 @@ export default async function NeedPage({ params, searchParams }: {
       <ScrollReveal className="nd-reveal">
         <section className="nd-advice" aria-labelledby="nd-advice-title">
           <div>
-            <p lang="ar" dir="rtl" className="nd-advice-ar">قلّنا على حاجتك، نعطيوك الوصفة المناسبة</p>
+            <p lang="ar" dir="rtl" className="nd-advice-ar">
+              قلّنا على حاجتك، نعطيوك الوصفة المناسبة
+            </p>
             <h2 id="nd-advice-title">Pas sûr de ce qui vous convient ?</h2>
-            <p>Expliquez-nous votre besoin : Slouma vous indique la plante et la préparation qui marchent, gratuitement.</p>
+            <p>
+              Expliquez-nous votre besoin : Slouma vous indique la plante et la préparation qui marchent, gratuitement.
+            </p>
           </div>
-          {whatsapp ? <a href={whatsapp} target="_blank" rel="noopener noreferrer" className="nd-advice-btn">Demander conseil sur WhatsApp</a> : <Link href="/shop/contact" className="nd-advice-btn">Nous contacter</Link>}
+          {whatsapp ? (
+            <a href={whatsapp} target="_blank" rel="noopener noreferrer" className="nd-advice-btn">
+              Demander conseil sur WhatsApp
+            </a>
+          ) : (
+            <Link href="/shop/contact" className="nd-advice-btn">
+              Nous contacter
+            </Link>
+          )}
         </section>
       </ScrollReveal>
     </div>

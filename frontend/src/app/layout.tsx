@@ -25,11 +25,10 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
-    <html
-      lang="fr"
-      className={`${geistSans.variable} ${geistMono.variable} ${arabic.variable} h-full antialiased`}
-    >
-      <body className="min-h-full flex flex-col"><AuthProvider>{children}</AuthProvider></body>
+    <html lang="fr" className={`${geistSans.variable} ${geistMono.variable} ${arabic.variable} h-full antialiased`}>
+      <body className="min-h-full flex flex-col">
+        <AuthProvider>{children}</AuthProvider>
+      </body>
     </html>
   );
 }

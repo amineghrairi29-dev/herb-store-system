@@ -6,6 +6,9 @@ import { PublicCartService } from './public-cart.service.js';
 @Controller('public/cart')
 export class PublicCartController {
   constructor(private readonly cart: PublicCartService) {}
-  @Post('validate') @HttpCode(200)
-  validate(@Body() body: unknown) { return this.cart.validate(body); }
+  @Post('validate')
+  @HttpCode(200)
+  validate(@Body() body: unknown) {
+    return this.cart.validate(body);
+  }
 }

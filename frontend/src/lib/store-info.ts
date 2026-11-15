@@ -18,7 +18,10 @@ export function isStoreInfo(value: unknown): value is StoreInfo {
 /** Server-side read, cached 5 minutes; null when the API is unreachable. */
 export async function getStoreInfo(): Promise<StoreInfo | null> {
   try {
-    const response = await fetch(`${apiBase}/public/store-info`, { next: { revalidate: 300 }, signal: AbortSignal.timeout(5000) });
+    const response = await fetch(`${apiBase}/public/store-info`, {
+      next: { revalidate: 300 },
+      signal: AbortSignal.timeout(5000),
+    });
     if (!response.ok) return null;
     const value: unknown = await response.json();
     return isStoreInfo(value) ? value : null;

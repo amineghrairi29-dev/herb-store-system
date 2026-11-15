@@ -17,9 +17,13 @@ export default function HomeStory() {
   const items = useRef<(HTMLLIElement | null)[]>([]);
   useEffect(() => {
     if (!("IntersectionObserver" in window)) return;
-    const observer = new IntersectionObserver((entries) => {
-      for (const entry of entries) if (entry.isIntersecting) setActive(Number((entry.target as HTMLElement).dataset.step));
-    }, { rootMargin: "-45% 0px -45% 0px" });
+    const observer = new IntersectionObserver(
+      (entries) => {
+        for (const entry of entries)
+          if (entry.isIntersecting) setActive(Number((entry.target as HTMLElement).dataset.step));
+      },
+      { rootMargin: "-45% 0px -45% 0px" },
+    );
     items.current.forEach((item) => item && observer.observe(item));
     return () => observer.disconnect();
   }, []);
@@ -28,13 +32,27 @@ export default function HomeStory() {
       <div className="h-story-pin">
         <p className="h-eyebrow">De la récolte à votre tasse</p>
         <h2 id="story-title">Chaque recette passe par nos mains.</h2>
-        <p className="h-story-text">Depuis 2006, la même exigence : savoir d’où vient chaque plante et comment la préparer.</p>
-        <div className="h-progress" aria-hidden="true"><span style={{ transform: `scaleX(${(active + 1) / steps.length})` }} /></div>
-        <p className="h-story-count" aria-live="polite">Étape {active + 1} sur {steps.length} · {steps[active][0]}</p>
+        <p className="h-story-text">
+          Depuis 2006, la même exigence : savoir d’où vient chaque plante et comment la préparer.
+        </p>
+        <div className="h-progress" aria-hidden="true">
+          <span style={{ transform: `scaleX(${(active + 1) / steps.length})` }} />
+        </div>
+        <p className="h-story-count" aria-live="polite">
+          Étape {active + 1} sur {steps.length} · {steps[active][0]}
+        </p>
       </div>
       <ol className="h-steps">
         {steps.map(([name, text], index) => (
-          <li key={name} ref={(element) => { items.current[index] = element; }} data-step={index} data-active={index === active || undefined} className="h-step">
+          <li
+            key={name}
+            ref={(element) => {
+              items.current[index] = element;
+            }}
+            data-step={index}
+            data-active={index === active || undefined}
+            className="h-step"
+          >
             <span className="h-step-number">{String(index + 1).padStart(2, "0")}</span>
             <h3>{name}</h3>
             <p>{text}</p>

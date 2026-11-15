@@ -7,9 +7,7 @@ export default async function Page({
   const params = await searchParams;
   return (
     <CustomerAuth
-      returnTo={
-        typeof params.returnTo === "string" ? params.returnTo : "/shop/checkout"
-      }
+      returnTo={typeof params.returnTo === "string" ? params.returnTo : "/shop/checkout"}
       googleError={params.error === "google"}
     />
   );

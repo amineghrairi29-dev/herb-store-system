@@ -5,10 +5,12 @@
  */
 export function productSlug(name: string): string {
   return name
-    .normalize("NFD").replace(/[̀-ͯ]/g, "")       // é -> e
-    .replace(/[ً-ٰٟـ]/g, "")            // Arabic diacritics and tatweel
+    .normalize("NFD")
+    .replace(/[̀-ͯ]/g, "") // é -> e
+    .replace(/[ً-ٰٟـ]/g, "") // Arabic diacritics and tatweel
     .toLowerCase()
-    .replace(/œ/g, "oe").replace(/æ/g, "ae")
+    .replace(/œ/g, "oe")
+    .replace(/æ/g, "ae")
     .replace(/[^a-z0-9ء-ي]+/g, "-")
     .replace(/^-+|-+$/g, "")
     .slice(0, 80)

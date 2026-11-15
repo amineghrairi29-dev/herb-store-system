@@ -13,12 +13,17 @@ import "./home/home.css";
 // Searches (/shop?q=…) point to the plain shop page as the canonical address.
 export const metadata: Metadata = { alternates: { canonical: "/shop" } };
 
-export default async function ShopPage({ searchParams }: { searchParams: Promise<Record<string, string | string[] | undefined>> }) {
+export default async function ShopPage({
+  searchParams,
+}: {
+  searchParams: Promise<Record<string, string | string[] | undefined>>;
+}) {
   const params = await searchParams;
   // A need filter belongs to its own page; other old catalogue filters fall back to the product list.
   const classification = typeof params.classification === "string" ? params.classification : null;
   if (classification) redirect(`/shop/besoins/${encodeURIComponent(classification)}`);
-  if (["category", "subcategory", "availability", "sort", "page", "pageSize"].some((key) => params[key] !== undefined)) redirect("/shop#products");
+  if (["category", "subcategory", "availability", "sort", "page", "pageSize"].some((key) => params[key] !== undefined))
+    redirect("/shop#products");
   const query = typeof params.q === "string" ? params.q.trim().slice(0, 200) : "";
   const store = await getStoreInfo();
   return (

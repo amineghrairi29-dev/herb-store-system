@@ -1,1 +1,1 @@
-export { default } from '../shop/layout';
+export { default } from "../shop/layout";

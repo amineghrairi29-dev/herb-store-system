@@ -9,9 +9,7 @@ import ProductForm from "../../product-form";
 import ProductGallery from "../../product-gallery";
 
 type LoadState =
-  | { status: "loading" }
-  | { status: "success"; product: ProductDetails }
-  | { status: "error"; message: string };
+  { status: "loading" } | { status: "success"; product: ProductDetails } | { status: "error"; message: string };
 
 export default function EditProduct({ id }: { id: string }) {
   const [state, setState] = useState<LoadState>({ status: "loading" });
@@ -54,7 +52,9 @@ export default function EditProduct({ id }: { id: string }) {
               ? "Connexion impossible à l’API. Vérifiez le serveur et sa configuration CORS."
               : error instanceof SyntaxError
                 ? "La réponse du serveur est invalide."
-                : error instanceof Error ? error.message : "Une erreur inattendue est survenue.",
+                : error instanceof Error
+                  ? error.message
+                  : "Une erreur inattendue est survenue.",
         });
       } finally {
         window.clearTimeout(timeout);
@@ -68,23 +68,45 @@ export default function EditProduct({ id }: { id: string }) {
     };
   }, [id, attempt]);
 
-  if (state.status === "success") return <><ProductForm product={state.product} /><ProductGallery productId={state.product.id} initial={state.product.gallery ?? []} /></>;
+  if (state.status === "success")
+    return (
+      <>
+        <ProductForm product={state.product} />
+        <ProductGallery productId={state.product.id} initial={state.product.gallery ?? []} />
+      </>
+    );
 
   return (
-    <section aria-label="Chargement du produit" className="rounded-xl border border-slate-200 bg-white p-6 shadow-sm sm:p-8">
+    <section
+      aria-label="Chargement du produit"
+      className="rounded-xl border border-slate-200 bg-white p-6 shadow-sm sm:p-8"
+    >
       {state.status === "loading" ? (
-        <p role="status" className="py-10 text-center text-sm text-slate-600">Chargement du produit…</p>
+        <p role="status" className="py-10 text-center text-sm text-slate-600">
+          Chargement du produit…
+        </p>
       ) : (
         <div role="alert" className="rounded-lg border border-red-200 bg-red-50 p-4 text-sm text-red-900">
           <p className="font-semibold">Impossible de charger le produit</p>
           <p className="mt-2">{state.message}</p>
-          <button type="button" onClick={() => {
-            setState({ status: "loading" });
-            setAttempt((current) => current + 1);
-          }} className="mt-4 rounded-md border border-red-300 bg-white px-4 py-2 font-semibold hover:bg-red-100 focus-visible:outline-2 focus-visible:outline-red-700">Réessayer</button>
+          <button
+            type="button"
+            onClick={() => {
+              setState({ status: "loading" });
+              setAttempt((current) => current + 1);
+            }}
+            className="mt-4 rounded-md border border-red-300 bg-white px-4 py-2 font-semibold hover:bg-red-100 focus-visible:outline-2 focus-visible:outline-red-700"
+          >
+            Réessayer
+          </button>
         </div>
       )}
-      <Link href="/admin/products" className="mt-5 inline-block rounded-md px-3 py-2 text-sm font-semibold text-emerald-800 hover:bg-emerald-50 focus-visible:outline-2 focus-visible:outline-emerald-700">Annuler</Link>
+      <Link
+        href="/admin/products"
+        className="mt-5 inline-block rounded-md px-3 py-2 text-sm font-semibold text-emerald-800 hover:bg-emerald-50 focus-visible:outline-2 focus-visible:outline-emerald-700"
+      >
+        Annuler
+      </Link>
     </section>
   );
 }
