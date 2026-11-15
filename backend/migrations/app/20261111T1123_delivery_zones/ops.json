@@ -1,0 +1,251 @@
+[
+  {
+    "id": "table.deliveryZone",
+    "label": "Create table \"deliveryZone\"",
+    "summary": "Creates table \"deliveryZone\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "table",
+        "name": "deliveryZone"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure table \"deliveryZone\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"deliveryZone\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "create table \"deliveryZone\"",
+        "sql": "CREATE TABLE \"public\".\"deliveryZone\" (\n  \"createdAt\" timestamptz DEFAULT (now()) NOT NULL,\n  \"delay\" text,\n  \"fee\" numeric NOT NULL,\n  \"freeAbove\" numeric,\n  \"governorate\" text NOT NULL,\n  \"id\" SERIAL NOT NULL,\n  \"isActive\" bool DEFAULT false NOT NULL,\n  \"sortOrder\" int4 DEFAULT 0 NOT NULL,\n  \"updatedAt\" timestamptz NOT NULL,\n  PRIMARY KEY (\"id\"),\n  CONSTRAINT \"delivery_zone_delay_f0704b23\" CHECK (delay IS NULL OR length(delay) <= 80),\n  CONSTRAINT \"delivery_zone_fee_fb4159c8\" CHECK (fee >= 0 AND fee < 1000),\n  CONSTRAINT \"delivery_zone_free_above_e057d75c\" CHECK (\"freeAbove\" IS NULL OR (\"freeAbove\" > 0 AND \"freeAbove\" < 1000000)),\n  CONSTRAINT \"delivery_zone_governorate_c0cc3d26\" CHECK (length(btrim(governorate)) BETWEEN 1 AND 80)\n)",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify table \"deliveryZone\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": [
+          "\"public\".\"deliveryZone\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "column.public.onlineOrder.deliveryCity",
+    "label": "Add column \"deliveryCity\" to \"onlineOrder\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "column",
+        "name": "deliveryCity",
+        "table": "onlineOrder"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure column \"deliveryCity\" is missing",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3)) AS \"result\"",
+        "params": [
+          "public",
+          "onlineOrder",
+          "deliveryCity"
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add column \"deliveryCity\"",
+        "sql": "ALTER TABLE \"public\".\"onlineOrder\" ADD COLUMN \"deliveryCity\" text"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify column \"deliveryCity\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3)) AS \"result\"",
+        "params": [
+          "public",
+          "onlineOrder",
+          "deliveryCity"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "column.public.onlineOrder.deliveryFee",
+    "label": "Add column \"deliveryFee\" to \"onlineOrder\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "column",
+        "name": "deliveryFee",
+        "table": "onlineOrder"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure column \"deliveryFee\" is missing",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3)) AS \"result\"",
+        "params": [
+          "public",
+          "onlineOrder",
+          "deliveryFee"
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add column \"deliveryFee\"",
+        "sql": "ALTER TABLE \"public\".\"onlineOrder\" ADD COLUMN \"deliveryFee\" numeric"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify column \"deliveryFee\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3)) AS \"result\"",
+        "params": [
+          "public",
+          "onlineOrder",
+          "deliveryFee"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "column.public.onlineOrder.deliveryGovernorate",
+    "label": "Add column \"deliveryGovernorate\" to \"onlineOrder\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "column",
+        "name": "deliveryGovernorate",
+        "table": "onlineOrder"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure column \"deliveryGovernorate\" is missing",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3)) AS \"result\"",
+        "params": [
+          "public",
+          "onlineOrder",
+          "deliveryGovernorate"
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add column \"deliveryGovernorate\"",
+        "sql": "ALTER TABLE \"public\".\"onlineOrder\" ADD COLUMN \"deliveryGovernorate\" text"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify column \"deliveryGovernorate\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3)) AS \"result\"",
+        "params": [
+          "public",
+          "onlineOrder",
+          "deliveryGovernorate"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "unique.deliveryZone.deliveryZone_governorate_key",
+    "label": "Add unique constraint on \"deliveryZone\" (governorate)",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "unique",
+        "name": "deliveryZone_governorate_key",
+        "table": "deliveryZone"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure constraint \"deliveryZone_governorate_key\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "deliveryZone_governorate_key",
+          "public",
+          "\"public\".\"deliveryZone\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add unique constraint \"deliveryZone_governorate_key\"",
+        "sql": "ALTER TABLE \"public\".\"deliveryZone\" ADD CONSTRAINT \"deliveryZone_governorate_key\" UNIQUE (\"governorate\")"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify constraint \"deliveryZone_governorate_key\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "deliveryZone_governorate_key",
+          "public",
+          "\"public\".\"deliveryZone\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "checkConstraint.onlineOrder.online_order_delivery_fee_77848000",
+    "label": "Add check constraint \"online_order_delivery_fee_77848000\" on \"onlineOrder\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "checkConstraint",
+        "name": "online_order_delivery_fee_77848000",
+        "table": "onlineOrder"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure constraint \"online_order_delivery_fee_77848000\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "online_order_delivery_fee_77848000",
+          "public",
+          "\"public\".\"onlineOrder\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add check constraint \"online_order_delivery_fee_77848000\"",
+        "sql": "ALTER TABLE \"public\".\"onlineOrder\" ADD CONSTRAINT \"online_order_delivery_fee_77848000\" CHECK (\"deliveryFee\" IS NULL OR (\"deliveryFee\" >= 0 AND \"deliveryFee\" < 1000))"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify constraint \"online_order_delivery_fee_77848000\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "online_order_delivery_fee_77848000",
+          "public",
+          "\"public\".\"onlineOrder\""
+        ]
+      }
+    ]
+  }
+]

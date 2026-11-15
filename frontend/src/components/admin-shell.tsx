@@ -13,7 +13,7 @@ const groups: { label: string; links: [string, string, AdminIconName][] }[] = [
   { label: 'Commerce', links: [['/products', 'Produits', 'products'], ['/stock', 'Stock', 'stock'], ['/online-orders', 'Commandes en ligne', 'orders'], ['/sales', 'Ventes', 'sales']] },
   { label: 'Approvisionnement', links: [['/purchases', 'Achats', 'purchases'], ['/suppliers', 'Fournisseurs', 'suppliers']] },
   { label: 'Finance', links: [['/cash', 'Caisse', 'cash'], ['/expenses', 'Dépenses', 'expenses'], ['/finance', 'Finance', 'finance'], ['/reports', 'Rapports', 'reports']] },
-  { label: 'Administration', links: [['/users', 'Utilisateurs', 'users'], ['/settings/store', 'Paramètres', 'settings'], ['/audit', 'Journal d’audit', 'audit']] },
+  { label: 'Administration', links: [['/users', 'Utilisateurs', 'users'], ['/settings/store', 'Paramètres', 'settings'], ['/settings/delivery', 'Livraison', 'orders'], ['/audit', 'Journal d’audit', 'audit']] },
 ];
 const matches = (path: string, href: string) => path === href || path.startsWith(`${href}/`);
 
