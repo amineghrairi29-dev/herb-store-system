@@ -3,7 +3,7 @@ import Link from 'next/link';
 import { useEffect, useRef, useState } from 'react';
 import { usePathname } from 'next/navigation';
 import { canOpen, type CurrentUser } from '@/lib/auth';
-import StoreName from './store-name';
+import { SloumaIcon } from './brand/slouma-logo';
 import AdminAccountMenu from './admin-account-menu';
 import AdminIcon, { type AdminIconName } from './admin-icon';
 import styles from './admin-shell.module.css';
@@ -39,13 +39,13 @@ export default function AdminShell({ user, busy, logout, children }: { user: Cur
     desktop.addEventListener('change', resize);
     return () => { panel?.close(); document.body.style.overflow = previous; desktop.removeEventListener('change', resize); opener?.focus(); };
   }, [open]);
-  const brand = <Link href="/dashboard" className={styles.brand} onClick={() => setOpen(false)}><span className={styles.brandIcon}><AdminIcon name="products" /></span><StoreName /></Link>;
+  const brand = <Link href="/dashboard" className={styles.brand} onClick={() => setOpen(false)} aria-label="دار سلومة, tableau de bord"><SloumaIcon size={42} className={styles.brandIcon} /><span className={styles.brandText}><span lang="ar" dir="rtl" className={styles.brandName}>دار سلومة</span><span className={styles.brandSub}>Gestion du magasin</span></span></Link>;
   return <div lang="fr" className={styles.shell}>
     <a href="#admin-content" className={styles.skip}>Aller au contenu</a>
     <aside className={styles.sidebar}>{brand}<Navigation pathname={pathname} user={user} /></aside>
     <dialog ref={dialog} className={styles.drawer} aria-label="Navigation du magasin" onCancel={() => setOpen(false)} onClick={event => { if (event.target === event.currentTarget) setOpen(false); }}>
       <div className={styles.drawerBody}><div className={styles.drawerHeader}>{brand}<button autoFocus type="button" className={styles.close} aria-label="Fermer la navigation" onClick={() => setOpen(false)}><AdminIcon name="close" /></button></div><Navigation pathname={pathname} user={user} close={() => setOpen(false)} /></div>
     </dialog>
-    <div className={styles.workspace}><header className={styles.topbar}><div className={styles.pageHeading}><button ref={trigger} type="button" className={styles.menu} aria-label="Ouvrir la navigation" aria-expanded={open} aria-haspopup="dialog" onClick={() => setOpen(true)}><AdminIcon name="menu" /></button><p>{title}</p></div><AdminAccountMenu key={pathname} user={user} busy={busy} logout={logout} /></header><div id="admin-content" tabIndex={-1} className={styles.content}>{children}</div></div>
+    <div className={styles.workspace}><header className={styles.topbar}><div className={styles.pageHeading}><button ref={trigger} type="button" className={styles.menu} aria-label="Ouvrir la navigation" aria-expanded={open} aria-haspopup="dialog" onClick={() => setOpen(true)}><AdminIcon name="menu" /></button><p>{title}</p></div><a href="/shop" target="_blank" rel="noopener noreferrer" className={styles.shopLink} aria-label="Voir la boutique (nouvel onglet)"><span>Voir la boutique</span><span aria-hidden="true">↗</span></a><AdminAccountMenu key={pathname} user={user} busy={busy} logout={logout} /></header><div id="admin-content" tabIndex={-1} className={styles.content}>{children}</div></div>
   </div>;
 }

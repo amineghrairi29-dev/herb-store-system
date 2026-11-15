@@ -2,7 +2,7 @@
 import { useEffect, useState } from 'react';
 import { authApi } from '@/lib/auth';
 export default function StoreName() {
-  const [name, setName] = useState('Herb Store');
+  const [name, setName] = useState('Dar Slouma');
   useEffect(() => {
     let active = true, version = 0;
     const reload = async () => {
@@ -12,7 +12,7 @@ export default function StoreName() {
         const value: unknown = await response.json();
         if (!response.ok || !value || typeof value !== 'object' || !('storeName' in value) || typeof value.storeName !== 'string' || !value.storeName.trim()) throw new Error();
         if (active && request === version) setName(value.storeName);
-      } catch { if (active && request === version) setName('Herb Store'); }
+      } catch { if (active && request === version) setName('Dar Slouma'); }
     };
     void reload(); window.addEventListener('store:updated', reload);
     return () => { active = false; window.removeEventListener('store:updated', reload); };
