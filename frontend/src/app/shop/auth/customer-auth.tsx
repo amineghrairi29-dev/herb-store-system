@@ -1,10 +1,10 @@
 "use client";
 import Image from 'next/image';
 import Link from 'next/link';
-import StoreName from '@/components/store-name';
 import { useEffect, useRef, useState, type FormEvent } from "react";
+import { SloumaStamp } from "@/components/brand/slouma-logo";
+import { Leaf } from "../storefront/leaf";
 import "./customer-auth.css";
-import BackLink from "../back-link";
 import { useRouter } from "next/navigation";
 import { apiBase } from "@/lib/api-base";
 import { safeCustomerReturn, useCustomerAuth } from "../customer-auth-provider";
@@ -23,7 +23,14 @@ export default function CustomerAuth({
   const target = safeCustomerReturn(returnTo);
   const [register, setRegister] = useState(false),
     [busy, setBusy] = useState(false),
-    [google, setGoogle] = useState(false);
+    [google, setGoogle] = useState(false),
+    [password, setPassword] = useState(""),
+    [shown, setShown] = useState(false);
+  const rules = [
+    { label: "8 caractères", ok: password.length >= 8 },
+    { label: "une lettre", ok: /[a-zA-Z]/.test(password) },
+    { label: "un chiffre", ok: /[0-9]/.test(password) },
+  ];
   const [error, setError] = useState(
     googleError
       ? "Connexion Google impossible ou annulée. Réessayez ou connectez-vous avec votre email."
@@ -115,95 +122,85 @@ export default function CustomerAuth({
     }
   }
   const field = "ca-input";
+  const switchTo = (value: boolean) => { setRegister(value); setError(""); };
   return (
     <section className="customer-auth">
-      <aside className="ca-visual" aria-label="L’univers de la boutique">
-        <Image src="/images/shop/hero/hero-main.png" alt="Herbes aromatiques, mortier et huile botanique" fill sizes="(max-width: 759px) 100vw, 50vw" className="ca-visual-image" preload />
-        <div className="ca-visual-copy"><p className="ca-brand"><StoreName /></p><p className="ca-visual-title">Le naturel,<br /><em>tout simplement.</em></p><span>Votre sélection, à portée de main.</span></div>
+      <aside className="ca-visual" aria-label="دار سلومة">
+        <span className="ca-blob" aria-hidden="true" />
+        <div className="ca-photo" aria-hidden="true"><Image src="/images/shop/hero/hero-main.png" alt="" fill sizes="(max-width: 899px) 0px, 30vw" className="ca-visual-image" preload /></div>
+        <span className="ca-leaf ca-leaf-1" aria-hidden="true"><Leaf color="#A9C68F" /></span>
+        <span className="ca-leaf ca-leaf-2" aria-hidden="true"><Leaf color="#D99A2B" vein="rgb(31 42 26 / .35)" /></span>
+        <span className="ca-leaf ca-leaf-3" aria-hidden="true"><Leaf color="#3E7B3A" vein="rgb(255 255 255 / .35)" /></span>
+        <div className="ca-visual-copy">
+          <span className="ca-stamp" aria-hidden="true"><SloumaStamp size={92} tone="cream" /></span>
+          <p lang="ar" dir="rtl" className="ca-ar">مرحبا بيك في دار سلومة</p>
+          <p className="ca-visual-title">Votre compte,<br /><em>vos recettes.</em></p>
+          <ul className="ca-perks">
+            <li><span aria-hidden="true">✓</span>Toutes vos commandes et leur suivi</li>
+            <li><span aria-hidden="true">✓</span>Adresse remplie d’avance à la commande</li>
+            <li><span aria-hidden="true">✓</span>Le compte reste facultatif pour commander</li>
+          </ul>
+        </div>
       </aside>
       <div className="ca-form-panel">
       <div className="ca-form-inner">
-      <BackLink href="/shop">Retour à la boutique</BackLink>
-      <div className="ca-heading" aria-hidden="true" />
+      <div className="ca-top">
+        <Link href="/shop" className="ca-home" aria-label="Retour à la boutique"><span aria-hidden="true">←</span><span lang="ar" dir="rtl" className="ca-name">دار سلومة</span></Link>
+      </div>
+      <h1 className="ca-title">{register ? "Créer un compte" : "Bon retour parmi nous"}</h1>
+      <p className="ca-sub">{register ? "Une minute suffit. Seuls l’email et le mot de passe sont obligatoires." : "Connectez-vous pour retrouver vos commandes."}</p>
       <div className="ca-switch" data-register={register} role="group" aria-label="Accès au compte">
         <span className="ca-tab-indicator" aria-hidden="true" />
-        <button type="button" disabled={busy} aria-pressed={!register} onClick={() => { setRegister(false); setError(""); }}>Connexion</button>
-        <button type="button" disabled={busy} aria-pressed={register} onClick={() => { setRegister(true); setError(""); }}>Inscription</button>
+        <button type="button" disabled={busy} aria-pressed={!register} onClick={() => switchTo(false)}>Connexion</button>
+        <button type="button" disabled={busy} aria-pressed={register} onClick={() => switchTo(true)}>Inscription</button>
       </div>
       <form onSubmit={submit} className="ca-form">
         <fieldset disabled={busy} className="ca-fields">
-          <legend className="sr-only">
-            {register ? "Créer un compte" : "Se connecter"}
-          </legend>
+          <legend className="sr-only">{register ? "Créer un compte" : "Se connecter"}</legend>
           <label className="ca-label">
             Email
-            <input
-              name="email"
-              type="email"
-              autoComplete="email"
-              required
-              maxLength={254}
-              className={field}
-            />
+            <input name="email" type="email" autoComplete="email" required maxLength={254} className={field} placeholder="vous@exemple.com" />
           </label>
           <label className="ca-label">
             Mot de passe
-            <input
-              name="password"
-              type="password"
-              required
-              minLength={register ? 8 : undefined}
-              maxLength={72}
-              autoComplete={register ? "new-password" : "current-password"}
-              className={field}
-            />
+            <span className="ca-password">
+              <input name="password" type={shown ? "text" : "password"} required minLength={register ? 8 : undefined} maxLength={72} autoComplete={register ? "new-password" : "current-password"} className={field} value={password} onChange={(event) => setPassword(event.target.value)} aria-describedby={register ? "ca-rules" : undefined} />
+              <button type="button" className="ca-eye" onClick={() => setShown((value) => !value)} aria-label={shown ? "Masquer le mot de passe" : "Afficher le mot de passe"} aria-pressed={shown}>
+                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2.5 12S6 5.5 12 5.5 21.5 12 21.5 12 18 18.5 12 18.5 2.5 12 2.5 12Z" fill="none" stroke="currentColor" strokeWidth="1.8" /><circle cx="12" cy="12" r="3" fill="none" stroke="currentColor" strokeWidth="1.8" />{shown && <path d="M4 4l16 16" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />}</svg>
+              </button>
+            </span>
           </label>
           {register && (
             <>
-              <p className="ca-help">
-                Au moins 8 caractères, une lettre et un chiffre.
-              </p>
-              <label className="ca-label">
-                Nom complet (facultatif)
-                <input
-                  name="fullName"
-                  maxLength={150}
-                  autoComplete="name"
-                  className={field}
-                />
-              </label>
-              <label className="ca-label">
-                Téléphone (facultatif)
-                <input
-                  name="phone"
-                  type="tel"
-                  maxLength={40}
-                  autoComplete="tel"
-                  className={field}
-                />
-              </label>
+              <ul id="ca-rules" className="ca-rules" aria-label="Le mot de passe doit contenir">
+                {rules.map((rule) => <li key={rule.label} data-ok={rule.ok}><span aria-hidden="true">{rule.ok ? "✓" : "•"}</span>{rule.label}<span className="sr-only">{rule.ok ? " : fait" : " : à faire"}</span></li>)}
+              </ul>
+              <div className="ca-pair">
+                <label className="ca-label">
+                  Nom <span className="ca-optional">(facultatif)</span>
+                  <input name="fullName" maxLength={150} autoComplete="name" className={field} dir="auto" />
+                </label>
+                <label className="ca-label">
+                  Téléphone <span className="ca-optional">(facultatif)</span>
+                  <input name="phone" type="tel" inputMode="tel" maxLength={40} autoComplete="tel" className={field} placeholder="98 123 456" />
+                </label>
+              </div>
             </>
           )}
-          <button
-            className="ca-primary"
-            type="submit"
-          >
-            {busy
-              ? "Connexion..."
-              : register
-                ? "Créer un compte"
-                : "Se connecter"}
+          <button className="ca-primary" type="submit">
+            {busy ? <><span className="ca-spinner" aria-hidden="true" />{register ? "Création…" : "Connexion…"}</> : <>{register ? "Créer mon compte" : "Se connecter"} <span aria-hidden="true">→</span></>}
           </button>
         </fieldset>
       </form>
+      {(error || auth.error) && (
+        <p role="alert" className="ca-error">{error || auth.error}</p>
+      )}
       {google && (
         <>
           <p className="ca-divider"><span>ou</span></p>
           <a
             aria-disabled={busy}
-            onClick={(e) => {
-              if (busy) e.preventDefault();
-            }}
+            onClick={(e) => { if (busy) e.preventDefault(); }}
             className="ca-google"
             href={`${apiBase}/public/auth/google/start?${new URLSearchParams({ returnTo: target, ...(entry ? { entry: 'true' } : {}) })}`}
           >
@@ -217,12 +214,7 @@ export default function CustomerAuth({
           </a>
         </>
       )}
-      {entry && <Link href="/shop" className="ca-visitor">Continuer en tant que visiteur</Link>}
-      {(error || auth.error) && (
-        <p role="alert" className="ca-error">
-          {error || auth.error}
-        </p>
-      )}
+      <Link href="/shop" className="ca-visitor">{entry ? "Continuer en tant que visiteur" : "Commander sans compte"} <span aria-hidden="true">→</span></Link>
       </div>
       </div>
     </section>

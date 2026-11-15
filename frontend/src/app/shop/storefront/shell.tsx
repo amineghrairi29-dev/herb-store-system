@@ -29,7 +29,7 @@ export default function StorefrontShell({ children }: { children: React.ReactNod
       <a className="sf-skip" href="#shop-main">Aller au contenu</a>
       {!authPage && <Announcement />}
       {!authPage && <PublicHeader key={pathname} />}
-      <main id="shop-main" className={redesigned ? (pathname === "/shop" ? "" : "sf-container sf-inner-page") : "sf-legacy-main"}>
+      <main id="shop-main" className={authPage ? undefined : redesigned ? (pathname === "/shop" ? "" : "sf-container sf-inner-page") : "sf-legacy-main"}>
         {children}
       </main>
       {!authPage && <SiteFooter />}
