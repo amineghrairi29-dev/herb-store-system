@@ -32,3 +32,15 @@
   .about-values > div + div { border-top: 1px solid #e4e8dd; padding-top: 16px; }
   .about-values p { max-width: none; }
 }
+
+.about-visit { display: grid; grid-template-columns: 1fr auto; gap: 20px 32px; align-items: center; margin-top: 48px; padding: 32px; border: 1px solid var(--sf-line, #dce5da); border-radius: 20px; background: var(--sf-sage, #edf3e9); }
+.about-visit h2 { font: 400 28px/1.2 Georgia, serif; margin-bottom: 10px; }
+.about-visit dl { display: grid; gap: 4px; margin-top: 10px; }
+.about-visit dl div { display: flex; flex-wrap: wrap; gap: 4px 12px; }
+.about-visit dt { font-weight: 600; }
+.about-visit-actions { display: grid; gap: 12px; justify-items: start; }
+.about-whatsapp { display: inline-flex; align-items: center; min-height: 46px; padding: 0 20px; border-radius: 999px; background: #173f32; color: #fff; font-weight: 500; transition: transform 0.2s ease; }
+.about-whatsapp:hover { transform: translateY(-2px); }
+.about-note { grid-column: 1 / -1; font-size: 13px; color: var(--sf-muted, #637268); }
+@media (max-width: 759px) { .about-visit { grid-template-columns: 1fr; padding: 22px; } }
+@media (prefers-reduced-motion: reduce) { .about-whatsapp { transition: none; } .about-whatsapp:hover { transform: none; } }

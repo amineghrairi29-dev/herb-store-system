@@ -1,0 +1,18 @@
+/* Shared by FAQ, delivery and legal pages. */
+.sf-legal h2 { font: 400 24px/1.3 Georgia, serif; margin: 34px 0 10px; }
+.sf-legal p, .sf-legal li { color: var(--sf-muted); line-height: 1.85; }
+.sf-legal ul { padding-inline-start: 20px; margin: 8px 0 14px; list-style: disc; }
+.sf-legal .sf-updated { font-size: 13px; margin-top: 30px; }
+.sf-faq { display: grid; gap: 10px; margin: 26px 0 34px; }
+.sf-faq details { border: 1px solid var(--sf-line); border-radius: 14px; background: var(--sf-white); overflow: hidden; }
+.sf-faq summary { cursor: pointer; list-style: none; display: flex; justify-content: space-between; gap: 16px; padding: 18px 20px; font-weight: 500; color: var(--sf-ink); }
+.sf-faq summary::-webkit-details-marker { display: none; }
+.sf-faq summary::after { content: "+"; font-size: 22px; line-height: 1; color: var(--sf-green); transition: transform 0.25s ease; }
+.sf-faq details[open] summary::after { transform: rotate(45deg); }
+.sf-faq details > p { padding: 0 20px 18px; color: var(--sf-muted); line-height: 1.8; animation: sf-faq-open 0.3s ease both; }
+@keyframes sf-faq-open { from { opacity: 0; transform: translateY(-4px); } to { opacity: 1; transform: none; } }
+.sf-steps { counter-reset: step; display: grid; gap: 14px; margin: 24px 0 32px; padding: 0; list-style: none; }
+.sf-steps li { counter-increment: step; position: relative; padding: 18px 20px 18px 64px; border: 1px solid var(--sf-line); border-radius: 14px; background: var(--sf-white); color: var(--sf-muted); line-height: 1.7; }
+.sf-steps li::before { content: counter(step); position: absolute; left: 20px; top: 16px; display: grid; place-items: center; width: 30px; height: 30px; border-radius: 50%; background: var(--sf-sage); color: var(--sf-green); font-weight: 600; }
+.sf-steps strong { color: var(--sf-ink); }
+@media (prefers-reduced-motion: reduce) { .sf-faq summary::after { transition: none; } .sf-faq details > p { animation: none; } }

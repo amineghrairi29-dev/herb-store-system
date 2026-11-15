@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { displayPhone, getStoreInfo, whatsappLink } from "@/lib/store-info";
 import "./contact.css";
+import { shopContent } from "@/lib/shop-content";
 
 export const metadata: Metadata = {
   title: "Contact",
@@ -45,6 +46,11 @@ export default async function ContactPage() {
               <span>Voir sur la carte ↗</span>
             </a>
           )}
+          <div className="sf-contact-card">
+            <span className="sf-contact-label">Horaires</span>
+            {shopContent.openingHours.map((row) => <strong key={row.days} className="sf-contact-hours">{row.hours}</strong>)}
+            <span>{shopContent.openingHours.map((row) => row.days).join(" · ")}</span>
+          </div>
           {store?.email && (
             <a className="sf-contact-card" href={`mailto:${store.email}`}>
               <span className="sf-contact-label">Email</span>

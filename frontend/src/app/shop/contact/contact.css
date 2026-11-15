@@ -21,3 +21,4 @@
 .sf-contact-label { font-size: 12px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--sf-green); }
 .sf-contact-primary { background: var(--sf-sage); }
 @media (prefers-reduced-motion: reduce) { .sf-contact-card { transition: none; } .sf-contact-card:hover { transform: none; } }
+.sf-contact-card .sf-contact-hours { font-size: 18px; }

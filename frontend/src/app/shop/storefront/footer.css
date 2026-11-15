@@ -23,3 +23,5 @@
   .storefront .sf-footer .sf-footer-bottom > span:last-child { margin-left: 0; text-align: left; }
 }
 @media(prefers-reduced-motion: reduce) { .storefront .sf-footer a { transition: none; } }
+.sf-footer-legal { display: flex; flex-wrap: wrap; gap: 6px 18px; }
+.sf-footer-legal a:hover { text-decoration: underline; }
