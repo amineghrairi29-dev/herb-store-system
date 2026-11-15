@@ -1,0 +1,32 @@
+# One-off: second Prettier pass on the backend (a few files change again on a second
+# run), then commit. Removed right after it has run.
+name: Format once
+
+on:
+  push:
+    branches: [phase-4e-prettier]
+
+permissions:
+  contents: write
+
+jobs:
+  format:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 22
+      - name: Prettier (backend), until stable
+        working-directory: backend
+        run: |
+          for pass in 1 2 3; do npx --yes prettier@3.9.6 --write "src/**/*.ts" "test/**/*.ts" > /dev/null; done
+          npx --yes prettier@3.9.6 --check "src/**/*.ts" "test/**/*.ts"
+      - name: Commit
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A backend
+          git diff --cached --stat
+          git diff --cached --quiet || git commit -m "Prettier : seconde passe sur le backend"
+          git push
