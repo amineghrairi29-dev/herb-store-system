@@ -70,12 +70,15 @@ model OnlineOrder {
   deliveryGovernorate String?
   deliveryCity String?
   deliveryFee Decimal?
+  deliveryStatus String?
+  deliveryStatusAt TimestamptzString?
 
   @@index([status, createdAt])
   @@index([customerId])
   @@check(expression: "(\"saleId\" IS NULL AND \"convertedAt\" IS NULL) OR (\"saleId\" IS NOT NULL AND \"convertedAt\" IS NOT NULL AND status = 'CONFIRMED')", name: "online_order_conversion")
   @@check(expression: "\"totalAmount\" > 0 AND \"totalAmount\" < 'Infinity'::numeric", name: "online_order_total")
   @@check(expression: "\"deliveryFee\" IS NULL OR (\"deliveryFee\" >= 0 AND \"deliveryFee\" < 1000)", name: "online_order_delivery_fee")
+  @@check(expression: "(\"deliveryStatus\" IS NULL AND \"deliveryStatusAt\" IS NULL) OR (status = 'CONFIRMED' AND \"deliveryStatus\" IN ('PREPARING', 'SHIPPED', 'DELIVERED', 'RETURNED') AND \"deliveryStatusAt\" IS NOT NULL)", name: "online_order_delivery_status")
   @@check(expression: "(status = 'PENDING' AND \"confirmedAt\" IS NULL AND \"cancelledAt\" IS NULL) OR (status = 'CONFIRMED' AND \"confirmedAt\" IS NOT NULL AND \"cancelledAt\" IS NULL) OR (status = 'CANCELLED' AND \"cancelledAt\" IS NOT NULL AND \"confirmedAt\" IS NULL)", name: "online_order_status")
 }
 

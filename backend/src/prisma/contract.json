@@ -1268,6 +1268,20 @@
                   "kind": "scalar"
                 }
               },
+              "deliveryStatus": {
+                "nullable": true,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                }
+              },
+              "deliveryStatusAt": {
+                "nullable": true,
+                "type": {
+                  "codecId": "pg/timestamptz-string@1",
+                  "kind": "scalar"
+                }
+              },
               "id": {
                 "nullable": false,
                 "type": {
@@ -1387,6 +1401,12 @@
                 },
                 "deliveryGovernorate": {
                   "column": "deliveryGovernorate"
+                },
+                "deliveryStatus": {
+                  "column": "deliveryStatus"
+                },
+                "deliveryStatusAt": {
+                  "column": "deliveryStatusAt"
                 },
                 "id": {
                   "column": "id"
@@ -4343,6 +4363,11 @@
                   "prefix": "online_order_delivery_fee"
                 },
                 {
+                  "expression": "(\"deliveryStatus\" IS NULL AND \"deliveryStatusAt\" IS NULL) OR (status = 'CONFIRMED' AND \"deliveryStatus\" IN ('PREPARING', 'SHIPPED', 'DELIVERED', 'RETURNED') AND \"deliveryStatusAt\" IS NOT NULL)",
+                  "name": "online_order_delivery_status_c57d254c",
+                  "prefix": "online_order_delivery_status"
+                },
+                {
                   "expression": "(status = 'PENDING' AND \"confirmedAt\" IS NULL AND \"cancelledAt\" IS NULL) OR (status = 'CONFIRMED' AND \"confirmedAt\" IS NOT NULL AND \"cancelledAt\" IS NULL) OR (status = 'CANCELLED' AND \"cancelledAt\" IS NOT NULL AND \"confirmedAt\" IS NULL)",
                   "name": "online_order_status_e490f5ea",
                   "prefix": "online_order_status"
@@ -4416,6 +4441,16 @@
                 "deliveryGovernorate": {
                   "codecId": "pg/text@1",
                   "nativeType": "text",
+                  "nullable": true
+                },
+                "deliveryStatus": {
+                  "codecId": "pg/text@1",
+                  "nativeType": "text",
+                  "nullable": true
+                },
+                "deliveryStatusAt": {
+                  "codecId": "pg/timestamptz-string@1",
+                  "nativeType": "timestamptz",
                   "nullable": true
                 },
                 "id": {
@@ -6348,7 +6383,7 @@
         "kind": "postgres-schema"
       }
     },
-    "storageHash": "041bfee8d1354cc639e224ee75a14e805f9844af58ec4a30bb19970a43b01e51"
+    "storageHash": "1a271a6c502a71c3ab8fe6d9513c16c6dfe6b31688e2885947d59b949744f9c3"
   },
   "execution": {
     "executionHash": "61c9271858a528765fde510b4abf69c10396ea3942af7d5f8941f810942342de",

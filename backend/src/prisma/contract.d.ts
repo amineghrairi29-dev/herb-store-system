@@ -33,7 +33,7 @@ import type {
 } from '@prisma/orm-postgres/contract/types';
 
 export type StorageHash =
-  StorageHashBase<'041bfee8d1354cc639e224ee75a14e805f9844af58ec4a30bb19970a43b01e51'>;
+  StorageHashBase<'1a271a6c502a71c3ab8fe6d9513c16c6dfe6b31688e2885947d59b949744f9c3'>;
 export type ExecutionHash =
   ExecutionHashBase<'61c9271858a528765fde510b4abf69c10396ea3942af7d5f8941f810942342de'>;
 export type ProfileHash =
@@ -369,6 +369,8 @@ export type FieldOutputTypes = {
       readonly deliveryGovernorate: CodecTypes['pg/text@1']['output'] | null;
       readonly deliveryCity: CodecTypes['pg/text@1']['output'] | null;
       readonly deliveryFee: CodecTypes['pg/numeric@1']['output'] | null;
+      readonly deliveryStatus: CodecTypes['pg/text@1']['output'] | null;
+      readonly deliveryStatusAt: CodecTypes['pg/timestamptz-string@1']['output'] | null;
     };
     readonly OnlineOrderLine: {
       readonly id: CodecTypes['pg/int4@1']['output'];
@@ -678,6 +680,8 @@ export type FieldInputTypes = {
       readonly deliveryGovernorate: CodecTypes['pg/text@1']['input'] | null;
       readonly deliveryCity: CodecTypes['pg/text@1']['input'] | null;
       readonly deliveryFee: CodecTypes['pg/numeric@1']['input'] | null;
+      readonly deliveryStatus: CodecTypes['pg/text@1']['input'] | null;
+      readonly deliveryStatusAt: CodecTypes['pg/timestamptz-string@1']['input'] | null;
     };
     readonly OnlineOrderLine: {
       readonly id: CodecTypes['pg/int4@1']['input'];
@@ -980,6 +984,8 @@ export type StorageColumnTypes = {
       readonly deliveryCity: CodecTypes['pg/text@1']['output'] | null;
       readonly deliveryFee: CodecTypes['pg/numeric@1']['output'] | null;
       readonly deliveryGovernorate: CodecTypes['pg/text@1']['output'] | null;
+      readonly deliveryStatus: CodecTypes['pg/text@1']['output'] | null;
+      readonly deliveryStatusAt: CodecTypes['pg/timestamptz-string@1']['output'] | null;
       readonly id: CodecTypes['pg/int4@1']['output'];
       readonly notes: CodecTypes['pg/text@1']['output'] | null;
       readonly reference: CodecTypes['pg/text@1']['output'];
@@ -1289,6 +1295,8 @@ export type StorageColumnInputTypes = {
       readonly deliveryCity: CodecTypes['pg/text@1']['input'] | null;
       readonly deliveryFee: CodecTypes['pg/numeric@1']['input'] | null;
       readonly deliveryGovernorate: CodecTypes['pg/text@1']['input'] | null;
+      readonly deliveryStatus: CodecTypes['pg/text@1']['input'] | null;
+      readonly deliveryStatusAt: CodecTypes['pg/timestamptz-string@1']['input'] | null;
       readonly id: CodecTypes['pg/int4@1']['input'];
       readonly notes: CodecTypes['pg/text@1']['input'] | null;
       readonly reference: CodecTypes['pg/text@1']['input'];
@@ -2358,6 +2366,16 @@ type ContractBase = Omit<
                 readonly deliveryFee: {
                   readonly nativeType: 'numeric';
                   readonly codecId: 'pg/numeric@1';
+                  readonly nullable: true;
+                };
+                readonly deliveryStatus: {
+                  readonly nativeType: 'text';
+                  readonly codecId: 'pg/text@1';
+                  readonly nullable: true;
+                };
+                readonly deliveryStatusAt: {
+                  readonly nativeType: 'timestamptz';
+                  readonly codecId: 'pg/timestamptz-string@1';
                   readonly nullable: true;
                 };
               };
@@ -4542,6 +4560,17 @@ type ContractBase = Omit<
                 readonly nullable: true;
                 readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/numeric@1' };
               };
+              readonly deliveryStatus: {
+                readonly nullable: true;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
+              };
+              readonly deliveryStatusAt: {
+                readonly nullable: true;
+                readonly type: {
+                  readonly kind: 'scalar';
+                  readonly codecId: 'pg/timestamptz-string@1';
+                };
+              };
             };
             readonly relations: {
               readonly customer: {
@@ -4587,6 +4616,8 @@ type ContractBase = Omit<
                 readonly deliveryGovernorate: { readonly column: 'deliveryGovernorate' };
                 readonly deliveryCity: { readonly column: 'deliveryCity' };
                 readonly deliveryFee: { readonly column: 'deliveryFee' };
+                readonly deliveryStatus: { readonly column: 'deliveryStatus' };
+                readonly deliveryStatusAt: { readonly column: 'deliveryStatusAt' };
               };
             };
           };

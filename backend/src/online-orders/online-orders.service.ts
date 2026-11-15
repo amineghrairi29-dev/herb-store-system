@@ -9,6 +9,7 @@ import type { Client } from 'pg';
 import { notifyNewOrder } from './order-notifier.js';
 import { activeDeliveryZones } from '../delivery/delivery-zones.service.js';
 import { deliveryFee, isGovernorate } from '../delivery/delivery-values.js';
+import { canMoveDelivery, isDeliveryStatus } from './delivery-status.js';
 
 /**
  * Delivery for an order. With no active zone (delivery prices not set up yet), orders keep working without a fee.
@@ -75,7 +76,7 @@ export class OnlineOrdersService {
       if (!order || (tunisianPhone(order.customerPhone) ?? order.customerPhone.trim()) !== given) throw missing();
       const lines = await tx.orm.public.OnlineOrderLine.where({ orderId: order.id }).orderBy((row) => row.id.asc()).all();
       const fee = order.deliveryFee === null ? null : String(order.deliveryFee);
-      return { reference: order.reference, status: order.status, totalAmount: order.totalAmount, deliveryFee: fee, grandTotal: orderTotal([String(order.totalAmount), fee ?? '0.000']), deliveryGovernorate: order.deliveryGovernorate, createdAt: order.createdAt,
+      return { reference: order.reference, status: order.status, deliveryStatus: order.deliveryStatus, totalAmount: order.totalAmount, deliveryFee: fee, grandTotal: orderTotal([String(order.totalAmount), fee ?? '0.000']), deliveryGovernorate: order.deliveryGovernorate, createdAt: order.createdAt,
         items: lines.map(({ productNameSnapshot, unitSnapshot, quantity, unitPrice, lineTotal }) => ({ productNameSnapshot, unitSnapshot, quantity, unitPrice, lineTotal })) };
     }, true);
   }
@@ -114,5 +115,26 @@ export class OnlineOrdersService {
       if (order.status !== 'PENDING') throw new ConflictException('Seule une commande en attente peut être confirmée ou annulée.');
       return audited(tx, status === 'CONFIRMED' ? 'ONLINE_ORDER_CONFIRM' : 'ONLINE_ORDER_CANCEL', 'ONLINE_ORDER', await tx.orm.public.OnlineOrder.where({ id }).update({ status, ...(status === 'CONFIRMED' ? { confirmedAt: new Date().toISOString() } : { cancelledAt: new Date().toISOString() }) }));
     });
+  }
+  /** Back office: delivery tracking of a confirmed order. */
+  delivery(id: number, body: unknown) {
+    purchaseId(id); const { deliveryStatus } = orderObject(body, ['deliveryStatus']);
+    if (!isDeliveryStatus(deliveryStatus)) throw new BadRequestException('Statut de livraison invalide.');
+    return transaction(async (tx) => {
+      await tx.client.query('SELECT id FROM public."onlineOrder" WHERE id = $1 FOR UPDATE', [id]);
+      const order = await tx.orm.public.OnlineOrder.first({ id });
+      if (!order) throw new NotFoundException('Commande introuvable.');
+      if (order.status !== 'CONFIRMED') throw new ConflictException('Confirmez la commande avant de suivre sa livraison.');
+      if (!canMoveDelivery(order.deliveryStatus, deliveryStatus)) throw new ConflictException('Ce changement de statut de livraison n’est pas possible.');
+      const updated = await tx.orm.public.OnlineOrder.where({ id }).update({ deliveryStatus, deliveryStatusAt: new Date().toISOString() });
+      return audited(tx, 'ONLINE_ORDER_DELIVERY_UPDATE', 'ONLINE_ORDER', updated, { from: order.deliveryStatus, to: deliveryStatus });
+    });
+  }
+  /** Storefront account: the signed-in customer's own orders, newest first. */
+  customerOrders(customerId: number) {
+    return transaction(async (tx) => (await tx.client.query<{ reference: string; status: string; deliveryStatus: string | null; totalAmount: string; deliveryFee: string | null; createdAt: string; itemCount: number }>(
+      `SELECT o.reference, o.status, o."deliveryStatus", o."totalAmount"::text AS "totalAmount", o."deliveryFee"::text AS "deliveryFee", o."createdAt"::text AS "createdAt",
+              (SELECT count(*)::int FROM public."onlineOrderLine" l WHERE l."orderId" = o.id) AS "itemCount"
+       FROM public."onlineOrder" o WHERE o."customerId" = $1 ORDER BY o."createdAt" DESC, o.id DESC LIMIT 50`, [customerId])).rows, true);
   }
 }
