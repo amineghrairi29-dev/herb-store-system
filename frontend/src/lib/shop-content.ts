@@ -8,6 +8,8 @@ export const shopContent = {
   openingHours: [
     { days: "Tous les jours", hours: "8h30 – 13h00 · 14h30 – 19h30" },
   ],
+  /** Same hours as openingHours, for "Ouvert maintenant" (Tunis time, every day). */
+  openingSlots: [["08:30", "13:00"], ["14:30", "19:30"]],
 } as const;
 
 export function yearsOfExperience(now = new Date()): number {
