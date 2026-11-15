@@ -1,6 +1,6 @@
 import { categoryFixture } from './category-fixture.js';
 const classification = categoryFixture();
-import { CustomerGuard } from '../src/customer-auth/customer.guard.js';
+import { OptionalCustomerGuard } from '../src/customer-auth/customer.guard.js';
 import type { ExecutionContext } from '@nestjs/common';
 import 'dotenv/config';
 import { Test } from '@nestjs/testing';
@@ -23,7 +23,7 @@ describe.skipIf(process.env.RUN_DATABASE_TESTS !== '1')('Online orders (disposab
   const orderId = async (reference: string) => (await db.orm.public.OnlineOrder.first({ reference }))!.id;
   beforeAll(async () => {
     Reflect.defineMetadata('design:paramtypes', [OnlineOrdersService], OnlineOrdersController); Reflect.defineMetadata('design:paramtypes', [OnlineOrdersService], PublicOrdersController);
-    const module = await Test.createTestingModule({ controllers: [OnlineOrdersController, PublicOrdersController], providers: [OnlineOrdersService] }).overrideGuard(CustomerGuard).useValue({ canActivate(context: ExecutionContext) { context.switchToHttp().getRequest().customer = { id: null }; return true; } }).compile(); app = module.createNestApplication(); app.useLogger(false); await app.init();
+    const module = await Test.createTestingModule({ controllers: [OnlineOrdersController, PublicOrdersController], providers: [OnlineOrdersService] }).overrideGuard(OptionalCustomerGuard).useValue({ canActivate(context: ExecutionContext) { context.switchToHttp().getRequest().customer = null; return true; } }).compile(); app = module.createNestApplication(); app.useLogger(false); await app.init();
     await db.transaction(async (tx) => {
       for (let i = 0; i < 6; i++) {
         const product = await tx.orm.public.Product.create({ categoryId: classification.id, sku: `${token}-${i}`, name: 'نعناع', productType: 'VRAC', salePrice: '0.100000000000000001', category: token, storageUnit: 'KG', saleUnit: 'KG', conversionFactor: '1', isActive: i !== 1, isSellable: i !== 2, isVisibleOnline: i !== 3 }); await tx.orm.public.ProductClassification.create({ productId: product.id, classificationId: classification.classificationId }); ids.push(product.id);

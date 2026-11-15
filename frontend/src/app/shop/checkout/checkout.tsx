@@ -9,6 +9,7 @@ import type { CartItem } from "@/lib/cart";
 import { displayAmount } from "@/lib/purchase-decimal";
 import type { OrderReceipt, OrderLine } from "@/types/online-order";
 import type { Customer } from "../customer-auth-provider";
+import { tunisianPhone } from "@/lib/phone";
 
 interface OrderQuote { items: OrderLine[]; totalAmount: string }
 async function preview(items: CartItem[], signal?: AbortSignal): Promise<OrderQuote> {
@@ -17,7 +18,7 @@ async function preview(items: CartItem[], signal?: AbortSignal): Promise<OrderQu
   return response.json() as Promise<OrderQuote>;
 }
 
-export default function Checkout({ customer }: { customer: Customer }) {
+export default function Checkout({ customer }: { customer: Customer | null }) {
   const cart = useCart(), router = useRouter(), locked = useRef(false);
   const [error, setError] = useState("");
   const [quoted, setQuoted] = useState<{ key: string; data: OrderQuote | null; error: string } | null>(null);
@@ -35,13 +36,14 @@ export default function Checkout({ customer }: { customer: Customer }) {
   const total = valid ? quote.totalAmount : null;
   async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault(); if (locked.current || !valid || !cart.beginOrder()) return;
-    locked.current = true; setError("");
     const fields = new FormData(event.currentTarget), items = cart.items.map((item) => ({ ...item }));
+    const customerPhone = tunisianPhone(String(fields.get("customerPhone") ?? ""));
+    if (!customerPhone) { setError("Numéro de téléphone invalide : 8 chiffres attendus (ex. 98 123 456)."); cart.endOrder(); return; }
+    locked.current = true; setError("");
     try {
       const checked = await preview(items);
       if (checked.items.some((line) => line.unitPrice !== quote?.items.find((previous) => previous.productId === line.productId)?.unitPrice)) throw new Error("Les prix ont changé. Vérifiez le nouveau récapitulatif avant de renvoyer votre commande.");
-      const response = await fetch(`${apiBase}/public/orders`, { method: "POST", credentials: "include", headers: { "Content-Type": "application/json; charset=utf-8" }, body: JSON.stringify({ customerName: String(fields.get("customerName") ?? "").trim(), customerPhone: String(fields.get("customerPhone") ?? "").trim(), deliveryAddress: String(fields.get("deliveryAddress") ?? "").trim(), notes: String(fields.get("notes") ?? "").trim() || null, items }) });
-      if (response.status === 401) { router.replace("/shop/auth?returnTo=/shop/checkout"); return; }
+      const response = await fetch(`${apiBase}/public/orders`, { method: "POST", credentials: "include", headers: { "Content-Type": "application/json; charset=utf-8" }, body: JSON.stringify({ customerName: String(fields.get("customerName") ?? "").trim(), customerPhone, customerEmail: customer ? undefined : String(fields.get("customerEmail") ?? "").trim() || null, website: String(fields.get("website") ?? ""), deliveryAddress: String(fields.get("deliveryAddress") ?? "").trim(), notes: String(fields.get("notes") ?? "").trim() || null, items }) });
       if (!response.ok) {
         const body: unknown = await response.json().catch(() => null);
         const message = body && typeof body === "object" && "message" in body && typeof body.message === "string" ? body.message : "Impossible d’enregistrer la commande. Réessayez.";
@@ -57,10 +59,13 @@ export default function Checkout({ customer }: { customer: Customer }) {
     {!cart.hydrated ? <p role="status">Chargement du panier…</p> : !cart.items.length ? <div className="co-empty"><p>Votre panier est vide.</p><Link href="/shop#products" className="co-primary">Découvrir le catalogue</Link></div> : <div className="co-layout">
       <form onSubmit={submit} className="co-form"><fieldset disabled={cart.busy}><legend>Vos coordonnées</legend>
         <div className="co-fields">
-          <label>Nom *<input name="customerName" defaultValue={customer.fullName ?? ""} required maxLength={150} autoComplete="name" /></label>
-          <label>Téléphone *<input name="customerPhone" defaultValue={customer.phone ?? ""} type="tel" required minLength={6} maxLength={40} autoComplete="tel" /></label>
-          <label className="co-wide">Adresse de livraison *<textarea name="deliveryAddress" defaultValue={customer.deliveryAddress ?? ""} required maxLength={500} autoComplete="street-address" rows={2} /></label>
+          {!customer && <p className="co-wide co-account-hint">Pas besoin de compte pour commander. <Link href="/shop/auth?returnTo=/shop/checkout">Se connecter</Link> pour retrouver vos commandes.</p>}
+          <label>Nom *<input name="customerName" defaultValue={customer?.fullName ?? ""} required maxLength={150} autoComplete="name" /></label>
+          <label>Téléphone *<input name="customerPhone" defaultValue={customer?.phone ?? ""} type="tel" inputMode="tel" required maxLength={40} autoComplete="tel" placeholder="98 123 456" /></label>
+          {!customer && <label>Email <span>(facultatif)</span><input name="customerEmail" type="email" maxLength={254} autoComplete="email" /></label>}
+          <label className="co-wide">Adresse de livraison *<textarea name="deliveryAddress" defaultValue={customer?.deliveryAddress ?? ""} required maxLength={500} autoComplete="street-address" rows={2} /></label>
           <label className="co-wide">Notes <span>(facultatif)</span><textarea name="notes" maxLength={2000} rows={2} /></label>
+          <div className="co-honeypot" aria-hidden="true"><label>Site web<input name="website" tabIndex={-1} autoComplete="off" defaultValue="" /></label></div>
         </div>
         <p className="co-payment">Paiement à la réception</p>
         <button disabled={!valid || cart.busy} className="co-primary">{cart.busy ? "Envoi de la commande…" : "Confirmer la commande"}</button>

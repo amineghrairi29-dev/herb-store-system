@@ -5,6 +5,7 @@ import StoreName from "@/components/store-name";
 import PublicHeader from "./public-header";
 import "./footer.css";
 import { LeafIcon } from "./visuals";
+import WhatsAppButton from "./whatsapp-button";
 
 const links = [
   ["/shop", "Accueil"],
@@ -27,6 +28,7 @@ export default function StorefrontShell({
         <footer className="mx-auto max-w-7xl px-5 py-8 text-sm text-stone-500">
           Notre catalogue · Commandes soumises à confirmation du magasin
         </footer>
+        {pathname !== "/shop/auth" && <WhatsAppButton />}
       </div>
     );
   return (
@@ -89,6 +91,7 @@ export default function StorefrontShell({
           <span>Le naturel, tout simplement.</span>
         </div>
       </footer>
+      <WhatsAppButton />
     </div>
   );
 }

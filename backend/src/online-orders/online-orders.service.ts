@@ -3,9 +3,10 @@ import { withPurchaseTransaction as transaction } from '../purchases/purchase-tr
 import { audited } from '../audit/audit.service.js';
 import { purchaseId } from '../purchases/purchase-validation.js';
 import { validateCartInTransaction } from '../public-catalogue/public-cart.service.js';
-import { orderInput, orderLineTotal, orderObject, orderTotal } from './order-input.js';
+import { orderInput, orderLineTotal, orderObject, orderTotal, tunisianPhone } from './order-input.js';
 import { cartInput, type CartInput } from '../public-catalogue/cart-validation.js';
 import type { Client } from 'pg';
+import { notifyNewOrder } from './order-notifier.js';
 
 async function orderQuote(client: Client, items: CartInput[]) {
   const checked = await validateCartInTransaction(client, items);
@@ -23,7 +24,7 @@ export class OnlineOrdersService {
   }
   async create(body: unknown, customerId: number | null = null) {
     const input = orderInput(body);
-    return transaction(async (tx) => {
+    const created = await transaction(async (tx) => {
       await tx.client.query('SET TRANSACTION ISOLATION LEVEL REPEATABLE READ');
       const account = customerId === null ? null : (await tx.client.query<{ email: string }>('SELECT email FROM public.customer WHERE id = $1', [customerId])).rows[0];
       const { items: lines, totalAmount: total } = await orderQuote(tx.client, input.items);
@@ -36,14 +37,19 @@ export class OnlineOrdersService {
       const order = (await tx.orm.public.OnlineOrder.first({ id }))!;
       return { reference: order.reference, status: order.status, customerName: order.customerName, totalAmount: order.totalAmount, createdAt: order.createdAt, items: lines.map(({ productId, ...line }) => ({ productId, ...line })) };
     });
+    // After commit, outside the transaction; never awaited so the customer is not kept waiting.
+    void notifyNewOrder({ ...created, totalAmount: String(created.totalAmount), customerPhone: input.customerPhone, deliveryAddress: input.deliveryAddress, notes: input.notes });
+    return created;
   }
 
   async lookup(reference: string, phone: unknown) {
     const missing = () => new NotFoundException('Commande introuvable.');
     if (!/^ORD-\d{6,10}$/.test(reference) || typeof phone !== 'string' || !phone.trim() || phone.length > 40) throw missing();
     return transaction(async (tx) => {
-      const order = await tx.orm.public.OnlineOrder.first({ reference, customerPhone: phone.trim() });
-      if (!order) throw missing();
+      const order = await tx.orm.public.OnlineOrder.first({ reference });
+      // Accepts "98 123 456", "+216 98123456"... and still matches orders stored before normalization.
+      const given = tunisianPhone(phone) ?? phone.trim();
+      if (!order || (tunisianPhone(order.customerPhone) ?? order.customerPhone.trim()) !== given) throw missing();
       const lines = await tx.orm.public.OnlineOrderLine.where({ orderId: order.id }).orderBy((row) => row.id.asc()).all();
       return { reference: order.reference, status: order.status, totalAmount: order.totalAmount, createdAt: order.createdAt,
         items: lines.map(({ productNameSnapshot, unitSnapshot, quantity, unitPrice, lineTotal }) => ({ productNameSnapshot, unitSnapshot, quantity, unitPrice, lineTotal })) };
