@@ -1,0 +1,3 @@
+# Prisma writes migration files with LF line endings; keep them that way on Windows too,
+# so git does not report them as changed after a migrate.
+backend/migrations/** text eol=lf
