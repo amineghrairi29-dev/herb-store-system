@@ -3,6 +3,7 @@ import { Aref_Ruqaa, Fraunces, Inter } from "next/font/google";
 import { CartProvider } from "./cart-provider";
 import { CustomerAuthProvider } from "./customer-auth-provider";
 import StorefrontShell from "./storefront/shell";
+import { siteUrl } from "@/lib/site-url";
 import "./theme.css";
 import "./storefront/storefront.css";
 import "./storefront/homepage-layout.css";
@@ -16,6 +17,10 @@ export const metadata: Metadata = {
   title: { default: "دار سلومة · Dar Slouma, herboristerie à Gabès depuis 2006", template: "%s | دار سلومة" },
   description: "Herboristerie à Ghannouch (Gabès) depuis 2006 : plantes, mélanges et épices, conseils personnalisés, livraison et paiement à la réception.",
   robots: { index: true, follow: true },
+  metadataBase: new URL(siteUrl),
+  openGraph: { siteName: "دار سلومة · Dar Slouma", locale: "fr_TN", type: "website", images: [{ url: "/images/shop/hero/hero-main.png", alt: "Herbes, mortier et huile de la boutique Dar Slouma" }] },
+  twitter: { card: "summary_large_image" },
+  icons: { icon: "/icon.svg" },
 };
 export default function ShopLayout({ children }: { children: React.ReactNode }) {
   return (

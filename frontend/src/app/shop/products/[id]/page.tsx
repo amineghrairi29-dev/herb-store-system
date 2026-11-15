@@ -12,6 +12,8 @@ import type { Metadata } from "next";
 import { getStoreInfo, whatsappLink } from "@/lib/store-info";
 import { productImageUrl } from "@/lib/product-image";
 import ScrollReveal from "../../storefront/scroll-reveal";
+import { JsonLd, breadcrumbJsonLd } from "@/lib/structured-data";
+import { siteUrl } from "@/lib/site-url";
 
 async function loadProduct(id: string): Promise<PublicProduct | null> {
   if (!/^[1-9]\d*$/.test(id)) return null;
@@ -26,7 +28,7 @@ export async function generateMetadata({ params }: { params: Promise<{ id: strin
   if (!product) return { title: "Produit introuvable" };
   const description = (product.description ?? product.benefits ?? `${product.name} — ${product.classifications.map((c) => c.nameFr).join(", ")}`).slice(0, 160);
   const image = productImageUrl(product.mainImagePath);
-  return { title: product.name, description, openGraph: { title: product.name, description, ...(image ? { images: [image] } : {}) } };
+  return { title: product.name, description, alternates: { canonical: `/shop/products/${product.id}` }, openGraph: { title: product.name, description, type: "website", ...(image ? { images: [image] } : {}) } };
 }
 
 export default async function ProductPage({ params }: { params: Promise<{ id: string }> }) {
@@ -47,7 +49,29 @@ export default async function ProductPage({ params }: { params: Promise<{ id: st
   } catch { /* Optional suggestions must not block an otherwise available product. */ }
   const facts = ([["Origine", product.origin], ["Conditionnement", product.packaging], ["Nom scientifique", product.scientificName]] as const).filter(([, value]) => !!value);
   const imageUrl = productImageUrl(product.mainImagePath);
+  const productLd = {
+    "@context": "https://schema.org",
+    "@type": "Product",
+    name: product.name,
+    ...(product.nameFr && product.nameFr !== product.name ? { alternateName: product.nameFr } : {}),
+    ...(product.description ? { description: product.description } : {}),
+    sku: product.sku,
+    category: product.category.nameFr,
+    image: [imageUrl, ...(product.gallery ?? []).map(productImageUrl)].filter(Boolean),
+    brand: { "@type": "Brand", name: "Dar Slouma" },
+    offers: {
+      "@type": "Offer",
+      url: `${siteUrl}/shop/products/${product.id}`,
+      priceCurrency: "TND",
+      price: product.salePrice,
+      unitText: unit,
+      availability: unavailable ? "https://schema.org/OutOfStock" : product.availabilityStatus === "LOW_STOCK" ? "https://schema.org/LimitedAvailability" : "https://schema.org/InStock",
+      seller: { "@id": `${siteUrl}/shop#store` },
+    },
+  };
   return <div className="pp">
+    <JsonLd data={productLd} />
+    <JsonLd data={breadcrumbJsonLd([["Boutique", "/shop"], [product.category.nameFr, `/shop/besoins/${encodeURIComponent(product.category.slug)}`], [product.name, `/shop/products/${product.id}`]])} />
     <nav className="pp-breadcrumb" aria-label="Fil d’Ariane"><Link href="/shop">Boutique</Link><span aria-hidden="true">›</span><Link href={`/shop/besoins/${encodeURIComponent(product.category.slug)}`}><bdi>{product.category.nameFr}</bdi></Link><span aria-hidden="true">›</span><span aria-current="page"><bdi>{product.name}</bdi></span></nav>
     <article className="pp-overview" aria-labelledby="product-title">
       <div className="pp-enter" style={{ "--i": 0 } as React.CSSProperties}><ProductGalleryView images={images} name={product.name} /></div>
