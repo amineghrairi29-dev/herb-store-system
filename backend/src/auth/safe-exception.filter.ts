@@ -21,13 +21,11 @@ export class SafeExceptionFilter implements ExceptionFilter {
       parserType === 'entity.too.large'
     ) {
       const status = parserType === 'entity.too.large' ? 413 : 400;
-      response
-        .status(status)
-        .json({
-          statusCode: status,
-          message:
-            status === 413 ? 'Request body too large' : 'Invalid JSON body',
-        });
+      response.status(status).json({
+        statusCode: status,
+        message:
+          status === 413 ? 'Request body too large' : 'Invalid JSON body',
+      });
       return;
     }
     const status = error instanceof HttpException ? error.getStatus() : 500;

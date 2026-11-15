@@ -194,16 +194,14 @@ describe.skipIf(process.env.RUN_DATABASE_TESTS !== '1')(
       });
       let id: number | undefined;
       try {
-        const receipt = await app
-          .get(OnlineOrdersService)
-          .create(
-            {
-              ...data(),
-              customerEmail: 'different@example.com',
-              deliveryAddress: '  12 rue des Plantes  ',
-            },
-            customer.id,
-          );
+        const receipt = await app.get(OnlineOrdersService).create(
+          {
+            ...data(),
+            customerEmail: 'different@example.com',
+            deliveryAddress: '  12 rue des Plantes  ',
+          },
+          customer.id,
+        );
         const order = (await db.orm.public.OnlineOrder.first({
           reference: receipt.reference,
         }))!;

@@ -216,13 +216,11 @@ describe.skipIf(process.env.RUN_DATABASE_TESTS !== '1')(
       ).rejects.toThrow();
     });
     it('fails closed for Google-only accounts and revoked tokens', async () => {
-      const customer = await app
-        .get(CustomerAuthService)
-        .google({
-          sub: tag,
-          email: tag + '-google@example.test',
-          authoritative: true,
-        });
+      const customer = await app.get(CustomerAuthService).google({
+        sub: tag,
+        email: tag + '-google@example.test',
+        authoritative: true,
+      });
       const service = app.get(SelfAccountService);
       expect(
         await service.security(

@@ -24,12 +24,10 @@ export function configureHttpSecurity(app: INestApplication) {
     res.setHeader('Cache-Control', 'no-store');
     if (req.headers.origin && req.headers.origin !== frontendOrigin()) {
       res.setHeader('Vary', 'Origin');
-      res
-        .status(403)
-        .json({
-          statusCode: 403,
-          message: 'Origine de la requête non autorisée.',
-        });
+      res.status(403).json({
+        statusCode: 403,
+        message: 'Origine de la requête non autorisée.',
+      });
       return;
     }
     next();

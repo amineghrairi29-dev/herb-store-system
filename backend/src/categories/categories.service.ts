@@ -33,15 +33,13 @@ export class CategoriesService {
         a.sortOrder - b.sortOrder ||
         a.nameFr.localeCompare(b.nameFr, 'fr') ||
         a.id - b.id;
-      return categories
-        .sort(order)
-        .map((c) => ({
-          ...c,
-          allowedUnits: allowedUnits(c.measurementMode),
-          subcategories: subcategories
-            .filter((s) => s.categoryId === c.id)
-            .sort(order),
-        }));
+      return categories.sort(order).map((c) => ({
+        ...c,
+        allowedUnits: allowedUnits(c.measurementMode),
+        subcategories: subcategories
+          .filter((s) => s.categoryId === c.id)
+          .sort(order),
+      }));
     }, true);
   }
   async detail(id: number) {

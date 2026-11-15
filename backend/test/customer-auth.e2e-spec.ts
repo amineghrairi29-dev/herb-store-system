@@ -378,13 +378,11 @@ describe.skipIf(process.env.RUN_DATABASE_TESTS !== '1')(
       );
       const google = app.get(GoogleAuthService);
       // Provider exchange is mocked; signed JWT verification has separate cryptographic tests.
-      const finish = vi
-        .spyOn(google, 'finish')
-        .mockResolvedValue({
-          sub: tag + '-callback',
-          email: tag + '-callback@gmail.com',
-          authoritative: true,
-        });
+      const finish = vi.spyOn(google, 'finish').mockResolvedValue({
+        sub: tag + '-callback',
+        email: tag + '-callback@gmail.com',
+        authoritative: true,
+      });
       try {
         const start = await request(app.getHttpServer())
           .get('/public/auth/google/start?returnTo=/shop/checkout')
