@@ -34,7 +34,7 @@ export default function AdminAccountMenu({ user, busy, logout }: {
       <svg className={styles.chevron} aria-hidden="true" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5"><path d="m4 6 4 4 4-4" /></svg>
     </button>
     <div id={panelId} className={styles.dropdown} hidden={!open}>
-      <Link href="/account" className={styles.summary} onClick={() => setOpen(false)}>
+      <Link href="/admin/account" className={styles.summary} onClick={() => setOpen(false)}>
         <span className={styles.avatar}><UserIcon /></span>
         <span className={styles.identity}><bdi className={styles.fullName}>{user.fullName}</bdi><bdi className={styles.email}>{user.email}</bdi></span>
       </Link>

@@ -1,7 +1,16 @@
 import type { NextConfig } from "next";
 
+// The back office moved under /admin: old bookmarks and links keep working.
+const adminSections = ['account', 'audit', 'cash', 'categories', 'classifications', 'dashboard', 'expenses', 'finance', 'online-orders', 'products', 'purchases', 'reports', 'sales', 'settings', 'stock', 'suppliers', 'users'];
+
 const nextConfig: NextConfig = {
   poweredByHeader: false,
+  async redirects() {
+    return adminSections.flatMap((section) => [
+      { source: `/${section}`, destination: `/admin/${section}`, permanent: true },
+      { source: `/${section}/:path*`, destination: `/admin/${section}/:path*`, permanent: true },
+    ]);
+  },
   async headers() {
     return [{ source: '/:path*', headers: [
       { key: 'X-Content-Type-Options', value: 'nosniff' },

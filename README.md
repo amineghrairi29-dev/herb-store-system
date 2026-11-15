@@ -46,6 +46,8 @@ npm install
 npm run dev               # http://localhost:3000
 ```
 
+Boutique : `http://localhost:3000/shop`. Connexion : `/auth`. Gestion du magasin : `/admin` (les anciennes adresses comme `/dashboard` ou `/products` redirigent vers `/admin/...`).
+
 Tests backend : `npm test` (unitaires) et `npm run test:e2e` (base de test requise).
 
 ## Notifications de commande
