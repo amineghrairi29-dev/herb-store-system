@@ -3,6 +3,9 @@ import Link from "next/link";
 import { getStoreInfo, whatsappLink } from "@/lib/store-info";
 import { shopContent } from "@/lib/shop-content";
 import "../info-pages.css";
+import PageHero from "../storefront/page-hero";
+import OpenStatus from "../storefront/open-status";
+import FaqList from "./faq-list";
 
 export const metadata: Metadata = { title: "Questions fréquentes", description: "Commande, livraison, paiement, conseils d’utilisation : les réponses aux questions les plus posées." };
 
@@ -21,15 +24,16 @@ const questions: [string, string][] = [
 export default async function FaqPage() {
   const store = await getStoreInfo();
   const whatsapp = whatsappLink(store?.phone, "Bonjour, j’ai une question.");
-  return <section className="sf-information-page">
-    <p className="sf-eyebrow">Aide</p>
-    <h1>Questions fréquentes</h1>
-    <p className="sf-information-lead">Vous ne trouvez pas votre réponse ? Nous répondons à toutes vos questions.</p>
-    <div className="sf-faq">{questions.map(([question, answer]) => <details key={question}><summary>{question}</summary><p>{answer}</p></details>)}</div>
-    <div className="sf-information-note">
-      <h2>Une autre question ?</h2>
-      <p>La boutique est ouverte {shopContent.openingHours.map((row) => `${row.days.toLowerCase()}, ${row.hours}`).join(" ; ")}.</p>
-    </div>
-    {whatsapp ? <a href={whatsapp} target="_blank" rel="noopener noreferrer" className="sf-button">Poser ma question sur WhatsApp ↗</a> : <Link href="/shop/contact" className="sf-button">Nous contacter ↗</Link>}
-  </section>;
+  return <div className="ip">
+    <PageHero ar="عندك سؤال؟ عندنا الجواب" eyebrow="Aide" title="Questions fréquentes" lead="Les réponses aux questions qu’on nous pose le plus. Pas la vôtre ? Écrivez-nous, on répond à tout." />
+    <FaqList questions={questions} />
+    <aside className="ip-cta">
+      <div>
+        <p lang="ar" dir="rtl" className="ip-cta-ar">اسألنا، سلومة يجاوبك</p>
+        <h2>Une autre question ?</h2>
+        <p>La boutique est ouverte {shopContent.openingHours.map((row) => `${row.days.toLowerCase()}, ${row.hours}`).join(" ; ")}. <OpenStatus /></p>
+      </div>
+      {whatsapp ? <a href={whatsapp} target="_blank" rel="noopener noreferrer" className="ip-btn">Poser ma question sur WhatsApp</a> : <Link href="/shop/contact" className="ip-btn">Nous contacter</Link>}
+    </aside>
+  </div>;
 }

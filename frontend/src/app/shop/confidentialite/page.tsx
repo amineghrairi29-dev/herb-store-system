@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { getStoreInfo } from "@/lib/store-info";
 import "../info-pages.css";
+import PageHero from "../storefront/page-hero";
+import LegalToc from "../storefront/legal-toc";
 
 export const metadata: Metadata = { title: "Politique de confidentialité", description: "Quelles données nous collectons, pourquoi, et comment exercer vos droits." };
 
@@ -9,10 +11,11 @@ export const metadata: Metadata = { title: "Politique de confidentialité", desc
 export default async function PrivacyPage() {
   const store = await getStoreInfo();
   const name = store?.storeName ?? "la boutique";
-  return <section className="sf-information-page sf-legal">
-    <p className="sf-eyebrow">Informations légales</p>
-    <h1>Politique de confidentialité</h1>
-    <p className="sf-information-lead"><bdi>{name}</bdi> collecte uniquement les informations nécessaires pour traiter et livrer vos commandes.</p>
+  return <div className="ip">
+    <PageHero ar="معلوماتك محفوظة عندنا" eyebrow="Informations légales" title="Politique de confidentialité" lead={<><bdi>{name}</bdi> collecte uniquement les informations nécessaires pour traiter et livrer vos commandes.</>} compact />
+    <div className="ip-legal">
+      <LegalToc articleId="legal" />
+      <article id="legal" className="ip-prose">
     <h2>Données collectées</h2>
     <ul>
       <li>Lors d’une commande : nom, téléphone, adresse de livraison, gouvernorat et ville, email (facultatif), notes, produits commandés.</li>
@@ -30,7 +33,9 @@ export default async function PrivacyPage() {
     <h2>Conservation</h2>
     <p>Les données de commande sont conservées le temps nécessaire à la gestion de la boutique et au respect des obligations comptables.</p>
     <h2>Vos droits</h2>
-    <p>Conformément à la législation tunisienne sur la protection des données personnelles (loi organique n° 2004-63 du 27 juillet 2004), vous pouvez demander l’accès à vos données, leur rectification ou leur suppression. Contactez-nous depuis la page <Link href="/shop/contact" className="underline">Contact</Link>.</p>
+    <p>Conformément à la législation tunisienne sur la protection des données personnelles (loi organique n° 2004-63 du 27 juillet 2004), vous pouvez demander l’accès à vos données, leur rectification ou leur suppression. Contactez-nous depuis la page <Link href="/shop/contact">Contact</Link>.</p>
     <p className="sf-updated">Dernière mise à jour : novembre 2026.</p>
-  </section>;
+      </article>
+    </div>
+  </div>;
 }

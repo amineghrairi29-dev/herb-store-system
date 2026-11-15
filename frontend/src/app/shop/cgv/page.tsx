@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { getStoreInfo } from "@/lib/store-info";
 import "../info-pages.css";
+import PageHero from "../storefront/page-hero";
+import LegalToc from "../storefront/legal-toc";
 
 export const metadata: Metadata = { title: "Conditions générales de vente", description: "Conditions applicables aux commandes passées sur la boutique en ligne." };
 
@@ -10,9 +12,11 @@ export default async function TermsPage() {
   const store = await getStoreInfo();
   const name = store?.storeName ?? "la boutique";
   const place = [store?.address, store?.city].filter(Boolean).join(", ");
-  return <section className="sf-information-page sf-legal">
-    <p className="sf-eyebrow">Informations légales</p>
-    <h1>Conditions générales de vente</h1>
+  return <div className="ip">
+    <PageHero ar="الشروط متاع البيع" eyebrow="Informations légales" title="Conditions générales de vente" compact />
+    <div className="ip-legal">
+      <LegalToc articleId="legal" />
+      <article id="legal" className="ip-prose">
     <h2>1. Objet</h2>
     <p>Les présentes conditions s’appliquent à toute commande passée sur la boutique en ligne de <bdi>{name}</bdi>{place && <>, située <bdi>{place}</bdi></>}. Passer une commande implique leur acceptation.</p>
     <h2>2. Produits</h2>
@@ -25,13 +29,15 @@ export default async function TermsPage() {
     <h2>5. Paiement</h2>
     <p>Le paiement s’effectue à la livraison, en espèces. Aucun paiement n’est demandé en ligne.</p>
     <h2>6. Livraison</h2>
-    <p>La livraison est proposée dans les zones affichées lors de la commande. Les délais sont indicatifs. Merci de vérifier votre commande à la réception et de nous signaler tout problème sans attendre. Voir aussi <Link href="/shop/livraison" className="underline">Livraison et paiement</Link>.</p>
+    <p>La livraison est proposée dans les zones affichées lors de la commande. Les délais sont indicatifs. Merci de vérifier votre commande à la réception et de nous signaler tout problème sans attendre. Voir aussi <Link href="/shop/livraison">Livraison et paiement</Link>.</p>
     <h2>7. Données personnelles</h2>
-    <p>Les informations fournies lors de la commande servent à la traiter et à la livrer. Voir la <Link href="/shop/confidentialite" className="underline">politique de confidentialité</Link>.</p>
+    <p>Les informations fournies lors de la commande servent à la traiter et à la livrer. Voir la <Link href="/shop/confidentialite">politique de confidentialité</Link>.</p>
     <h2>8. Droit applicable</h2>
     <p>Les présentes conditions sont soumises au droit tunisien. En cas de différend, une solution amiable sera recherchée en priorité.</p>
     <h2>9. Contact</h2>
-    <p>Pour toute question : page <Link href="/shop/contact" className="underline">Contact</Link>.</p>
+    <p>Pour toute question : page <Link href="/shop/contact">Contact</Link>.</p>
     <p className="sf-updated">Dernière mise à jour : novembre 2026.</p>
-  </section>;
+      </article>
+    </div>
+  </div>;
 }
