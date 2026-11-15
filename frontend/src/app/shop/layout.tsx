@@ -18,7 +18,7 @@ export const metadata: Metadata = {
   description: "Herboristerie à Ghannouch (Gabès) depuis 2006 : plantes, mélanges et épices, conseils personnalisés, livraison et paiement à la réception.",
   robots: { index: true, follow: true },
   metadataBase: new URL(siteUrl),
-  openGraph: { siteName: "دار سلومة · Dar Slouma", locale: "fr_TN", type: "website", images: [{ url: "/images/shop/hero/hero-main.png", alt: "Herbes, mortier et huile de la boutique Dar Slouma" }] },
+  openGraph: { siteName: "دار سلومة · Dar Slouma", locale: "fr_TN", type: "website", images: [{ url: "/images/shop/og.jpg", width: 1200, height: 630, alt: "Herbes, mortier et huile de la boutique Dar Slouma" }] },
   twitter: { card: "summary_large_image" },
   icons: { icon: "/icon.svg" },
 };

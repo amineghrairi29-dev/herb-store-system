@@ -2,11 +2,12 @@
 import Link from "next/link";
 import { useEffect, useRef } from "react";
 import ProductImage from "@/components/product-image";
+import { productPath } from "@/lib/product-url";
 import { SloumaStamp } from "@/components/brand/slouma-logo";
 import type { PublicClassification } from "@/types/public-product";
 import { Leaf } from "../../storefront/leaf";
 
-type Photo = { id: number; name: string; path: string };
+type Photo = { id: number; name: string; nameFr: string | null; path: string };
 
 /**
  * Banner of a need page: the Arabic name written large on the need's own tint, and
@@ -54,7 +55,7 @@ export default function NeedHero({ need, total, photos }: { need: PublicClassifi
         <div className="nd-layer nd-layer-back"><span className="nd-leaf nd-leaf-1"><Leaf color="#A9C68F" /></span><span className="nd-leaf nd-leaf-2"><Leaf color="#D99A2B" vein="rgb(31 42 26 / .35)" /></span></div>
         <div className="nd-photos">
           {photos.map((photo, index) => (
-            <Link key={photo.id} href={`/shop/products/${photo.id}`} tabIndex={-1} className={`nd-photo nd-photo-${index + 1}`}>
+            <Link key={photo.id} href={productPath(photo)} tabIndex={-1} className={`nd-photo nd-photo-${index + 1}`}>
               <ProductImage imagePath={photo.path} name="" className="nd-photo-image" sizes={index === 0 ? "(max-width: 899px) 60vw, 340px" : "180px"} fallback={<span className="nd-photo-image" />} />
             </Link>
           ))}
