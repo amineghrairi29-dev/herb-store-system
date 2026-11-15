@@ -28,8 +28,9 @@
 .header[data-scrolled] .brand:hover .stamp { transform: scale(0.78) rotate(-8deg); }
 .icon { display: none; flex: none; }
 .identity { display: flex; flex-direction: column; line-height: 1.05; min-width: 0; }
-.arabicName { font-family: var(--font-arabic), serif; font-size: 24px; text-align: left; }
-.latinName { font-family: var(--font-display), Georgia, serif; font-size: 16px; letter-spacing: 0.01em; white-space: nowrap; }
+/* The name is written in Arabic only: large calligraphy, the stamp carries the rest. */
+.arabicName { font-family: var(--font-arabic), serif; font-size: 34px; font-weight: 700; line-height: 1.1; color: var(--c-leaf-dark); text-align: left; transition: font-size var(--t-base) var(--ease-out); }
+.header[data-scrolled] .arabicName { font-size: 28px; }
 
 .desktopNav { display: flex; align-items: center; gap: 26px; }
 .desktopNav a { position: relative; padding-block: 6px; color: var(--c-forest); font-size: 15px; font-weight: 500; text-decoration: none; }
@@ -88,8 +89,7 @@
   .desktopNav { display: none; }
   .stamp { display: none; }
   .icon { display: block; }
-  .arabicName { font-size: 20px; }
-  .latinName { font-size: 13px; }
+  .arabicName, .header[data-scrolled] .arabicName { font-size: 26px; }
   .cartLabel, .accountLabel { display: none; }
   .cart { padding: 0 12px; }
   .menuButton { display: inline-grid; }

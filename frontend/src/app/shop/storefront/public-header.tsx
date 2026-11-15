@@ -94,12 +94,11 @@ export default function PublicHeader() {
       <div className={styles.row}>
         <div className={styles.brandGroup}>
           <NeedsDrawer />
-          <Link href="/shop" className={styles.brand} aria-label="Herboristerie Slouma, accueil">
+          <Link href="/shop" className={styles.brand} aria-label="Dar Slouma, accueil">
             <SloumaStamp size={64} className={styles.stamp} />
             <SloumaIcon size={42} className={styles.icon} />
             <span className={styles.identity}>
-              <span lang="ar" dir="rtl" className={styles.arabicName}>عطارة سلومة</span>
-              <span className={styles.latinName}>Herboristerie Slouma</span>
+              <span lang="ar" dir="rtl" className={styles.arabicName}>دار سلومة</span>
             </span>
           </Link>
         </div>

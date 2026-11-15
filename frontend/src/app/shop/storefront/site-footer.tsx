@@ -47,7 +47,7 @@ export default function SiteFooter() {
         </div>
       </div>
       <div className="site-footer-inner site-footer-bottom">
-        <span>© {new Date().getFullYear()} Herboristerie Slouma</span>
+        <span>© {new Date().getFullYear()} <span lang="ar" dir="rtl">دار سلومة</span> · Ghannouch, Gabès</span>
         <nav aria-label="Informations légales">{legal.map(([href, label]) => <Link key={href} href={href}>{label}</Link>)}</nav>
       </div>
     </footer>
