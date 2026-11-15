@@ -9,9 +9,11 @@ import "./about.css";
 import { Leaf } from "../storefront/leaf";
 import ScrollReveal from "../storefront/scroll-reveal";
 import OpenStatus from "../storefront/open-status";
+import { JsonLd, storeJsonLd } from "@/lib/structured-data";
 
 export const metadata: Metadata = {
   title: "Notre histoire",
+  alternates: { canonical: "/shop/about" },
   description: `Herboristerie à Ghannouch (Gabès) depuis ${shopContent.foundedYear} : recettes traditionnelles éprouvées et conseils personnalisés pour chaque client.`,
 };
 
@@ -30,6 +32,7 @@ export default async function AboutPage() {
   ];
   return (
     <div className="ip ab">
+      <JsonLd data={storeJsonLd(store)} />
       <header className="ab-hero">
         <div className="ab-hero-copy">
           <p className="ip-eyebrow ip-in" style={{ "--i": 0 } as React.CSSProperties}>{shopContent.tagline}</p>

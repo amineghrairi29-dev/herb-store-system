@@ -8,6 +8,7 @@ import Catalogue from "../../catalogue";
 import ScrollReveal from "../../storefront/scroll-reveal";
 import { needTint } from "../need-tints";
 import NeedHero from "./need-hero";
+import { JsonLd, breadcrumbJsonLd } from "@/lib/structured-data";
 import "../needs.css";
 
 const allowed = ["q", "sort", "availability", "page", "pageSize"];
@@ -36,7 +37,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   const need = (await loadNeeds(false).catch(() => [])).find((item) => item.slug === slug);
   if (!need) return { title: "Besoin introuvable" };
   const description = `Plantes, mélanges et recettes de دار سلومة pour : ${need.nameFr}. Conseil gratuit, paiement à la livraison.`;
-  return { title: `${need.nameFr} · ${need.nameAr}`, description, openGraph: { title: need.nameFr, description } };
+  return { title: `${need.nameFr} · ${need.nameAr}`, description, alternates: { canonical: `/shop/besoins/${encodeURIComponent(need.slug)}` }, openGraph: { title: need.nameFr, description } };
 }
 
 export default async function NeedPage({ params, searchParams }: {
@@ -61,6 +62,7 @@ export default async function NeedPage({ params, searchParams }: {
 
   return (
     <div className="nd" style={{ "--tile": tint, "--tile-ink": ink } as React.CSSProperties}>
+      <JsonLd data={breadcrumbJsonLd([["Boutique", "/shop"], [need.nameFr, `/shop/besoins/${encodeURIComponent(need.slug)}`]])} />
       <NeedHero need={need} total={preview.total} photos={photos} />
 
       {others.length > 0 && (
