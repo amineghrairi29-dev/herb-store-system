@@ -5,8 +5,8 @@
 .section legend { margin-bottom: 14px; font-size: 14px; font-weight: 600; }
 .section label { display: grid; gap: 6px; min-width: 0; font-size: 12px; }
 .section input { width: 100%; min-width: 0; height: 42px; padding: 10px 12px; border: 1px solid #dce2d5; border-radius: 10px; background: #fdfcf7; font-size: 14px; }
-.section button { justify-self: start; max-width: 100%; border-radius: 9px; background: #244e37; color: white; padding: 10px 16px; font-size: 13px; cursor: pointer; }
-.section button:hover { background: #1c422e; }
+.section button { justify-self: start; max-width: 100%; border-radius: 9px; background: #2e5e2b; color: white; padding: 10px 16px; font-size: 13px; cursor: pointer; }
+.section button:hover { background: #24492a; }
 .section button:disabled { opacity: .6; cursor: wait; }
 .section :is(input,button):focus-visible { outline: 2px solid #648369; outline-offset: 3px; }
 .section p { font-size: 13px; line-height: 1.6; }
@@ -14,7 +14,7 @@
 .error, .success { padding: 10px 12px; border-radius: 9px; margin: 16px 0 0; }
 .error { color: #8b453d; background: #fbefeb; }
 .success { color: #446343; background: #eff5e9; }
-.section .retry { padding: 0; color: #244e37; background: transparent; text-decoration: underline; }
+.section .retry { padding: 0; color: #2e5e2b; background: transparent; text-decoration: underline; }
 .section[data-theme=admin] { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0 24px; margin-top: 20px; background: #fffefb; border-color: #dfe5d6; color: #284635; border-radius: 15px; box-shadow: 0 4px 18px rgb(38 62 40 / 3%); }
 .section[data-theme=admin] h2 { grid-column: 1 / -1; font-family: inherit; font-size: 18px; font-weight: 600; margin-bottom: 22px; }
 .section[data-theme=admin] > p { grid-column: 1 / -1; }
