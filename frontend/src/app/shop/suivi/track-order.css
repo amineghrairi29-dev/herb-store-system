@@ -3,7 +3,7 @@
 .track-form input { min-height: 44px; border: 1px solid var(--sf-line); border-radius: 12px; padding: 8px 12px; font-size: 16px; background: var(--sf-white); }
 .track-error { color: #8a3b2a; }
 .track-result { margin-top: 24px; padding: 24px; border: 1px solid var(--sf-line); border-radius: var(--sf-radius); background: var(--sf-white); }
-.track-result h2 { font: 400 24px/1.3 Georgia, serif; margin-bottom: 18px; }
+.track-result h2 { font: 400 24px/1.3 var(--font-display), Georgia, serif; margin-bottom: 18px; }
 .track-steps { list-style: none; padding: 0; margin: 0 0 20px; display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; counter-reset: step; }
 .track-steps li { position: relative; padding-top: 14px; border-top: 4px solid var(--sf-line); font-size: 13px; color: var(--sf-muted); transition: border-color 0.4s ease; }
 .track-steps li[data-done] { border-color: var(--sf-green); color: var(--sf-ink); }

@@ -1,5 +1,5 @@
 /* Shared by FAQ, delivery and legal pages. */
-.sf-legal h2 { font: 400 24px/1.3 Georgia, serif; margin: 34px 0 10px; }
+.sf-legal h2 { font: 400 24px/1.3 var(--font-display), Georgia, serif; margin: 34px 0 10px; }
 .sf-legal p, .sf-legal li { color: var(--sf-muted); line-height: 1.85; }
 .sf-legal ul { padding-inline-start: 20px; margin: 8px 0 14px; list-style: disc; }
 .sf-legal .sf-updated { font-size: 13px; margin-top: 30px; }

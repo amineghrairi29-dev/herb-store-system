@@ -1,0 +1,33 @@
+/*
+ * Theme "Feuille et miel" (approved 2026-11-11).
+ * Every storefront page reads these tokens; change a color here, it changes everywhere.
+ */
+.slouma-theme {
+  --c-leaf: #3e7b3a;        /* attention: titles, badges, prices, links */
+  --c-leaf-dark: #2e5e2b;
+  --c-honey: #d99a2b;       /* the one buy button per screen, dark text on it */
+  --c-honey-dark: #c0841c;
+  --c-honey-ink: #1f2a1a;
+  --c-honey-light: #f2c46b;
+  --c-forest: #1f3a24;      /* body text, footer */
+  --c-sage: #a9c68f;        /* decoration */
+  --c-sprout: #eef4e4;      /* section backgrounds */
+  --c-cream: #fbfaf5;       /* page background */
+  --c-paper: #ffffff;       /* cards, forms */
+  --c-muted: #5d6b57;
+  --c-line: #dce3d2;
+  --c-success-bg: #e3efdc; --c-success: #2e5e2b;
+  --c-warning-bg: #fbf0d9; --c-warning: #8a5a00;
+  --c-error-bg: #f8e7e1;   --c-error: #a33a23;
+  --r-field: 12px; --r-card: 20px; --r-pill: 999px;
+  --t-fast: 150ms; --t-base: 300ms; --t-slow: 600ms;
+  --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+  --shadow-raise: 0 10px 30px rgb(31 58 36 / 0.1);
+  font-family: var(--font-body), system-ui, sans-serif;
+  color: var(--c-forest);
+}
+.slouma-theme .font-display { font-family: var(--font-display), Georgia, serif; }
+.slouma-theme .font-arabic { font-family: var(--font-arabic), serif; }
+@media (prefers-reduced-motion: reduce) {
+  .slouma-theme { --t-fast: 0ms; --t-base: 0ms; --t-slow: 0ms; }
+}

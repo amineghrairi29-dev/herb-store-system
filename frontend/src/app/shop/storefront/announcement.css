@@ -1,0 +1,20 @@
+/* Top bar above the header, and the wrapper for pages not yet redesigned. */
+.sf-announce { overflow: hidden; background: var(--c-forest); color: #f3f6ee; font-size: 13px; font-weight: 500; }
+.sf-announce-track { display: flex; justify-content: center; gap: 40px; padding: 9px 16px; }
+.sf-announce-track span { display: inline-flex; align-items: center; gap: 10px; white-space: nowrap; }
+.sf-announce-track span::before { content: ""; width: 6px; height: 6px; border-radius: 50%; background: var(--c-honey-light); }
+@media (max-width: 759px) {
+  .sf-announce-track { display: grid; justify-items: center; padding: 0; height: 34px; }
+  .sf-announce-track span { grid-area: 1 / 1; align-self: center; opacity: 0; animation: announce 9s infinite; }
+  .sf-announce-track span:nth-child(2) { animation-delay: 3s; }
+  .sf-announce-track span:nth-child(3) { animation-delay: 6s; }
+}
+@keyframes announce { 0% { opacity: 0; transform: translateY(8px); } 5%, 28% { opacity: 1; transform: none; } 33%, 100% { opacity: 0; transform: translateY(-8px); } }
+@media (prefers-reduced-motion: reduce) {
+  .sf-announce-track span { animation: none; opacity: 1; }
+  .sf-announce-track span:not(:first-child) { display: none; }
+}
+.sf-legacy { min-height: 100vh; background: var(--c-cream); color: var(--c-forest); }
+.sf-legacy-main { width: min(1280px, calc(100% - 40px)); margin-inline: auto; padding-block: 32px 48px; }
+.sf-legacy .sf-skip, .storefront .sf-skip { position: absolute; top: -100px; left: 16px; z-index: 60; padding: 10px 14px; border-radius: 10px; background: #fff; color: var(--c-forest); }
+.sf-legacy .sf-skip:focus, .storefront .sf-skip:focus { top: 12px; }

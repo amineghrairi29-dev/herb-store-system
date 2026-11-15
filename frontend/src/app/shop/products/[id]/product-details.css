@@ -9,7 +9,7 @@
 .pd-placeholder svg { width: 64px; height: 64px; }
 .pd-summary { min-width: 0; padding-block: 4px; }
 .pd-category { color: #6c7b61; font-size: 11px; line-height: 1.4; margin: 0 0 6px; overflow-wrap: anywhere; }
-.pd-summary h1 { font-family: Georgia, 'Times New Roman', serif; font-size: clamp(26px, 2.3vw, 32px); font-weight: 400; line-height: 1.12; letter-spacing: -.025em; margin: 0; overflow-wrap: anywhere; }
+.pd-summary h1 { font-family: var(--font-display), Georgia, serif; font-size: clamp(26px, 2.3vw, 32px); font-weight: 400; line-height: 1.12; letter-spacing: -.025em; margin: 0; overflow-wrap: anywhere; }
 .pd-secondary-name { margin-top: 5px; color: #596b55; font-size: 14px; overflow-wrap: anywhere; }
 .pd-scientific { font-size: 12px; color: #74816f; font-style: italic; margin-top: 5px; overflow-wrap: anywhere; }
 .pd-price { margin: 14px 0 5px; font-size: 26px; font-weight: 600; line-height: 1.2; font-variant-numeric: tabular-nums; overflow-wrap: anywhere; }
@@ -38,7 +38,7 @@
 .pd-facts dt { color: #75816d; }
 .pd-facts dd { margin: 0; overflow-wrap: anywhere; }
 .pd-description { border-top: 1px solid #dde4d5; margin-top: 26px; padding-top: 20px; }
-.product-details h2 { font-family: Georgia, 'Times New Roman', serif; font-size: 23px; font-weight: 400; margin: 0 0 12px; }
+.product-details h2 { font-family: var(--font-display), Georgia, serif; font-size: 23px; font-weight: 400; margin: 0 0 12px; }
 .pd-description p { max-width: 850px; white-space: pre-wrap; overflow-wrap: anywhere; font-size: 15px; line-height: 1.75; color: #596852; }
 .pd-related { margin-top: 28px; }
 .pd-related-heading { display: flex; align-items: baseline; justify-content: space-between; gap: 16px; }
@@ -74,7 +74,7 @@
 /* Benefits / usage / precautions */
 .pd-details-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 16px; margin-top: 28px; }
 .pd-detail { padding: 22px; border: 1px solid #e4e8dd; border-radius: 14px; background: #fffef9; }
-.pd-detail h2 { margin: 0 0 10px; font: 400 22px/1.25 Georgia, serif; }
+.pd-detail h2 { margin: 0 0 10px; font: 400 22px/1.25 var(--font-display), Georgia, serif; }
 .pd-detail p { white-space: pre-line; line-height: 1.7; color: #4d5b52; }
 .pd-detail-warning { background: #fbf7ec; border-color: #eadfbf; }
 .pd-detail-note { margin-top: 10px; font-size: 12.5px; color: #7a6a3e !important; }
