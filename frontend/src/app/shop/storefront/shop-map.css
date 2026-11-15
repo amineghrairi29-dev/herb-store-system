@@ -1,0 +1,44 @@
+/* "Venir à la boutique" block (theme tokens in ../theme.css). */
+.sm { display: grid; grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr); gap: 0; overflow: hidden; border-radius: 32px; background: var(--c-forest); color: #fff; }
+.sm-info { display: flex; flex-direction: column; gap: 18px; padding: 36px 36px 34px; }
+.sm-ar { margin: 0 0 -12px; font-family: var(--font-arabic), serif; font-weight: 700; font-size: 28px; line-height: 1.4; color: var(--c-honey-light); text-align: left; }
+.sm h2 { margin: 0; font-family: var(--font-display), Georgia, serif; font-weight: 400; font-size: clamp(28px, 3vw, 36px); }
+.sm-facts { display: flex; flex-direction: column; gap: 14px; margin: 0; padding: 0; list-style: none; }
+.sm-facts li { display: flex; gap: 14px; }
+.sm-facts li > span:last-child { display: flex; flex-direction: column; gap: 3px; min-width: 0; }
+.sm-facts strong { font-size: 17px; overflow-wrap: anywhere; }
+.sm-landmark { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 10px; color: rgb(255 255 255 / 0.78); font-size: 14px; line-height: 1.5; }
+.sm-landmark [lang="ar"] { font-family: var(--font-arabic), serif; font-weight: 700; font-size: 17px; color: var(--c-sage); }
+.sm-icon { display: grid; flex: none; place-items: center; width: 42px; height: 42px; border-radius: 42% 58% 52% 48% / 52% 44% 56% 48%; background: rgb(255 255 255 / 0.1); color: var(--c-honey-light); }
+.sm-icon svg { width: 22px; height: 22px; }
+.sm-actions { display: flex; flex-wrap: wrap; gap: 10px; margin-top: auto; padding-top: 6px; }
+.sm-btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: 52px; padding: 0 22px; border-radius: var(--r-pill); background: var(--c-honey); color: var(--c-honey-ink); font-weight: 700; text-decoration: none; box-shadow: 0 10px 24px rgb(0 0 0 / 0.2); transition: transform var(--t-fast) var(--ease-out), background var(--t-fast); }
+.sm-btn svg { width: 18px; height: 18px; }
+.sm-btn:hover { background: var(--c-honey-light); transform: translateY(-2px); }
+.sm-btn-line { background: transparent; color: #fff; border: 1.5px solid rgb(255 255 255 / 0.35); box-shadow: none; }
+.sm-btn-line:hover { background: rgb(255 255 255 / 0.08); border-color: #fff; }
+.sm :is(a, button):focus-visible { outline: 3px solid var(--c-honey-light); outline-offset: 3px; }
+
+.sm-map { position: relative; min-height: 380px; background: var(--c-sprout); }
+.sm-map iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; filter: saturate(0.85); }
+.sm-placeholder { position: absolute; inset: 0; display: block; width: 100%; padding: 0; border: 0; background: none; cursor: pointer; }
+.sm-drawn { position: absolute; inset: 0; width: 100%; height: 100%; }
+.sm-post { position: absolute; left: calc(50% + 34px); top: calc(50% - 4px); padding: 4px 10px; border-radius: 8px; background: #fff; color: var(--c-muted); font-size: 12px; font-weight: 600; box-shadow: 0 4px 10px rgb(31 58 36 / 0.1); }
+.sm-pin { position: absolute; left: 50%; top: 50%; width: 44px; translate: -50% -100%; filter: drop-shadow(0 8px 10px rgb(31 58 36 / 0.3)); animation: sm-drop 900ms var(--ease-out) both, sm-bounce 2.4s ease-in-out 1.2s infinite; }
+.sm-pin svg { display: block; width: 100%; height: auto; }
+.sm-label { position: absolute; left: 50%; top: calc(50% + 8px); translate: -50% 0; padding: 4px 14px; border-radius: var(--r-pill); background: var(--c-leaf); color: #fff; font-family: var(--font-arabic), serif; font-weight: 700; font-size: 18px; white-space: nowrap; }
+.sm-load { position: absolute; right: 16px; bottom: 16px; padding: 8px 14px; border-radius: var(--r-pill); background: rgb(255 255 255 / 0.92); color: var(--c-leaf-dark); font-size: 13px; font-weight: 700; }
+@keyframes sm-drop { from { opacity: 0; transform: translateY(-30px); } }
+@keyframes sm-bounce { 50% { transform: translateY(-6px); } }
+
+@media (max-width: 900px) {
+  .sm { grid-template-columns: minmax(0, 1fr); border-radius: 26px; }
+  .sm-info { padding: 26px 22px; }
+  .sm-map { min-height: 280px; order: -1; }
+  .sm-btn { flex: 1 1 100%; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .sm-pin { animation: none; }
+  .sm-btn { transition: none; }
+  .sm-btn:hover { transform: none; }
+}

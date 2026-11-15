@@ -1,4 +1,4 @@
-import { shopContent } from "@/lib/shop-content";
+import { mapLinks, shopContent } from "@/lib/shop-content";
 import { siteUrl } from "@/lib/site-url";
 import type { StoreInfo } from "@/lib/store-info";
 
@@ -23,6 +23,8 @@ export function storeJsonLd(store: StoreInfo | null) {
     ...(store?.phone ? { telephone: `+216${store.phone.replace(/\D/g, "").slice(-8)}` } : {}),
     ...(store?.email ? { email: store.email } : {}),
     address: { "@type": "PostalAddress", ...(store?.address ? { streetAddress: store.address } : {}), addressLocality: store?.city || "Ghannouch", addressRegion: "Gabès", addressCountry: "TN" },
+    geo: { "@type": "GeoCoordinates", latitude: shopContent.location.latitude, longitude: shopContent.location.longitude },
+    hasMap: mapLinks.view,
     openingHoursSpecification: shopContent.openingSlots.map(([opens, closes]) => ({
       "@type": "OpeningHoursSpecification",
       dayOfWeek: ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"],
