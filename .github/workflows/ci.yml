@@ -28,7 +28,9 @@ jobs:
           node-version: 22
           cache: npm
           cache-dependency-path: backend/package-lock.json
-      - run: npm ci
+      # npm install, not npm ci: the backend lockfile misses a peer (typescript 5.9.3)
+      # that npm now requires. Back to npm ci once `npm install` is run and the lockfile committed.
+      - run: npm install --no-audit --no-fund
       - run: npm run lint
       - run: npm run build
       - run: npm test
@@ -66,7 +68,9 @@ jobs:
           node-version: 22
           cache: npm
           cache-dependency-path: backend/package-lock.json
-      - run: npm ci
+      # npm install, not npm ci: the backend lockfile misses a peer (typescript 5.9.3)
+      # that npm now requires. Back to npm ci once `npm install` is run and the lockfile committed.
+      - run: npm install --no-audit --no-fund
       - name: Apply migrations to the empty test database
         run: npx prisma db migrate
       - run: npm run test:e2e

@@ -9,21 +9,25 @@ const PAGE_SIZE = 8;
 /** Product section of the home page, with the search used by the header (/shop?q=…). */
 export default function HomeProducts({ query }: { query: string }) {
   const [products, setProducts] = useState<PublicProduct[] | null>(null);
-  const [page, setPage] = useState(1), [total, setTotal] = useState(0), [loading, setLoading] = useState(false), [error, setError] = useState(false), [attempt, setAttempt] = useState(0);
+  const [page, setPage] = useState(1), [total, setTotal] = useState(0), [attempt, setAttempt] = useState(0);
+  // The last answer is tagged with its request: a newer request means "loading", with no setState when it starts.
+  const requestKey = `${query}|${page}|${attempt}`;
+  const [answer, setAnswer] = useState<{ key: string; error: boolean } | null>(null);
+  const loading = answer?.key !== requestKey;
+  const error = !loading && !!answer?.error;
   const section = useRef<HTMLElement>(null);
   useEffect(() => { if (query) section.current?.scrollIntoView({ behavior: "smooth", block: "start" }); }, [query]);
   useEffect(() => {
     const controller = new AbortController();
-    setLoading(true); setError(false);
+    const key = requestKey;
     const params = new URLSearchParams({ pageSize: String(PAGE_SIZE), page: String(page), sort: "name_asc" });
     if (query) params.set("q", query);
     fetch(`${apiBase}/public/products?${params}`, { cache: "no-store", signal: AbortSignal.any([controller.signal, AbortSignal.timeout(15000)]) })
       .then(async (response) => { if (!response.ok) throw new Error(`HTTP ${response.status}`); return await response.json() as CatalogueResponse; })
-      .then((result) => { if (controller.signal.aborted) return; setTotal(result.pagination.totalItems); setProducts((list) => (page === 1 ? result.data : [...(list ?? []), ...result.data])); })
-      .catch(() => { if (!controller.signal.aborted) setError(true); })
-      .finally(() => { if (!controller.signal.aborted) setLoading(false); });
+      .then((result) => { if (controller.signal.aborted) return; setTotal(result.pagination.totalItems); setProducts((list) => (page === 1 ? result.data : [...(list ?? []), ...result.data])); setAnswer({ key, error: false }); })
+      .catch(() => { if (!controller.signal.aborted) setAnswer({ key, error: true }); });
     return () => controller.abort();
-  }, [query, page, attempt]);
+  }, [query, page, requestKey]);
   const remaining = products ? total - products.length : 0;
   return (
     <section ref={section} id="products" className="h-section h-products" aria-labelledby="products-title">
