@@ -11,9 +11,10 @@
   background: #25d366;
   color: #fff;
   box-shadow: 0 8px 24px rgb(0 0 0 / 0.18);
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  transition: transform 0.2s ease, box-shadow 0.2s ease, bottom 0.3s ease;
 }
 .sf-whatsapp:hover { transform: translateY(-2px) scale(1.04); box-shadow: 0 12px 28px rgb(0 0 0 / 0.22); }
 .sf-whatsapp:focus-visible { outline: 3px solid #173f32; outline-offset: 3px; }
 @media (prefers-reduced-motion: reduce) { .sf-whatsapp { transition: none; } .sf-whatsapp:hover { transform: none; } }
 @media (max-width: 759px) { .sf-whatsapp { right: 14px; bottom: 14px; width: 52px; height: 52px; } }
+@media (max-width: 899px) { :root[data-product-dock] .sf-whatsapp { bottom: 86px; } }

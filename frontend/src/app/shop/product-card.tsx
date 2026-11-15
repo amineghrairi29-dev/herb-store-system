@@ -3,6 +3,7 @@ import ProductImage from "@/components/product-image";
 import type { PublicProduct } from "@/types/public-product";
 import { displayAmount } from "@/lib/purchase-decimal";
 import AddToCart from "./add-to-cart";
+import { productImageUrl } from "@/lib/product-image";
 import { ProductImagePlaceholder } from "./storefront/visuals";
 import "./product-card.css";
 
@@ -30,7 +31,7 @@ export default function ProductCard({ product }: { product: PublicProduct }) {
         </Link>
         <p className="bpc-price">{displayAmount(product.salePrice)} <span>TND</span> <span className="bpc-unit">/ {units[product.saleUnit] ?? product.saleUnit}</span></p>
         <p className={`bpc-availability${unavailable ? " bpc-unavailable" : ""}`}><span aria-hidden="true" />{availability}</p>
-        <div className="bpc-cart"><AddToCart productId={product.id} outOfStock={unavailable} /></div>
+        <div className="bpc-cart"><AddToCart productId={product.id} outOfStock={unavailable} imageUrl={productImageUrl(product.mainImagePath)} /></div>
       </div>
     </article>
   );
