@@ -25,3 +25,6 @@
 @media (max-width: 899px) { .site-footer-grid { grid-template-columns: 1fr 1fr; } .site-footer-brand { grid-column: 1 / -1; flex-direction: row; align-items: center; } }
 @media (max-width: 520px) { .site-footer-inner { width: calc(100% - 32px); } .site-footer-grid { grid-template-columns: 1fr; gap: 26px; } .site-footer-brand { flex-direction: column; align-items: flex-start; } .site-footer-button { width: 100%; justify-content: center; } }
 @media (prefers-reduced-motion: reduce) { .site-footer-brand:hover svg, .site-footer-button:hover { transform: none; } }
+.site-footer-landmark { font-size: 13px; opacity: 0.85; }
+.site-footer-map { display: inline-flex; align-items: center; gap: 6px; margin: 2px 0 10px; color: var(--c-honey-light) !important; font-weight: 600; text-decoration: underline; text-underline-offset: 4px; text-decoration-color: rgb(242 196 107 / 0.4); }
+.site-footer-map:hover { text-decoration-color: currentColor; }

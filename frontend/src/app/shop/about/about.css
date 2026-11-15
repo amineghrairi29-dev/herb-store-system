@@ -52,6 +52,8 @@
 .ab-visit h2 { margin: 0 0 8px; font-family: var(--font-display), Georgia, serif; font-weight: 400; font-size: clamp(28px, 3vw, 36px); }
 .ab-visit p { margin: 0 0 8px; color: rgb(255 255 255 / 0.85); }
 .ab-visit dl { margin: 0 0 12px; }
+.ab-landmark { color: var(--c-sage) !important; font-size: 14px; }
+.ab-landmark [lang="ar"] { font-family: var(--font-arabic), serif; font-weight: 700; font-size: 17px; }
 .ab-visit dl div { display: flex; flex-wrap: wrap; gap: 4px 12px; }
 .ab-visit dt { font-weight: 700; }
 .ab-visit dd { margin: 0; color: rgb(255 255 255 / 0.85); }

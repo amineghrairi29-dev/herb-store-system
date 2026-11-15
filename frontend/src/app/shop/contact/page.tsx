@@ -6,6 +6,7 @@ import "../info-pages.css";
 import "./contact.css";
 import PageHero from "../storefront/page-hero";
 import OpenStatus from "../storefront/open-status";
+import ShopMap from "../storefront/shop-map";
 
 export const metadata: Metadata = {
   title: "Contact",
@@ -18,7 +19,6 @@ export default async function ContactPage() {
   const store = await getStoreInfo();
   const whatsapp = whatsappLink(store?.phone, "Bonjour, j’ai une question.");
   const place = [store?.address, store?.city].filter(Boolean).join(", ");
-  const map = place ? `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(place)}` : null;
   const phones = [store?.phone, store?.secondaryPhone].filter((value): value is string => !!value);
   return (
     <div className="ip">
@@ -48,14 +48,6 @@ export default async function ContactPage() {
           <span className="ct-sub">{shopContent.openingHours.map((row) => row.days).join(" · ")}</span>
           <OpenStatus />
         </div>
-        {place && map && (
-          <a className="ct-card ct-place" href={map} target="_blank" rel="noopener noreferrer" style={{ "--i": 4 } as React.CSSProperties}>
-            <span className="ct-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21s-7-6.2-7-11.5A7 7 0 0 1 19 9.5C19 14.8 12 21 12 21Z" {...stroke} /><circle cx="12" cy="9.5" r="2.5" {...stroke} /></svg></span>
-            <span className="ct-label">La boutique</span>
-            <strong><bdi>{place}</bdi></strong>
-            <span className="ct-sub">Voir sur la carte <span aria-hidden="true">↗</span></span>
-          </a>
-        )}
         {store?.email && (
           <a className="ct-card" href={`mailto:${store.email}`} style={{ "--i": 5 } as React.CSSProperties}>
             <span className="ct-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2" {...stroke} /><path d="m4 7 8 6 8-6" {...stroke} /></svg></span>
@@ -65,7 +57,7 @@ export default async function ContactPage() {
           </a>
         )}
       </div>
-      {!whatsapp && !phones.length && !place && <p className="ip-card">Les coordonnées de la boutique seront bientôt disponibles sur cette page.</p>}
+      <ShopMap address={place} />
       <aside className="ip-cta">
         <div>
           <p lang="ar" dir="rtl" className="ip-cta-ar">ما عرفتش شنوّة تختار؟</p>

@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { SloumaStamp } from "@/components/brand/slouma-logo";
 import { apiBase } from "@/lib/api-base";
 import { displayPhone, isStoreInfo, whatsappLink, type StoreInfo } from "@/lib/store-info";
-import { shopContent } from "@/lib/shop-content";
+import { mapLinks, shopContent } from "@/lib/shop-content";
 import "./site-footer.css";
 
 const shop = [["/shop#products", "Tous les produits"], ["/shop/suivi", "Suivre ma commande"], ["/shop/profile", "Mon compte"]] as const;
@@ -43,6 +43,8 @@ export default function SiteFooter() {
           <h2>Nous trouver</h2>
           {store?.phone && <a href={`tel:${store.phone.replace(/[^\d+]/g, "")}`} dir="ltr" className="site-footer-phone">{displayPhone(store.phone)}</a>}
           {place && <p><bdi>{place}</bdi></p>}
+          <p className="site-footer-landmark">{shopContent.location.landmark}</p>
+          <a href={mapLinks.directions} target="_blank" rel="noopener noreferrer" className="site-footer-map">Itinéraire <span aria-hidden="true">↗</span></a>
           {shopContent.openingHours.map((row) => <p key={row.days}>{row.days}<br />{row.hours}</p>)}
         </div>
       </div>

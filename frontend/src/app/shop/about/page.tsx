@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import Image from "next/image";
 import { getStoreInfo, whatsappLink } from "@/lib/store-info";
-import { shopContent, yearsOfExperience } from "@/lib/shop-content";
+import { mapLinks, shopContent, yearsOfExperience } from "@/lib/shop-content";
 import { SloumaStamp } from "@/components/brand/slouma-logo";
 import "../info-pages.css";
 import "./about.css";
@@ -24,7 +24,6 @@ export default async function AboutPage() {
   const whatsapp = whatsappLink(store?.phone, "Bonjour, j’ai une question sur une plante ou une recette.");
   const years = yearsOfExperience();
   const place = [store?.address, store?.city].filter(Boolean).join(", ");
-  const map = place ? `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(place)}` : null;
   const values = [
     { title: "L’expérience", text: `${years} ans à préparer, conseiller et accompagner nos clients, chaque jour à la boutique.`, icon: <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8.5" {...stroke} /><path d="M12 7.5V12l3 2" {...stroke} /></svg> },
     { title: "Des recettes éprouvées", text: "Des préparations traditionnelles, testées et ajustées avec les retours de nos clients.", icon: <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 11h16l-1.5 6.5A3 3 0 0 1 15.6 20H8.4a3 3 0 0 1-2.9-2.5L4 11Z M14 11l5-7" {...stroke} /></svg> },
@@ -91,12 +90,13 @@ export default async function AboutPage() {
           <p lang="ar" dir="rtl" className="ip-cta-ar">مرحبا بيك في الحانوت</p>
           <h2 id="visit-title">Passez nous voir</h2>
           {place && <p><bdi>{place}</bdi></p>}
+          <p className="ab-landmark">{shopContent.location.landmark} · <span lang="ar" dir="rtl">{shopContent.location.landmarkAr}</span></p>
           <dl>{shopContent.openingHours.map((row) => <div key={row.days}><dt>{row.days}</dt><dd>{row.hours}</dd></div>)}</dl>
           <OpenStatus />
         </div>
         <div className="ab-visit-actions">
           {whatsapp && <a href={whatsapp} target="_blank" rel="noopener noreferrer" className="ip-btn">Poser une question sur WhatsApp</a>}
-          {map && <a href={map} target="_blank" rel="noopener noreferrer" className="ab-map">Voir sur la carte <span aria-hidden="true">↗</span></a>}
+          <a href={mapLinks.directions} target="_blank" rel="noopener noreferrer" className="ab-map">Itinéraire Google Maps <span aria-hidden="true">↗</span></a>
           <Link href="/shop/contact" className="ab-map">Toutes nos coordonnées <span aria-hidden="true">→</span></Link>
         </div>
       </section>
