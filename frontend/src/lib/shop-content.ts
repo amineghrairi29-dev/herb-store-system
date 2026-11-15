@@ -5,11 +5,12 @@
 export const shopContent = {
   foundedYear: 2006,
   tagline: "Recettes éprouvées depuis 2006",
-  openingHours: [
-    { days: "Tous les jours", hours: "8h30 – 13h00 · 14h30 – 19h30" },
-  ],
+  openingHours: [{ days: "Tous les jours", hours: "8h30 – 13h00 · 14h30 – 19h30" }],
   /** Same hours as openingHours, for "Ouvert maintenant" (Tunis time, every day). */
-  openingSlots: [["08:30", "13:00"], ["14:30", "19:30"]],
+  openingSlots: [
+    ["08:30", "13:00"],
+    ["14:30", "19:30"],
+  ],
   /** Shop position (from Google Maps) and a landmark that helps people find the door. */
   location: {
     latitude: 33.93993,

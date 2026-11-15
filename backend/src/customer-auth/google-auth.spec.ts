@@ -112,14 +112,27 @@ describe('Google OIDC verification and redirect boundaries', () => {
   });
   it('preserves the profile return target', async () => {
     const start = await service.start('/shop/profile');
-    expect(service.readFlow(start.cookie, new URL(start.url).searchParams.get('state')).returnTo).toBe('/shop/profile');
+    expect(
+      service.readFlow(
+        start.cookie,
+        new URL(start.url).searchParams.get('state'),
+      ).returnTo,
+    ).toBe('/shop/profile');
   });
   it('signs the initial-entry context separately from action-gated auth', async () => {
     const start = await service.start('/shop', true);
-    const flow = service.readFlow(start.cookie, new URL(start.url).searchParams.get('state'));
+    const flow = service.readFlow(
+      start.cookie,
+      new URL(start.url).searchParams.get('state'),
+    );
     expect(flow.entry).toBe(true);
     expect(flow.returnTo).toBe('/shop');
     const gated = await service.start('/shop/checkout');
-    expect(service.readFlow(gated.cookie, new URL(gated.url).searchParams.get('state')).entry).toBe(false);
+    expect(
+      service.readFlow(
+        gated.cookie,
+        new URL(gated.url).searchParams.get('state'),
+      ).entry,
+    ).toBe(false);
   });
 });

@@ -61,13 +61,24 @@ export class CustomerAuthService {
     const data = input(body, ['fullName', 'phone', 'deliveryAddress']);
     const text = (key: string, max: number, required = false) => {
       const value = data[key];
-      if (typeof value !== 'string' || value.length > max || (required && !value.trim()))
-        throw new BadRequestException('Nom requis ; téléphone (40 caractères) et adresse (500 caractères) invalides.');
+      if (
+        typeof value !== 'string' ||
+        value.length > max ||
+        (required && !value.trim())
+      )
+        throw new BadRequestException(
+          'Nom requis ; téléphone (40 caractères) et adresse (500 caractères) invalides.',
+        );
       return value.trim() || null;
     };
-    const fullName = text('fullName', 150, true), phone = text('phone', 40), address = text('deliveryAddress', 500);
-    return transaction(async tx => {
-      const result = await tx.client.query<CustomerInfo>('UPDATE public.customer SET "fullName"=$1, phone=$2, "deliveryAddress"=$3, "updatedAt"=now() WHERE id=$4 AND "isActive"=true RETURNING id,email,"fullName",phone,"deliveryAddress"', [fullName, phone, address, customerId]);
+    const fullName = text('fullName', 150, true),
+      phone = text('phone', 40),
+      address = text('deliveryAddress', 500);
+    return transaction(async (tx) => {
+      const result = await tx.client.query<CustomerInfo>(
+        'UPDATE public.customer SET "fullName"=$1, phone=$2, "deliveryAddress"=$3, "updatedAt"=now() WHERE id=$4 AND "isActive"=true RETURNING id,email,"fullName",phone,"deliveryAddress"',
+        [fullName, phone, address, customerId],
+      );
       if (!result.rows[0]) throw new UnauthorizedException('Session expirée.');
       return safe(result.rows[0]);
     });

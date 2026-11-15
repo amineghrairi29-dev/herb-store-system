@@ -19,7 +19,13 @@ export function customerToken(request: Request) {
 export function safeReturn(value: unknown): string {
   // Deliberately small storefront allowlist; no arbitrary URLs or redirect chains.
   return typeof value === 'string' &&
-    ['/shop', '/shop/checkout', '/shop/cart', '/shop/catalogue', '/shop/profile'].includes(value)
+    [
+      '/shop',
+      '/shop/checkout',
+      '/shop/cart',
+      '/shop/catalogue',
+      '/shop/profile',
+    ].includes(value)
     ? value
     : '/shop';
 }

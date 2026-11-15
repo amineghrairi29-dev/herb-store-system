@@ -1,0 +1,4 @@
+# Mise en forme Prettier en masse : ignorée par git blame
+# (GitHub le fait seul ; en local : git config blame.ignoreRevsFile .git-blame-ignore-revs)
+cf57b254d0b1b9b814826210c78d97ee9f1060ca
+407646342a19a5f5771ece0405603ad48a35dedf

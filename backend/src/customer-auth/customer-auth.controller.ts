@@ -70,12 +70,37 @@ export class CustomerAuthController {
   me(@Req() req: CustomerRequest) {
     return req.customer;
   }
-  @Get('security') @UseGuards(CustomerGuard)
-  security(@Req() req: CustomerRequest) { return this.account.security('CUSTOMER', req.customer.id, customerToken(req)); }
-  @Patch('email') @UseGuards(CustomerGuard)
-  email(@Req() req: CustomerRequest, @Body() body: unknown) { return this.account.change('CUSTOMER', req.customer.id, customerToken(req), 'email', body); }
-  @Patch('password') @UseGuards(CustomerGuard)
-  password(@Req() req: CustomerRequest, @Body() body: unknown) { return this.account.change('CUSTOMER', req.customer.id, customerToken(req), 'password', body); }
+  @Get('security')
+  @UseGuards(CustomerGuard)
+  security(@Req() req: CustomerRequest) {
+    return this.account.security(
+      'CUSTOMER',
+      req.customer.id,
+      customerToken(req),
+    );
+  }
+  @Patch('email')
+  @UseGuards(CustomerGuard)
+  email(@Req() req: CustomerRequest, @Body() body: unknown) {
+    return this.account.change(
+      'CUSTOMER',
+      req.customer.id,
+      customerToken(req),
+      'email',
+      body,
+    );
+  }
+  @Patch('password')
+  @UseGuards(CustomerGuard)
+  password(@Req() req: CustomerRequest, @Body() body: unknown) {
+    return this.account.change(
+      'CUSTOMER',
+      req.customer.id,
+      customerToken(req),
+      'password',
+      body,
+    );
+  }
   @Patch('profile')
   @UseGuards(CustomerGuard)
   profile(@Req() req: CustomerRequest, @Body() body: unknown) {
@@ -92,8 +117,15 @@ export class CustomerAuthController {
     return { googleEnabled: this.google.enabled() };
   }
   @Get('google/start')
-  async start(@Query('returnTo') returnTo: unknown, @Res() res: Response, @Query('entry') entry: unknown) {
-    const flow = await this.google.start(entry === 'true' ? '/shop' : returnTo, entry === 'true');
+  async start(
+    @Query('returnTo') returnTo: unknown,
+    @Res() res: Response,
+    @Query('entry') entry: unknown,
+  ) {
+    const flow = await this.google.start(
+      entry === 'true' ? '/shop' : returnTo,
+      entry === 'true',
+    );
     res.cookie(googleCookie(), flow.cookie, {
       ...cookieOptions(),
       maxAge: 600000,
@@ -124,7 +156,8 @@ export class CustomerAuthController {
       // Never serialize provider errors, codes, tokens or profile details into a URL/log.
       res.redirect(
         frontendOrigin() +
-          authPath + '?' +
+          authPath +
+          '?' +
           new URLSearchParams({ returnTo, error: 'google' }),
       );
     }

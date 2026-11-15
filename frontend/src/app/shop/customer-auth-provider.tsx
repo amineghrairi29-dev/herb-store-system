@@ -1,12 +1,5 @@
 "use client";
-import {
-  createContext,
-  useCallback,
-  useContext,
-  useEffect,
-  useRef,
-  useState,
-} from "react";
+import { createContext, useCallback, useContext, useEffect, useRef, useState } from "react";
 import { usePathname } from "next/navigation";
 import { apiBase } from "@/lib/api-base";
 export interface Customer {
@@ -30,11 +23,7 @@ export function safeCustomerReturn(value: unknown) {
     ? value
     : "/shop";
 }
-export function CustomerAuthProvider({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
+export function CustomerAuthProvider({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const [customer, setCustomer] = useState<Customer | null>(null),
     [loading, setLoading] = useState(true),
@@ -55,8 +44,7 @@ export function CustomerAuthProvider({
           setCustomer(null);
           return null;
         }
-        if (!response.ok)
-          throw new Error("Impossible de vérifier votre session. Réessayez.");
+        if (!response.ok) throw new Error("Impossible de vérifier votre session. Réessayez.");
         const value: Customer = await response.json();
         setCustomer(value);
         return value;
@@ -91,11 +79,7 @@ export function CustomerAuthProvider({
     if (!response.ok) throw new Error("Déconnexion impossible. Réessayez.");
     setCustomer(null); // The cart belongs to the browser, independently of authentication.
   }, []);
-  return (
-    <Context.Provider value={{ customer, loading, error, refresh, logout }}>
-      {children}
-    </Context.Provider>
-  );
+  return <Context.Provider value={{ customer, loading, error, refresh, logout }}>{children}</Context.Provider>;
 }
 export function useCustomerAuth() {
   const value = useContext(Context);

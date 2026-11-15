@@ -9,7 +9,13 @@ import { UnifiedLoginController } from './unified-login.controller.js';
 @Module({
   imports: [AuthModule],
   controllers: [CustomerAuthController, UnifiedLoginController],
-  providers: [CustomerAuthService, GoogleAuthService, CustomerGuard, OptionalCustomerGuard, UnifiedLoginService],
+  providers: [
+    CustomerAuthService,
+    GoogleAuthService,
+    CustomerGuard,
+    OptionalCustomerGuard,
+    UnifiedLoginService,
+  ],
   exports: [CustomerAuthService, CustomerGuard, OptionalCustomerGuard],
 })
 export class CustomerAuthModule {}

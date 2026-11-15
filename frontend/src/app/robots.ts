@@ -3,8 +3,14 @@ import { siteUrl } from "@/lib/site-url";
 
 // Back-office routes and private shop steps stay out of search engines.
 const privatePaths = [
-  "/admin", "/login", "/auth",
-  "/shop/cart", "/shop/checkout", "/shop/order-success", "/shop/profile", "/shop/auth",
+  "/admin",
+  "/login",
+  "/auth",
+  "/shop/cart",
+  "/shop/checkout",
+  "/shop/order-success",
+  "/shop/profile",
+  "/shop/auth",
 ];
 
 export default function robots(): MetadataRoute.Robots {

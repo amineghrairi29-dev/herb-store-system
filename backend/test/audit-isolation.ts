@@ -7,13 +7,26 @@ if (process.env.RUN_DATABASE_TESTS === '1') {
   let owner: Client;
   const original = Client.prototype.query;
   beforeAll(async () => {
-    owner = new Client({ connectionString: process.env.DATABASE_URL }); await owner.connect();
-    await owner.query(`CREATE TABLE ${table} (LIKE public."auditEvent" INCLUDING ALL)`);
-    await owner.query(`CREATE TABLE ${settings} (LIKE public."storeSettings" INCLUDING ALL)`);
+    owner = new Client({ connectionString: process.env.DATABASE_URL });
+    await owner.connect();
+    await owner.query(
+      `CREATE TABLE ${table} (LIKE public."auditEvent" INCLUDING ALL)`,
+    );
+    await owner.query(
+      `CREATE TABLE ${settings} (LIKE public."storeSettings" INCLUDING ALL)`,
+    );
     Client.prototype.query = function (this: Client, ...args: unknown[]) {
-      if (typeof args[0] === 'string') args[0] = args[0].replaceAll('public."auditEvent"', table).replaceAll('public."storeSettings"', settings);
+      if (typeof args[0] === 'string')
+        args[0] = args[0]
+          .replaceAll('public."auditEvent"', table)
+          .replaceAll('public."storeSettings"', settings);
       return Reflect.apply(original, this, args);
     } as Client['query'];
   });
-  afterAll(async () => { Client.prototype.query = original; await owner?.query(`DROP TABLE IF EXISTS ${table}`); await owner?.query(`DROP TABLE IF EXISTS ${settings}`); await owner?.end(); });
+  afterAll(async () => {
+    Client.prototype.query = original;
+    await owner?.query(`DROP TABLE IF EXISTS ${table}`);
+    await owner?.query(`DROP TABLE IF EXISTS ${settings}`);
+    await owner?.end();
+  });
 }

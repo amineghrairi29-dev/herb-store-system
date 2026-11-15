@@ -598,7 +598,8 @@
 }
 .sf-information-page h1 {
   font:
-    400 clamp(38px, 5vw, 60px)/1.1 var(--font-display), Georgia,
+    400 clamp(38px, 5vw, 60px)/1.1 var(--font-display),
+    Georgia,
     serif;
   letter-spacing: -0.03em;
   margin-bottom: 30px;

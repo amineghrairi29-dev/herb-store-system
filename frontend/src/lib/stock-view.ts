@@ -4,16 +4,36 @@ import type { ProductStock } from "./stock-api";
 import type { MovementType } from "../app/admin/stock/movement-config";
 
 export interface StockMovement {
-  id: number; productId: number; type: MovementType; quantity: string; unit: string;
-  quantityInStorageUnit: string; reason: string | null; reference: string | null;
-  notes: string | null; createdAt: string;
+  id: number;
+  productId: number;
+  type: MovementType;
+  quantity: string;
+  unit: string;
+  quantityInStorageUnit: string;
+  reason: string | null;
+  reference: string | null;
+  notes: string | null;
+  createdAt: string;
 }
 export type StockStatus = "Rupture" | "Stock faible" | "Normal";
-export interface StockRow { product: ProductDetails; balance: ProductStock }
-export interface MovementFilters { productId: string; type: string; from: string; to: string }
+export interface StockRow {
+  product: ProductDetails;
+  balance: ProductStock;
+}
+export interface MovementFilters {
+  productId: string;
+  type: string;
+  from: string;
+  to: string;
+}
 export const emptyMovementFilters: MovementFilters = { productId: "", type: "", from: "", to: "" };
 export const movementLabels: Record<MovementType, string> = {
-  ENTRY: "Entrée", EXIT: "Sortie", LOSS: "Perte", ADJUSTMENT_IN: "Ajustement +", ADJUSTMENT_OUT: "Ajustement -", RETURN_IN: "Retour",
+  ENTRY: "Entrée",
+  EXIT: "Sortie",
+  LOSS: "Perte",
+  ADJUSTMENT_IN: "Ajustement +",
+  ADJUSTMENT_OUT: "Ajustement -",
+  RETURN_IN: "Retour",
 };
 
 export function stockStatus(stock: string, minimum: string | null): StockStatus {
@@ -34,22 +54,36 @@ export function filterMovements(movements: StockMovement[], filters: MovementFil
   const endDate = filters.to ? new Date(`${filters.to}T00:00:00`) : null;
   if (endDate) endDate.setDate(endDate.getDate() + 1);
   const end = endDate?.getTime() ?? Infinity;
-  return movements.filter((movement) =>
-    (!filters.productId || String(movement.productId) === filters.productId) &&
-    (!filters.type || movement.type === filters.type) &&
-    movementTime(movement.createdAt) >= start && movementTime(movement.createdAt) < end
-  ).sort((a, b) => movementTime(b.createdAt) - movementTime(a.createdAt) || b.id - a.id);
+  return movements
+    .filter(
+      (movement) =>
+        (!filters.productId || String(movement.productId) === filters.productId) &&
+        (!filters.type || movement.type === filters.type) &&
+        movementTime(movement.createdAt) >= start &&
+        movementTime(movement.createdAt) < end,
+    )
+    .sort((a, b) => movementTime(b.createdAt) - movementTime(a.createdAt) || b.id - a.id);
 }
 
 export function filterStock(rows: StockRow[], search: string, status: string): StockRow[] {
   const term = search.trim().normalize("NFKC").toLocaleLowerCase("fr");
   const rank: Record<StockStatus, number> = { Rupture: 0, "Stock faible": 1, Normal: 2 };
   const collator = new Intl.Collator("fr", { sensitivity: "base", numeric: true });
-  return rows.filter(({ product, balance }) =>
-    (!status || stockStatus(balance.stock, product.minStock) === status) &&
-    [product.name, product.nameFr ?? "", product.sku].some((value) => value.normalize("NFKC").toLocaleLowerCase("fr").includes(term))
-  ).sort((a, b) => rank[stockStatus(a.balance.stock, a.product.minStock)] - rank[stockStatus(b.balance.stock, b.product.minStock)]
-    || collator.compare(a.product.name, b.product.name) || collator.compare(a.product.sku, b.product.sku));
+  return rows
+    .filter(
+      ({ product, balance }) =>
+        (!status || stockStatus(balance.stock, product.minStock) === status) &&
+        [product.name, product.nameFr ?? "", product.sku].some((value) =>
+          value.normalize("NFKC").toLocaleLowerCase("fr").includes(term),
+        ),
+    )
+    .sort(
+      (a, b) =>
+        rank[stockStatus(a.balance.stock, a.product.minStock)] -
+          rank[stockStatus(b.balance.stock, b.product.minStock)] ||
+        collator.compare(a.product.name, b.product.name) ||
+        collator.compare(a.product.sku, b.product.sku),
+    );
 }
 
 export function stockSummary(rows: StockRow[], movements: StockMovement[], asOf: number) {

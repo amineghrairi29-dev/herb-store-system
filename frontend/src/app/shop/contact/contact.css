@@ -1,30 +1,159 @@
 /* Contact cards (theme tokens in ../theme.css; shared page parts in ../info-pages.css). */
-.ct-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; }
-.ct-card { position: relative; display: flex; flex-direction: column; gap: 4px; min-width: 0; padding: 24px; border: 1px solid var(--c-line); border-radius: 26px; background: var(--c-paper); color: var(--c-forest); text-decoration: none; animation: ip-up 550ms var(--ease-out) both; animation-delay: calc(250ms + var(--i) * 80ms); transition: transform var(--t-base) var(--ease-out), border-color var(--t-fast), box-shadow var(--t-base); }
-a.ct-card:hover { transform: translateY(-4px); border-color: var(--c-sage); box-shadow: 0 16px 32px rgb(31 58 36 / 0.1); }
-.ct-icon { display: grid; place-items: center; width: 48px; height: 48px; margin-bottom: 10px; border-radius: 42% 58% 52% 48% / 52% 44% 56% 48%; background: var(--c-sprout); color: var(--c-leaf); }
-.ct-icon svg { width: 24px; height: 24px; }
-.ct-label { font-size: 12px; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; color: var(--c-muted); }
-.ct-card strong { font-family: var(--font-display), Georgia, serif; font-weight: 400; font-size: 24px; line-height: 1.25; overflow-wrap: anywhere; }
-.ct-sub { color: var(--c-muted); font-size: 14px; }
-.ct-whatsapp { grid-row: span 2; justify-content: flex-end; min-height: 280px; border: 0; background: var(--c-leaf); color: #fff; overflow: hidden; isolation: isolate; }
-.ct-whatsapp::before { content: ""; position: absolute; z-index: -1; width: 300px; height: 300px; right: -110px; top: -110px; border-radius: 58% 42% 50% 50% / 46% 54% 46% 54%; background: var(--c-leaf-dark); transition: transform 800ms var(--ease-out); }
-.ct-whatsapp:hover::before { transform: scale(1.15) rotate(10deg); }
-.ct-whatsapp .ct-icon { width: 64px; height: 64px; margin-bottom: auto; background: #fff; color: var(--c-leaf); }
-.ct-whatsapp .ct-icon svg { width: 32px; height: 32px; }
-.ct-whatsapp .ct-label, .ct-whatsapp .ct-sub { color: rgb(255 255 255 / 0.8); }
-.ct-whatsapp strong { font-size: 32px; }
-.ct-go { position: absolute; right: 22px; bottom: 22px; display: grid; place-items: center; width: 46px; height: 46px; border-radius: 50%; background: var(--c-honey); color: var(--c-honey-ink); font-size: 20px; transition: transform var(--t-base) var(--ease-out); }
-.ct-whatsapp:hover .ct-go { transform: rotate(-45deg); }
-.ct-hours .ip-open { margin-top: 8px; }
-.ct-card:focus-visible { outline: 3px solid var(--c-leaf); outline-offset: 3px; }
-@media (max-width: 900px) { .ct-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+.ct-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 16px;
+}
+.ct-card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+  padding: 24px;
+  border: 1px solid var(--c-line);
+  border-radius: 26px;
+  background: var(--c-paper);
+  color: var(--c-forest);
+  text-decoration: none;
+  animation: ip-up 550ms var(--ease-out) both;
+  animation-delay: calc(250ms + var(--i) * 80ms);
+  transition:
+    transform var(--t-base) var(--ease-out),
+    border-color var(--t-fast),
+    box-shadow var(--t-base);
+}
+a.ct-card:hover {
+  transform: translateY(-4px);
+  border-color: var(--c-sage);
+  box-shadow: 0 16px 32px rgb(31 58 36 / 0.1);
+}
+.ct-icon {
+  display: grid;
+  place-items: center;
+  width: 48px;
+  height: 48px;
+  margin-bottom: 10px;
+  border-radius: 42% 58% 52% 48% / 52% 44% 56% 48%;
+  background: var(--c-sprout);
+  color: var(--c-leaf);
+}
+.ct-icon svg {
+  width: 24px;
+  height: 24px;
+}
+.ct-label {
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--c-muted);
+}
+.ct-card strong {
+  font-family: var(--font-display), Georgia, serif;
+  font-weight: 400;
+  font-size: 24px;
+  line-height: 1.25;
+  overflow-wrap: anywhere;
+}
+.ct-sub {
+  color: var(--c-muted);
+  font-size: 14px;
+}
+.ct-whatsapp {
+  grid-row: span 2;
+  justify-content: flex-end;
+  min-height: 280px;
+  border: 0;
+  background: var(--c-leaf);
+  color: #fff;
+  overflow: hidden;
+  isolation: isolate;
+}
+.ct-whatsapp::before {
+  content: "";
+  position: absolute;
+  z-index: -1;
+  width: 300px;
+  height: 300px;
+  right: -110px;
+  top: -110px;
+  border-radius: 58% 42% 50% 50% / 46% 54% 46% 54%;
+  background: var(--c-leaf-dark);
+  transition: transform 800ms var(--ease-out);
+}
+.ct-whatsapp:hover::before {
+  transform: scale(1.15) rotate(10deg);
+}
+.ct-whatsapp .ct-icon {
+  width: 64px;
+  height: 64px;
+  margin-bottom: auto;
+  background: #fff;
+  color: var(--c-leaf);
+}
+.ct-whatsapp .ct-icon svg {
+  width: 32px;
+  height: 32px;
+}
+.ct-whatsapp .ct-label,
+.ct-whatsapp .ct-sub {
+  color: rgb(255 255 255 / 0.8);
+}
+.ct-whatsapp strong {
+  font-size: 32px;
+}
+.ct-go {
+  position: absolute;
+  right: 22px;
+  bottom: 22px;
+  display: grid;
+  place-items: center;
+  width: 46px;
+  height: 46px;
+  border-radius: 50%;
+  background: var(--c-honey);
+  color: var(--c-honey-ink);
+  font-size: 20px;
+  transition: transform var(--t-base) var(--ease-out);
+}
+.ct-whatsapp:hover .ct-go {
+  transform: rotate(-45deg);
+}
+.ct-hours .ip-open {
+  margin-top: 8px;
+}
+.ct-card:focus-visible {
+  outline: 3px solid var(--c-leaf);
+  outline-offset: 3px;
+}
+@media (max-width: 900px) {
+  .ct-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
 @media (max-width: 560px) {
-  .ct-grid { grid-template-columns: minmax(0, 1fr); gap: 12px; }
-  .ct-whatsapp { grid-row: auto; min-height: 220px; }
-  .ct-card { padding: 20px; border-radius: 22px; }
+  .ct-grid {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 12px;
+  }
+  .ct-whatsapp {
+    grid-row: auto;
+    min-height: 220px;
+  }
+  .ct-card {
+    padding: 20px;
+    border-radius: 22px;
+  }
 }
 @media (prefers-reduced-motion: reduce) {
-  .ct-card { animation: none; transition: none; }
-  a.ct-card:hover, .ct-whatsapp:hover .ct-go, .ct-whatsapp:hover::before { transform: none; }
+  .ct-card {
+    animation: none;
+    transition: none;
+  }
+  a.ct-card:hover,
+  .ct-whatsapp:hover .ct-go,
+  .ct-whatsapp:hover::before {
+    transform: none;
+  }
 }

@@ -24,7 +24,27 @@ import { PublicCatalogueModule } from './public-catalogue/public-catalogue.modul
 import { OnlineOrdersModule } from './online-orders/online-orders.module.js';
 
 @Module({
-  imports: [ClassificationsModule, ProductImagesModule, CategoriesModule, AuthModule, AuditModule, StoreSettingsModule, DeliveryZonesModule, DashboardModule, ProductsModule, StockMovementsModule, SuppliersModule, PurchasesModule, SalesModule, CashModule, ExpensesModule, FinanceModule, ReportsModule, PublicCatalogueModule, OnlineOrdersModule],
+  imports: [
+    ClassificationsModule,
+    ProductImagesModule,
+    CategoriesModule,
+    AuthModule,
+    AuditModule,
+    StoreSettingsModule,
+    DeliveryZonesModule,
+    DashboardModule,
+    ProductsModule,
+    StockMovementsModule,
+    SuppliersModule,
+    PurchasesModule,
+    SalesModule,
+    CashModule,
+    ExpensesModule,
+    FinanceModule,
+    ReportsModule,
+    PublicCatalogueModule,
+    OnlineOrdersModule,
+  ],
   controllers: [AppController, HealthController],
   providers: [AppService, DatabaseLifecycle],
 })

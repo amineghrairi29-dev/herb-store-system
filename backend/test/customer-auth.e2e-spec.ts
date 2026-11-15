@@ -87,7 +87,9 @@ describe.skipIf(process.env.RUN_DATABASE_TESTS !== '1')(
       await db.query('DELETE FROM public.customer WHERE email LIKE $1', [
         tag + '%',
       ]);
-      await db.query('DELETE FROM public."user" WHERE email=$1', [tag + '-internal@example.test']);
+      await db.query('DELETE FROM public."user" WHERE email=$1', [
+        tag + '-internal@example.test',
+      ]);
       await db.end();
       await app?.close();
     });
@@ -151,20 +153,74 @@ describe.skipIf(process.env.RUN_DATABASE_TESTS !== '1')(
         .expect(200);
     });
     it('updates only the signed-in customer profile and preserves credentials', async () => {
-      const profile = { fullName: 'عميل Test', phone: '20987654', deliveryAddress: '12 rue des Plantes، تونس' };
-      const credentials = (await db.query('SELECT email,"passwordHash","googleSubject","isActive" FROM public.customer WHERE id=$1', [customerId])).rows[0];
-      const others = (await db.query('SELECT jsonb_agg(c ORDER BY id) AS data FROM public.customer c WHERE id<>$1', [customerId])).rows[0];
-      const patch = () => request(app.getHttpServer()).patch('/public/auth/profile').set('Origin', origin).set('Cookie', cookie);
-      await request(app.getHttpServer()).patch('/public/auth/profile').set('Origin', origin).send(profile).expect(401);
-      await request(app.getHttpServer()).patch('/public/auth/profile').set('Cookie', cookie).send(profile).expect(403);
-      for (const extra of [{ email: 'other@example.test' }, { id: 1 }, { role: 'ADMIN' }, { fullName: ' ' }, { deliveryAddress: 'x'.repeat(501) }]) await patch().send({ ...profile, ...extra }).expect(400);
+      const profile = {
+        fullName: 'عميل Test',
+        phone: '20987654',
+        deliveryAddress: '12 rue des Plantes، تونس',
+      };
+      const credentials = (
+        await db.query(
+          'SELECT email,"passwordHash","googleSubject","isActive" FROM public.customer WHERE id=$1',
+          [customerId],
+        )
+      ).rows[0];
+      const others = (
+        await db.query(
+          'SELECT jsonb_agg(c ORDER BY id) AS data FROM public.customer c WHERE id<>$1',
+          [customerId],
+        )
+      ).rows[0];
+      const patch = () =>
+        request(app.getHttpServer())
+          .patch('/public/auth/profile')
+          .set('Origin', origin)
+          .set('Cookie', cookie);
+      await request(app.getHttpServer())
+        .patch('/public/auth/profile')
+        .set('Origin', origin)
+        .send(profile)
+        .expect(401);
+      await request(app.getHttpServer())
+        .patch('/public/auth/profile')
+        .set('Cookie', cookie)
+        .send(profile)
+        .expect(403);
+      for (const extra of [
+        { email: 'other@example.test' },
+        { id: 1 },
+        { role: 'ADMIN' },
+        { fullName: ' ' },
+        { deliveryAddress: 'x'.repeat(501) },
+      ])
+        await patch()
+          .send({ ...profile, ...extra })
+          .expect(400);
       const result = await patch().send(profile).expect(200);
       expect(result.body).toEqual({ id: customerId, email, ...profile });
-      const me = await request(app.getHttpServer()).get('/public/auth/me').set('Cookie', cookie).expect(200);
+      const me = await request(app.getHttpServer())
+        .get('/public/auth/me')
+        .set('Cookie', cookie)
+        .expect(200);
       expect(me.body).toEqual(result.body);
-      expect((await db.query('SELECT email,"passwordHash","googleSubject","isActive" FROM public.customer WHERE id=$1', [customerId])).rows[0]).toEqual(credentials);
-      expect((await db.query('SELECT jsonb_agg(c ORDER BY id) AS data FROM public.customer c WHERE id<>$1', [customerId])).rows[0]).toEqual(others);
-      await patch().send({ fullName: 'عميل Test', phone: '20123456', deliveryAddress: '' }).expect(200);
+      expect(
+        (
+          await db.query(
+            'SELECT email,"passwordHash","googleSubject","isActive" FROM public.customer WHERE id=$1',
+            [customerId],
+          )
+        ).rows[0],
+      ).toEqual(credentials);
+      expect(
+        (
+          await db.query(
+            'SELECT jsonb_agg(c ORDER BY id) AS data FROM public.customer c WHERE id<>$1',
+            [customerId],
+          )
+        ).rows[0],
+      ).toEqual(others);
+      await patch()
+        .send({ fullName: 'عميل Test', phone: '20123456', deliveryAddress: '' })
+        .expect(200);
     });
     it('uses generic login errors, rejects inactive customers, rotates and logs out sessions', async () => {
       const a = await post('/public/auth/login')
@@ -287,7 +343,9 @@ describe.skipIf(process.env.RUN_DATABASE_TESTS !== '1')(
       });
       expect(user).toHaveProperty('id');
       const staff = cookieOf(
-        await post('/auth/login').send({ email: tag + '-internal@example.test', password }).expect(200),
+        await post('/auth/login')
+          .send({ email: tag + '-internal@example.test', password })
+          .expect(200),
       );
       await request(app.getHttpServer())
         .get('/auth/me')
@@ -312,35 +370,75 @@ describe.skipIf(process.env.RUN_DATABASE_TESTS !== '1')(
       ).toBeNull();
     });
     it('completes the Google callback with a customer-only cookie and checkout redirect', async () => {
-      vi.stubEnv('GOOGLE_CLIENT_ID', 'test-client'); vi.stubEnv('GOOGLE_CLIENT_SECRET', 'test-secret');
-      vi.stubEnv('GOOGLE_REDIRECT_URI', 'http://localhost:3001/public/auth/google/callback');
+      vi.stubEnv('GOOGLE_CLIENT_ID', 'test-client');
+      vi.stubEnv('GOOGLE_CLIENT_SECRET', 'test-secret');
+      vi.stubEnv(
+        'GOOGLE_REDIRECT_URI',
+        'http://localhost:3001/public/auth/google/callback',
+      );
       const google = app.get(GoogleAuthService);
       // Provider exchange is mocked; signed JWT verification has separate cryptographic tests.
-      const finish = vi.spyOn(google, 'finish').mockResolvedValue({ sub: tag + '-callback', email: tag + '-callback@gmail.com', authoritative: true });
+      const finish = vi.spyOn(google, 'finish').mockResolvedValue({
+        sub: tag + '-callback',
+        email: tag + '-callback@gmail.com',
+        authoritative: true,
+      });
       try {
-        const start = await request(app.getHttpServer()).get('/public/auth/google/start?returnTo=/shop/checkout').expect(302);
-        const state = new URL(String(start.headers.location)).searchParams.get('state');
-        const callback = await request(app.getHttpServer()).get('/public/auth/google/callback').query({ state, code: 'test-code' }).set('Cookie', cookieOf(start)).expect(302);
+        const start = await request(app.getHttpServer())
+          .get('/public/auth/google/start?returnTo=/shop/checkout')
+          .expect(302);
+        const state = new URL(String(start.headers.location)).searchParams.get(
+          'state',
+        );
+        const callback = await request(app.getHttpServer())
+          .get('/public/auth/google/callback')
+          .query({ state, code: 'test-code' })
+          .set('Cookie', cookieOf(start))
+          .expect(302);
         expect(callback.headers.location).toBe(origin + '/shop/checkout');
         const cookies = callback.headers['set-cookie'] as unknown as string[];
-        const customerCookie = cookies.find(value => value.startsWith('herb_customer='))!.split(';')[0];
-        const me = await request(app.getHttpServer()).get('/public/auth/me').set('Cookie', customerCookie).expect(200);
+        const customerCookie = cookies
+          .find((value) => value.startsWith('herb_customer='))!
+          .split(';')[0];
+        const me = await request(app.getHttpServer())
+          .get('/public/auth/me')
+          .set('Cookie', customerCookie)
+          .expect(200);
         expect(me.body.email).toBe(tag + '-callback@gmail.com');
         expect(me.body).not.toHaveProperty('googleSubject');
-        await request(app.getHttpServer()).get('/auth/me').set('Cookie', customerCookie).expect(401);
-        await post('/public/auth/logout').set('Cookie', customerCookie).expect(200);
-        await request(app.getHttpServer()).get('/public/auth/me').set('Cookie', customerCookie).expect(401);
-      } finally { finish.mockRestore(); vi.unstubAllEnvs(); }
+        await request(app.getHttpServer())
+          .get('/auth/me')
+          .set('Cookie', customerCookie)
+          .expect(401);
+        await post('/public/auth/logout')
+          .set('Cookie', customerCookie)
+          .expect(200);
+        await request(app.getHttpServer())
+          .get('/public/auth/me')
+          .set('Cookie', customerCookie)
+          .expect(401);
+      } finally {
+        finish.mockRestore();
+        vi.unstubAllEnvs();
+      }
     });
     it('creates/links verified Google identities once, revoking unverified local credentials on authoritative linking', async () => {
       const service = app.get(CustomerAuthService),
         googleEmail = tag + '-google@gmail.com';
       const initial = await service.register({ email: googleEmail, password });
-      await service.updateProfile(initial.customer.id, { fullName: 'Google Profile Test', phone: '20987654', deliveryAddress: '12 rue des Plantes' });
+      await service.updateProfile(initial.customer.id, {
+        fullName: 'Google Profile Test',
+        phone: '20987654',
+        deliveryAddress: '12 rue des Plantes',
+      });
       const identity = { sub: tag, email: googleEmail, authoritative: true };
       const linked = await service.google(identity);
       expect(linked.customer.id).toBe(initial.customer.id);
-      expect(await service.current(linked.token)).toMatchObject({ fullName: 'Google Profile Test', phone: '20987654', deliveryAddress: '12 rue des Plantes' });
+      expect(await service.current(linked.token)).toMatchObject({
+        fullName: 'Google Profile Test',
+        phone: '20987654',
+        deliveryAddress: '12 rue des Plantes',
+      });
       await expect(service.current(initial.token)).rejects.toThrow();
       await expect(
         service.login({ email: googleEmail, password }),

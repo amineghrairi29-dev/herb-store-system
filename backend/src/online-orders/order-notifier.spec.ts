@@ -1,7 +1,24 @@
-import { notifyNewOrder, orderNoticeText, type OrderNotice } from './order-notifier.js';
-const order: OrderNotice = { reference: 'ORD-000042', totalAmount: '25.500', customerName: 'Amine', customerPhone: '98123456', deliveryAddress: 'Ghannouch', notes: null, items: [{ productNameSnapshot: 'Menthe', quantity: '0.250', unitSnapshot: 'KG' }] };
+import {
+  notifyNewOrder,
+  orderNoticeText,
+  type OrderNotice,
+} from './order-notifier.js';
+const order: OrderNotice = {
+  reference: 'ORD-000042',
+  totalAmount: '25.500',
+  customerName: 'Amine',
+  customerPhone: '98123456',
+  deliveryAddress: 'Ghannouch',
+  notes: null,
+  items: [
+    { productNameSnapshot: 'Menthe', quantity: '0.250', unitSnapshot: 'KG' },
+  ],
+};
 describe('Order notifier', () => {
-  afterEach(() => { vi.unstubAllEnvs(); vi.unstubAllGlobals(); });
+  afterEach(() => {
+    vi.unstubAllEnvs();
+    vi.unstubAllGlobals();
+  });
   it('formats the shop message with contact and lines', () => {
     const text = orderNoticeText(order);
     expect(text).toContain('ORD-000042');
@@ -10,18 +27,25 @@ describe('Order notifier', () => {
     expect(text).not.toContain('Note');
   });
   it('shows delivery fee and amount to collect', () => {
-    const text = orderNoticeText({ ...order, deliveryFee: '7.000', grandTotal: '32.500' });
+    const text = orderNoticeText({
+      ...order,
+      deliveryFee: '7.000',
+      grandTotal: '32.500',
+    });
     expect(text).toContain('Livraison : 7.000 TND');
     expect(text).toContain('Total à encaisser : 32.500 TND');
   });
   it('does nothing without Telegram settings', async () => {
-    vi.stubEnv('TELEGRAM_BOT_TOKEN', ''); vi.stubEnv('TELEGRAM_CHAT_ID', '');
-    const fetchMock = vi.fn(); vi.stubGlobal('fetch', fetchMock);
+    vi.stubEnv('TELEGRAM_BOT_TOKEN', '');
+    vi.stubEnv('TELEGRAM_CHAT_ID', '');
+    const fetchMock = vi.fn();
+    vi.stubGlobal('fetch', fetchMock);
     await notifyNewOrder(order);
     expect(fetchMock).not.toHaveBeenCalled();
   });
   it('never throws when Telegram is unreachable', async () => {
-    vi.stubEnv('TELEGRAM_BOT_TOKEN', 'token'); vi.stubEnv('TELEGRAM_CHAT_ID', '1');
+    vi.stubEnv('TELEGRAM_BOT_TOKEN', 'token');
+    vi.stubEnv('TELEGRAM_CHAT_ID', '1');
     vi.stubGlobal('fetch', vi.fn().mockRejectedValue(new Error('offline')));
     await expect(notifyNewOrder(order)).resolves.toBeUndefined();
   });

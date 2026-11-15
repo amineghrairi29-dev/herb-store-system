@@ -25,26 +25,51 @@ export default function ProductCard({ product }: { product: PublicProduct }) {
   const subtitle = isArabic && product.nameFr && product.nameFr !== product.name ? product.nameFr : null;
   const href = productPath(product);
   return (
-    <article className="botanical-product-card" data-product-id={product.id} data-availability={product.availabilityStatus}>
+    <article
+      className="botanical-product-card"
+      data-product-id={product.id}
+      data-availability={product.availabilityStatus}
+    >
       <Link className="bpc-image-link" href={href} tabIndex={-1} aria-hidden="true">
         <ProductImage
           imagePath={product.mainImagePath}
           name=""
           className="bpc-image"
           sizes="(max-width: 520px) 46vw, (max-width: 899px) 30vw, 280px"
-          fallback={<div className="bpc-image bpc-placeholder"><ProductImagePlaceholder /></div>}
+          fallback={
+            <div className="bpc-image bpc-placeholder">
+              <ProductImagePlaceholder />
+            </div>
+          }
         />
       </Link>
       <div className="bpc-body">
-        <p className="bpc-meta"><bdi>{category}</bdi><span aria-hidden="true">·</span><span className="bpc-availability">{availability}</span></p>
+        <p className="bpc-meta">
+          <bdi>{category}</bdi>
+          <span aria-hidden="true">·</span>
+          <span className="bpc-availability">{availability}</span>
+        </p>
         <Link className="bpc-name-link" href={href} title={product.name}>
-          <h3 className={`bpc-name${isArabic ? " bpc-name-ar" : ""}`} {...(isArabic ? { lang: "ar", dir: "rtl" } : {})}>{product.name}</h3>
+          <h3 className={`bpc-name${isArabic ? " bpc-name-ar" : ""}`} {...(isArabic ? { lang: "ar", dir: "rtl" } : {})}>
+            {product.name}
+          </h3>
         </Link>
-        {subtitle && <p className="bpc-subtitle"><bdi>{subtitle}</bdi></p>}
+        {subtitle && (
+          <p className="bpc-subtitle">
+            <bdi>{subtitle}</bdi>
+          </p>
+        )}
       </div>
       <div className="bpc-foot">
-        <p className="bpc-price">{displayAmount(product.salePrice)} <span>TND/{units[product.saleUnit] ?? product.saleUnit}</span></p>
-        <AddToCart productId={product.id} outOfStock={unavailable} imageUrl={productImageUrl(product.mainImagePath)} compact />
+        <p className="bpc-price">
+          {displayAmount(product.salePrice)} <span>TND/{units[product.saleUnit] ?? product.saleUnit}</span>
+        </p>
+        <AddToCart
+          productId={product.id}
+          outOfStock={unavailable}
+          imageUrl={productImageUrl(product.mainImagePath)}
+          compact
+        />
       </div>
     </article>
   );

@@ -12,7 +12,9 @@ export default async function EditProductPage({ params }: { params: Promise<{ id
         <header className="mb-8">
           <p className="mb-2 text-xs font-semibold uppercase tracking-widest text-emerald-700">Catalogue</p>
           <h1 className="text-3xl font-semibold tracking-tight sm:text-4xl">Modifier un produit</h1>
-          <p className="mt-3 text-sm text-slate-600">Modifiez les informations du produit. Les champs marqués d’un * sont obligatoires.</p>
+          <p className="mt-3 text-sm text-slate-600">
+            Modifiez les informations du produit. Les champs marqués d’un * sont obligatoires.
+          </p>
         </header>
         <EditProduct key={id} id={id} />
       </div>

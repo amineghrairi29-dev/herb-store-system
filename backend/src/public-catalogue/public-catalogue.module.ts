@@ -4,5 +4,8 @@ import { PublicCatalogueService } from './public-catalogue.service.js';
 import { PublicCartController } from './public-cart.controller.js';
 import { PublicCartService } from './public-cart.service.js';
 
-@Module({ controllers: [PublicCatalogueController, PublicCartController], providers: [PublicCatalogueService, PublicCartService] })
+@Module({
+  controllers: [PublicCatalogueController, PublicCartController],
+  providers: [PublicCatalogueService, PublicCartService],
+})
 export class PublicCatalogueModule {}

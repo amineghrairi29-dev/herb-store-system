@@ -1,3 +1,5 @@
-import { redirect } from 'next/navigation';
+import { redirect } from "next/navigation";
 // /admin opens the dashboard.
-export default function AdminHome() { redirect('/admin/dashboard'); }
+export default function AdminHome() {
+  redirect("/admin/dashboard");
+}

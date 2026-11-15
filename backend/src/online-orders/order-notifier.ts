@@ -9,16 +9,28 @@ export type OrderNotice = {
   customerPhone: string;
   deliveryAddress: string;
   notes: string | null;
-  items: { productNameSnapshot: string; quantity: string; unitSnapshot: string }[];
+  items: {
+    productNameSnapshot: string;
+    quantity: string;
+    unitSnapshot: string;
+  }[];
 };
 
 const logger = new Logger('OrderNotifier');
 
 export function orderNoticeText(order: OrderNotice): string {
-  const lines = order.items.map((item) => `• ${item.productNameSnapshot} — ${item.quantity} ${item.unitSnapshot}`);
+  const lines = order.items.map(
+    (item) =>
+      `• ${item.productNameSnapshot} — ${item.quantity} ${item.unitSnapshot}`,
+  );
   return [
     `🛒 Nouvelle commande ${order.reference}`,
-    ...(order.deliveryFee != null ? [`Articles : ${order.totalAmount} TND · Livraison : ${order.deliveryFee} TND`, `Total à encaisser : ${order.grandTotal ?? order.totalAmount} TND`] : [`Total : ${order.totalAmount} TND`]),
+    ...(order.deliveryFee != null
+      ? [
+          `Articles : ${order.totalAmount} TND · Livraison : ${order.deliveryFee} TND`,
+          `Total à encaisser : ${order.grandTotal ?? order.totalAmount} TND`,
+        ]
+      : [`Total : ${order.totalAmount} TND`]),
     '',
     `Client : ${order.customerName}`,
     `Téléphone : ${order.customerPhone}`,
@@ -39,14 +51,25 @@ export async function notifyNewOrder(order: OrderNotice): Promise<void> {
   const chatId = process.env.TELEGRAM_CHAT_ID?.trim();
   if (!token || !chatId) return;
   try {
-    const response = await fetch(`https://api.telegram.org/bot${encodeURIComponent(token)}/sendMessage`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ chat_id: chatId, text: orderNoticeText(order).slice(0, 4000) }),
-      signal: AbortSignal.timeout(5000),
-    });
-    if (!response.ok) logger.warn(`Telegram notification failed for ${order.reference}: HTTP ${response.status}`);
+    const response = await fetch(
+      `https://api.telegram.org/bot${encodeURIComponent(token)}/sendMessage`,
+      {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          chat_id: chatId,
+          text: orderNoticeText(order).slice(0, 4000),
+        }),
+        signal: AbortSignal.timeout(5000),
+      },
+    );
+    if (!response.ok)
+      logger.warn(
+        `Telegram notification failed for ${order.reference}: HTTP ${response.status}`,
+      );
   } catch (error) {
-    logger.warn(`Telegram notification failed for ${order.reference}: ${error instanceof Error ? error.message : 'unknown error'}`);
+    logger.warn(
+      `Telegram notification failed for ${order.reference}: ${error instanceof Error ? error.message : 'unknown error'}`,
+    );
   }
 }

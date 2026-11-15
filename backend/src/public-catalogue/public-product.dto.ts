@@ -23,4 +23,9 @@ export interface PublicProductDto {
   precautions?: string | null;
   gallery?: string[];
 }
-export interface PublicClassification { id: number; slug: string; nameAr: string; nameFr: string }
+export interface PublicClassification {
+  id: number;
+  slug: string;
+  nameAr: string;
+  nameFr: string;
+}

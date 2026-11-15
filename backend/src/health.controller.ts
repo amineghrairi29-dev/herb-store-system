@@ -5,5 +5,7 @@ import { Access } from './auth/auth-policy.js';
 @Controller('health')
 export class HealthController {
   @Get()
-  health() { return { status: 'ok' }; }
+  health() {
+    return { status: 'ok' };
+  }
 }

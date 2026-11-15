@@ -4,10 +4,33 @@ import { BadRequestException } from '@nestjs/common';
 import type { CreateProductDto } from './dto/create-product.dto.js';
 import type { UpdateProductDto } from './dto/update-product.dto.js';
 
-const requiredText = ['sku', 'name', 'productType', 'measurementMode', 'storageUnit', 'saleUnit'] as const;
-const optionalText = ['nameFr', 'scientificName', 'barcode', 'origin', 'packaging', 'description', 'location', 'benefits', 'usage', 'precautions'] as const;
+const requiredText = [
+  'sku',
+  'name',
+  'productType',
+  'measurementMode',
+  'storageUnit',
+  'saleUnit',
+] as const;
+const optionalText = [
+  'nameFr',
+  'scientificName',
+  'barcode',
+  'origin',
+  'packaging',
+  'description',
+  'location',
+  'benefits',
+  'usage',
+  'precautions',
+] as const;
 const longText = ['benefits', 'usage', 'precautions'];
-const decimals = ['salePrice', 'conversionFactor', 'minStock', 'maxStock'] as const;
+const decimals = [
+  'salePrice',
+  'conversionFactor',
+  'minStock',
+  'maxStock',
+] as const;
 const booleans = ['isActive', 'isSellable', 'isVisibleOnline'] as const;
 const units = ['KG', 'G', 'L', 'ML', 'PIECE'];
 
@@ -24,25 +47,55 @@ export function compareDecimals(left: string, right: string): number {
   return af === bf ? 0 : af > bf ? 1 : -1;
 }
 
-export function validateStockRange(minStock?: string | null, maxStock?: string | null): void {
-  if (minStock != null && maxStock != null && compareDecimals(maxStock, minStock) < 0) {
-    throw new BadRequestException('Le stock maximum doit être supérieur ou égal au stock minimum.');
+export function validateStockRange(
+  minStock?: string | null,
+  maxStock?: string | null,
+): void {
+  if (
+    minStock != null &&
+    maxStock != null &&
+    compareDecimals(maxStock, minStock) < 0
+  ) {
+    throw new BadRequestException(
+      'Le stock maximum doit être supérieur ou égal au stock minimum.',
+    );
   }
 }
 
-export function validateProductInput(input: unknown, partial: false): CreateProductDto;
-export function validateProductInput(input: unknown, partial: true): UpdateProductDto;
-export function validateProductInput(input: unknown, partial: boolean): CreateProductDto | UpdateProductDto {
+export function validateProductInput(
+  input: unknown,
+  partial: false,
+): CreateProductDto;
+export function validateProductInput(
+  input: unknown,
+  partial: true,
+): UpdateProductDto;
+export function validateProductInput(
+  input: unknown,
+  partial: boolean,
+): CreateProductDto | UpdateProductDto {
   if (typeof input !== 'object' || input === null || Array.isArray(input)) {
     throw new BadRequestException('Un objet JSON produit est requis.');
   }
   const values: Record<string, unknown> = { ...input };
-  const allowed: readonly string[] = [...requiredText, ...optionalText, ...decimals, ...booleans, 'classificationIds'];
+  const allowed: readonly string[] = [
+    ...requiredText,
+    ...optionalText,
+    ...decimals,
+    ...booleans,
+    'classificationIds',
+  ];
   for (const key of Object.keys(values)) {
-    if (!allowed.includes(key)) throw new BadRequestException(`Champ produit non autorisé : ${key}.`);
+    if (!allowed.includes(key))
+      throw new BadRequestException(`Champ produit non autorisé : ${key}.`);
   }
-  if (!partial || values.classificationIds !== undefined) values.classificationIds = classificationIds(values.classificationIds);
-  if (values.measurementMode !== undefined && !Object.hasOwn(measurementUnits, String(values.measurementMode))) throw new BadRequestException('Mode de mesure invalide.');
+  if (!partial || values.classificationIds !== undefined)
+    values.classificationIds = classificationIds(values.classificationIds);
+  if (
+    values.measurementMode !== undefined &&
+    !Object.hasOwn(measurementUnits, String(values.measurementMode))
+  )
+    throw new BadRequestException('Mode de mesure invalide.');
   for (const key of requiredText) {
     if (partial && values[key] === undefined) continue;
     const value = values[key];
@@ -56,8 +109,10 @@ export function validateProductInput(input: unknown, partial: boolean): CreatePr
     if (value === undefined) continue;
     const nullable = key === 'location' || key === 'barcode';
     if (nullable && value === null) continue;
-    if (typeof value !== 'string') throw new BadRequestException(`Le champ ${key} doit être un texte.`);
-    if (longText.includes(key) && value.length > 4000) throw new BadRequestException(`Le champ ${key} dépasse 4000 caractères.`);
+    if (typeof value !== 'string')
+      throw new BadRequestException(`Le champ ${key} doit être un texte.`);
+    if (longText.includes(key) && value.length > 4000)
+      throw new BadRequestException(`Le champ ${key} dépasse 4000 caractères.`);
     values[key] = key === 'barcode' ? value.trim() || null : value.trim();
   }
   for (const key of ['storageUnit', 'saleUnit']) {
@@ -65,15 +120,28 @@ export function validateProductInput(input: unknown, partial: boolean): CreatePr
       throw new BadRequestException(`Unité invalide pour ${key}.`);
     }
   }
-  if (values.productType !== undefined && !['VRAC', 'EMBALLE'].includes(String(values.productType))) {
+  if (
+    values.productType !== undefined &&
+    !['VRAC', 'EMBALLE'].includes(String(values.productType))
+  ) {
     throw new BadRequestException('Type de produit invalide.');
   }
   for (const key of decimals) {
     const value = values[key];
     const optional = key === 'minStock' || key === 'maxStock';
-    if ((value === undefined && (partial || optional)) || (value === null && optional)) continue;
-    if (typeof value !== 'string' || !/^\d+(?:\.\d+)?$/.test(value) || (!optional && !/[1-9]/.test(value))) {
-      throw new BadRequestException(`${key} doit être une chaîne décimale ${optional ? 'supérieure ou égale à 0' : 'supérieure à 0'}.`);
+    if (
+      (value === undefined && (partial || optional)) ||
+      (value === null && optional)
+    )
+      continue;
+    if (
+      typeof value !== 'string' ||
+      !/^\d+(?:\.\d+)?$/.test(value) ||
+      (!optional && !/[1-9]/.test(value))
+    ) {
+      throw new BadRequestException(
+        `${key} doit être une chaîne décimale ${optional ? 'supérieure ou égale à 0' : 'supérieure à 0'}.`,
+      );
     }
   }
   for (const key of booleans) {
