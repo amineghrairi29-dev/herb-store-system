@@ -6,7 +6,9 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "format": "npx --yes prettier@3.9.6 --write \"src/**/*.{ts,tsx,css}\" next.config.ts eslint.config.mjs",
+    "format:check": "npx --yes prettier@3.9.6 --check \"src/**/*.{ts,tsx,css}\" next.config.ts eslint.config.mjs"
   },
   "dependencies": {
     "next": "16.3.4",
