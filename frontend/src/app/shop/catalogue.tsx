@@ -31,27 +31,30 @@ export default function Catalogue({ query, need, whatsapp }: { query: string; ne
   const [pending, startTransition] = useTransition();
   const params = new URLSearchParams(query);
   const route = `/shop/besoins/${encodeURIComponent(need.slug)}`;
-  const [result, setResult] = useState<CatalogueResponse | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(false);
   const [retry, setRetry] = useState(0);
+  // One state per answer, tagged with the request it answers: "loading" means the
+  // latest answer is for an older request (no setState needed when a request starts).
+  const requestKey = `${need.slug}|${query}|${retry}`;
+  const [answer, setAnswer] = useState<{ key: string; data: CatalogueResponse | null; error: boolean } | null>(null);
+  const loading = answer?.key !== requestKey;
+  const error = !loading && !!answer?.error;
+  const result = answer?.data ?? null;
   const [search, setSearch] = useState(params.get("q") ?? "");
   const top = useRef<HTMLDivElement>(null);
   const firstLoad = useRef(true);
 
   useEffect(() => {
     const controller = new AbortController();
-    setLoading(true); setError(false);
+    const key = requestKey;
     const search = new URLSearchParams(query);
     search.set("classification", need.slug);
     if (!search.get("pageSize")) search.set("pageSize", "12");
     fetch(`${apiBase}/public/products?${search}`, { cache: "no-store", signal: AbortSignal.any([controller.signal, AbortSignal.timeout(15000)]) })
       .then(async (response) => { if (!response.ok) throw new Error(`Catalogue HTTP ${response.status}`); return await response.json() as CatalogueResponse; })
-      .then((data) => { if (!controller.signal.aborted) setResult(data); })
-      .catch((failure: unknown) => { if (!controller.signal.aborted) { console.error("Catalogue request failed", failure); setError(true); } })
-      .finally(() => { if (!controller.signal.aborted) setLoading(false); });
+      .then((data) => { if (!controller.signal.aborted) setAnswer({ key, data, error: false }); })
+      .catch((failure: unknown) => { if (!controller.signal.aborted) { console.error("Catalogue request failed", failure); setAnswer((previous) => ({ key, data: previous?.data ?? null, error: true })); } });
     return () => controller.abort();
-  }, [query, retry, need.slug]);
+  }, [query, need.slug, requestKey]);
 
   // After a filter or a page change, bring the toolbar back into view (not on first load).
   useEffect(() => {
