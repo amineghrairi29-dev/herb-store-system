@@ -34,7 +34,7 @@ async function loadPreview(slug: string): Promise<{ products: PublicProduct[]; t
 
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
   const { slug } = await params;
-  const need = (await loadNeeds(false).catch(() => [])).find((item) => item.slug === slug);
+  const need = (await loadNeeds(false).catch((): PublicClassification[] => [])).find((item) => item.slug === slug);
   if (!need) return { title: "Besoin introuvable" };
   const description = `Plantes, mélanges et recettes de دار سلومة pour : ${need.nameFr}. Conseil gratuit, paiement à la livraison.`;
   return { title: `${need.nameFr} · ${need.nameAr}`, description, alternates: { canonical: `/shop/besoins/${encodeURIComponent(need.slug)}` }, openGraph: { title: need.nameFr, description } };
@@ -45,7 +45,7 @@ export default async function NeedPage({ params, searchParams }: {
   searchParams: Promise<Record<string, string | string[] | undefined>>;
 }) {
   const { slug } = await params;
-  const [needs, shelf, preview, store] = await Promise.all([loadNeeds(false), loadNeeds(true).catch(() => []), loadPreview(slug), getStoreInfo()]);
+  const [needs, shelf, preview, store] = await Promise.all([loadNeeds(false), loadNeeds(true).catch((): PublicClassification[] => []), loadPreview(slug), getStoreInfo()]);
   const need = needs.find((item) => item.slug === slug);
   if (!need) notFound();
   const query = new URLSearchParams();
