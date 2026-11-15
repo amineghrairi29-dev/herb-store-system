@@ -30,6 +30,11 @@ export interface ProductDetails extends Product {
   minStock: string | null;
   maxStock: string | null;
   location: string | null;
+  /** Optional storefront texts (may be missing on older API responses). */
+  benefits?: string | null;
+  usage?: string | null;
+  precautions?: string | null;
+  gallery?: { id: number; path: string }[];
 }
 
 export function isProductDetails(value: unknown): value is ProductDetails {

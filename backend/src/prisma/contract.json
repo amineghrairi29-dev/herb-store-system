@@ -56,6 +56,10 @@
       "model": "ProductClassification",
       "namespace": "public"
     },
+    "productImage": {
+      "model": "ProductImage",
+      "namespace": "public"
+    },
     "purchase": {
       "model": "Purchase",
       "namespace": "public"
@@ -1575,6 +1579,13 @@
                   "kind": "scalar"
                 }
               },
+              "benefits": {
+                "nullable": true,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                }
+              },
               "category": {
                 "nullable": false,
                 "type": {
@@ -1701,6 +1712,13 @@
                   "kind": "scalar"
                 }
               },
+              "precautions": {
+                "nullable": true,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                }
+              },
               "productType": {
                 "nullable": false,
                 "type": {
@@ -1763,6 +1781,13 @@
                   "codecId": "pg/timestamptz-string@1",
                   "kind": "scalar"
                 }
+              },
+              "usage": {
+                "nullable": true,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                }
               }
             },
             "relations": {
@@ -1803,6 +1828,9 @@
               "fields": {
                 "barcode": {
                   "column": "barcode"
+                },
+                "benefits": {
+                  "column": "benefits"
                 },
                 "category": {
                   "column": "category"
@@ -1858,6 +1886,9 @@
                 "packaging": {
                   "column": "packaging"
                 },
+                "precautions": {
+                  "column": "precautions"
+                },
                 "productType": {
                   "column": "productType"
                 },
@@ -1884,6 +1915,9 @@
                 },
                 "updatedAt": {
                   "column": "updatedAt"
+                },
+                "usage": {
+                  "column": "usage"
                 }
               },
               "namespaceId": "public",
@@ -1960,6 +1994,83 @@
               },
               "namespaceId": "public",
               "table": "productClassification"
+            }
+          },
+          "ProductImage": {
+            "fields": {
+              "createdAt": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/timestamptz-string@1",
+                  "kind": "scalar"
+                }
+              },
+              "id": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/int4@1",
+                  "kind": "scalar"
+                }
+              },
+              "path": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                }
+              },
+              "productId": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/int4@1",
+                  "kind": "scalar"
+                }
+              },
+              "sortOrder": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/int4@1",
+                  "kind": "scalar"
+                }
+              }
+            },
+            "relations": {
+              "product": {
+                "cardinality": "N:1",
+                "on": {
+                  "localFields": [
+                    "productId"
+                  ],
+                  "targetFields": [
+                    "id"
+                  ]
+                },
+                "to": {
+                  "model": "Product",
+                  "namespace": "public"
+                }
+              }
+            },
+            "storage": {
+              "fields": {
+                "createdAt": {
+                  "column": "createdAt"
+                },
+                "id": {
+                  "column": "id"
+                },
+                "path": {
+                  "column": "path"
+                },
+                "productId": {
+                  "column": "productId"
+                },
+                "sortOrder": {
+                  "column": "sortOrder"
+                }
+              },
+              "namespaceId": "public",
+              "table": "productImage"
             }
           },
           "Purchase": {
@@ -4749,6 +4860,11 @@
                   "nativeType": "text",
                   "nullable": true
                 },
+                "benefits": {
+                  "codecId": "pg/text@1",
+                  "nativeType": "text",
+                  "nullable": true
+                },
                 "category": {
                   "codecId": "pg/text@1",
                   "nativeType": "text",
@@ -4863,6 +4979,11 @@
                   "nativeType": "text",
                   "nullable": true
                 },
+                "precautions": {
+                  "codecId": "pg/text@1",
+                  "nativeType": "text",
+                  "nullable": true
+                },
                 "productType": {
                   "codecId": "pg/text@1",
                   "nativeType": "text",
@@ -4907,6 +5028,11 @@
                   "codecId": "pg/timestamptz-string@1",
                   "nativeType": "timestamptz",
                   "nullable": false
+                },
+                "usage": {
+                  "codecId": "pg/text@1",
+                  "nativeType": "text",
+                  "nullable": true
                 }
               },
               "foreignKeys": [
@@ -5083,6 +5209,105 @@
                   "columns": [
                     "productId",
                     "classificationId"
+                  ]
+                }
+              ]
+            },
+            "productImage": {
+              "checks": [
+                {
+                  "expression": "path LIKE '/uploads/products/%'",
+                  "name": "product_image_path_0c199711",
+                  "prefix": "product_image_path"
+                }
+              ],
+              "columns": {
+                "createdAt": {
+                  "codecId": "pg/timestamptz-string@1",
+                  "default": {
+                    "expression": "now()",
+                    "kind": "function"
+                  },
+                  "nativeType": "timestamptz",
+                  "nullable": false
+                },
+                "id": {
+                  "codecId": "pg/int4@1",
+                  "default": {
+                    "expression": "autoincrement()",
+                    "kind": "function"
+                  },
+                  "nativeType": "int4",
+                  "nullable": false
+                },
+                "path": {
+                  "codecId": "pg/text@1",
+                  "nativeType": "text",
+                  "nullable": false
+                },
+                "productId": {
+                  "codecId": "pg/int4@1",
+                  "nativeType": "int4",
+                  "nullable": false
+                },
+                "sortOrder": {
+                  "codecId": "pg/int4@1",
+                  "default": {
+                    "kind": "literal",
+                    "value": 0
+                  },
+                  "nativeType": "int4",
+                  "nullable": false
+                }
+              },
+              "foreignKeys": [
+                {
+                  "onDelete": "restrict",
+                  "onUpdate": "restrict",
+                  "source": {
+                    "columns": [
+                      "productId"
+                    ],
+                    "namespaceId": "public",
+                    "tableName": "productImage"
+                  },
+                  "target": {
+                    "columns": [
+                      "id"
+                    ],
+                    "namespaceId": "public",
+                    "tableName": "product"
+                  }
+                }
+              ],
+              "indexes": [
+                {
+                  "columns": [
+                    "productId"
+                  ],
+                  "name": "productImage_productId_idx_5858600a",
+                  "prefix": "productImage_productId_idx",
+                  "unique": false
+                },
+                {
+                  "columns": [
+                    "productId",
+                    "sortOrder"
+                  ],
+                  "name": "productImage_productId_sortOrder_idx_fe80956b",
+                  "prefix": "productImage_productId_sortOrder_idx",
+                  "unique": false
+                }
+              ],
+              "primaryKey": {
+                "columns": [
+                  "id"
+                ]
+              },
+              "uniques": [
+                {
+                  "columns": [
+                    "path"
                   ]
                 }
               ]
@@ -6383,7 +6608,7 @@
         "kind": "postgres-schema"
       }
     },
-    "storageHash": "1a271a6c502a71c3ab8fe6d9513c16c6dfe6b31688e2885947d59b949744f9c3"
+    "storageHash": "6bc518f2e1b046cb63d54557b23d6c0dbeb43fedb6daf3a07b5511b79c088725"
   },
   "execution": {
     "executionHash": "61c9271858a528765fde510b4abf69c10396ea3942af7d5f8941f810942342de",

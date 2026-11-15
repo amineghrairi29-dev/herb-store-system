@@ -75,7 +75,8 @@ describe.skipIf(process.env.RUN_DATABASE_TESTS !== '1')('Public catalogue (isola
     expect(rows).toHaveLength(1); expect(rows[0].name).toBe('نعناع'); expect(rows[0].salePrice).toBe('12.500000000000000001');
     const keys = ['id', 'mainImagePath', 'sku', 'name', 'nameFr', 'scientificName', 'classifications', 'category', 'subcategory', 'salePrice', 'saleUnit', 'packaging', 'origin', 'description', 'availabilityStatus'].sort();
     expect(Object.keys(rows[0]).sort()).toEqual(keys);
-    expect(Object.keys((await request(app.getHttpServer()).get(`/public/products/${ids[0]}`).expect(200)).body as object).sort()).toEqual(keys);
+    // The detail adds long texts and the gallery to the same allowlist.
+    expect(Object.keys((await request(app.getHttpServer()).get(`/public/products/${ids[0]}`).expect(200)).body as object).sort()).toEqual([...keys, 'benefits', 'usage', 'precautions', 'gallery'].sort());
     for (const q of ['MENTHE FRAÎCHE', 'mentha', 'Feuilles', classification.slug]) expect((await list({ q })).data.length).toBeGreaterThan(0);
     expect((await list({ q: "%' OR true --" })).data).toEqual([]);
     expect((await list({ classification: String(classification.subClassificationId) })).data).toHaveLength(1);

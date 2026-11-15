@@ -6,6 +6,7 @@ import Link from "@/components/auth-link";
 import { useEffect, useState } from "react";
 import { isProductDetails, type ProductDetails } from "@/types/product";
 import ProductForm from "../../product-form";
+import ProductGallery from "../../product-gallery";
 
 type LoadState =
   | { status: "loading" }
@@ -67,7 +68,7 @@ export default function EditProduct({ id }: { id: string }) {
     };
   }, [id, attempt]);
 
-  if (state.status === "success") return <ProductForm product={state.product} />;
+  if (state.status === "success") return <><ProductForm product={state.product} /><ProductGallery productId={state.product.id} initial={state.product.gallery ?? []} /></>;
 
   return (
     <section aria-label="Chargement du produit" className="rounded-xl border border-slate-200 bg-white p-6 shadow-sm sm:p-8">

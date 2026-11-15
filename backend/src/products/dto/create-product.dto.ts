@@ -17,6 +17,9 @@ export class CreateProductDto {
   origin?: string;
   packaging?: string;
   description?: string;
+  benefits?: string;
+  usage?: string;
+  precautions?: string;
   isActive?: boolean;
   isSellable?: boolean;
   isVisibleOnline?: boolean;

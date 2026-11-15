@@ -6,6 +6,8 @@ export interface PublicProduct {
   scientificName: string | null; category: PublicClassification; subcategory: PublicClassification | null;
   salePrice: string; saleUnit: string; packaging: string | null;
   origin: string | null; description: string | null; availabilityStatus: Availability;
+  /** Product detail only. */
+  benefits?: string | null; usage?: string | null; precautions?: string | null; gallery?: string[];
 }
 export interface CatalogueResponse {
   data: PublicProduct[];

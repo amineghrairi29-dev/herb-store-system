@@ -50,3 +50,33 @@
 @media(max-width: 1000px) { .pd-related .pd-related-grid { grid-template-columns: repeat(2,minmax(0,1fr)); } }
 @media(max-width: 759px) { .pd-overview { grid-template-columns: minmax(0,1fr); gap: 18px; } .pd-image { height: 230px; } .pd-breadcrumb { margin-bottom: 18px; } .pd-summary h1 { font-size: 28px; } .pd-purchase { margin-top: 14px; } .pd-description { margin-top: 26px; } }
 @media(max-width: 479px) { .pd-image { height: 200px; } .pd-purchase-row { gap: 10px; } .pd-quantity button { min-height: 42px; } .pd-add { min-height: 44px; } .pd-related .pd-related-grid { grid-template-columns: minmax(0,1fr); } }
+
+/* Gallery */
+.pd-gallery { min-width: 0; display: grid; gap: 10px; align-content: start; }
+.pd-image-fade { animation: pd-fade 0.35s ease both; }
+@keyframes pd-fade { from { opacity: 0; transform: scale(0.985); } to { opacity: 1; transform: none; } }
+.pd-thumbs { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 2px; }
+.pd-thumb { flex: 0 0 64px; height: 64px; padding: 3px; border: 1px solid #e4e8dd; border-radius: 10px; background: #f2f3eb; cursor: pointer; transition: border-color 0.2s ease, transform 0.2s ease; }
+.pd-thumb:hover { transform: translateY(-1px); }
+.pd-thumb[aria-current="true"] { border-color: #2e6149; box-shadow: 0 0 0 1px #2e6149; }
+.pd-thumb-image { width: 100%; height: 100%; }
+
+/* Quick sizes, estimate, WhatsApp */
+.pd-sizes { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 12px; }
+.pd-size { min-height: 36px; padding: 0 14px; border: 1px solid #cfd6c7; border-radius: 999px; background: #fffef9; font-size: 14px; cursor: pointer; transition: background 0.2s ease, border-color 0.2s ease; }
+.pd-size:hover:not(:disabled) { border-color: #2e6149; }
+.pd-size[aria-pressed="true"] { background: #173f32; border-color: #173f32; color: #fff; }
+.pd-size:disabled { opacity: 0.5; cursor: default; }
+.pd-estimate { margin-top: 8px; font-size: 14px; color: #637268; }
+.pd-whatsapp { display: inline-flex; align-items: center; justify-content: center; gap: 8px; width: 100%; min-height: 46px; margin-top: 12px; border: 1px solid #25d366; border-radius: 999px; color: #128c4a; font-weight: 500; transition: background 0.2s ease; }
+.pd-whatsapp:hover { background: #eafaf0; }
+
+/* Benefits / usage / precautions */
+.pd-details-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 16px; margin-top: 28px; }
+.pd-detail { padding: 22px; border: 1px solid #e4e8dd; border-radius: 14px; background: #fffef9; }
+.pd-detail h2 { margin: 0 0 10px; font: 400 22px/1.25 Georgia, serif; }
+.pd-detail p { white-space: pre-line; line-height: 1.7; color: #4d5b52; }
+.pd-detail-warning { background: #fbf7ec; border-color: #eadfbf; }
+.pd-detail-note { margin-top: 10px; font-size: 12.5px; color: #7a6a3e !important; }
+
+@media (prefers-reduced-motion: reduce) { .pd-image-fade { animation: none; } .pd-thumb, .pd-size, .pd-whatsapp { transition: none; } .pd-thumb:hover { transform: none; } }

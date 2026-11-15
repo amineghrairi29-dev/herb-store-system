@@ -126,6 +126,10 @@ export default function ProductForm({ product }: { product?: ProductDetails }) {
     }
     const description = text("description");
     if (description || savedId) payload.description = description;
+    for (const name of ["benefits", "usage", "precautions"] as const) {
+      const value = text(name);
+      if (value || savedId) payload[name] = value;
+    }
 
     pending.current = true;
     setSubmitting(true);
@@ -271,6 +275,11 @@ export default function ProductForm({ product }: { product?: ProductDetails }) {
             <label className="text-sm font-medium sm:col-span-2">Description
               <textarea name="description" defaultValue={product?.description ?? ""} dir="auto" rows={4} className={`${inputClass} resize-y`} />
             </label>
+            {([["benefits", "Bienfaits", "Ex. : Aide à la digestion, apaise après le repas."], ["usage", "Mode d’utilisation", "Ex. : 1 cuillère à café pour une tasse d’eau chaude, infuser 5 minutes."], ["precautions", "Précautions", "Ex. : Déconseillé aux femmes enceintes. Demandez l’avis d’un médecin en cas de traitement."]] as const).map(([name, label, hint]) => (
+              <label key={name} className="text-sm font-medium sm:col-span-2">{label} <span className="font-normal text-slate-500">(affiché sur la fiche produit si rempli)</span>
+                <textarea name={name} defaultValue={product?.[name] ?? ""} dir="auto" rows={3} maxLength={4000} placeholder={hint} className={`${inputClass} resize-y`} />
+              </label>
+            ))}
           </div>
         </section>
         <section aria-labelledby="visibility-heading" className="border-t border-slate-100 pt-6">

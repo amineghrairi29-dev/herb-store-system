@@ -17,5 +17,10 @@ export interface PublicProductDto {
   origin: string | null;
   description: string | null;
   availabilityStatus: Availability;
+  /** Product detail only. */
+  benefits?: string | null;
+  usage?: string | null;
+  precautions?: string | null;
+  gallery?: string[];
 }
 export interface PublicClassification { id: number; slug: string; nameAr: string; nameFr: string }

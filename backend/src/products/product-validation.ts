@@ -5,7 +5,8 @@ import type { CreateProductDto } from './dto/create-product.dto.js';
 import type { UpdateProductDto } from './dto/update-product.dto.js';
 
 const requiredText = ['sku', 'name', 'productType', 'measurementMode', 'storageUnit', 'saleUnit'] as const;
-const optionalText = ['nameFr', 'scientificName', 'barcode', 'origin', 'packaging', 'description', 'location'] as const;
+const optionalText = ['nameFr', 'scientificName', 'barcode', 'origin', 'packaging', 'description', 'location', 'benefits', 'usage', 'precautions'] as const;
+const longText = ['benefits', 'usage', 'precautions'];
 const decimals = ['salePrice', 'conversionFactor', 'minStock', 'maxStock'] as const;
 const booleans = ['isActive', 'isSellable', 'isVisibleOnline'] as const;
 const units = ['KG', 'G', 'L', 'ML', 'PIECE'];
@@ -56,6 +57,7 @@ export function validateProductInput(input: unknown, partial: boolean): CreatePr
     const nullable = key === 'location' || key === 'barcode';
     if (nullable && value === null) continue;
     if (typeof value !== 'string') throw new BadRequestException(`Le champ ${key} doit être un texte.`);
+    if (longText.includes(key) && value.length > 4000) throw new BadRequestException(`Le champ ${key} dépasse 4000 caractères.`);
     values[key] = key === 'barcode' ? value.trim() || null : value.trim();
   }
   for (const key of ['storageUnit', 'saleUnit']) {
