@@ -18,7 +18,7 @@ export function storeJsonLd(store: StoreInfo | null) {
     description: "Herboristerie à Ghannouch (Gabès) depuis 2006 : plantes, mélanges et épices, recettes traditionnelles et conseils.",
     url: `${siteUrl}/shop`,
     logo: `${siteUrl}/icon.svg`,
-    image: `${siteUrl}/images/shop/hero/hero-main.png`,
+    image: `${siteUrl}/images/shop/og.jpg`,
     foundingDate: String(shopContent.foundedYear),
     ...(store?.phone ? { telephone: `+216${store.phone.replace(/\D/g, "").slice(-8)}` } : {}),
     ...(store?.email ? { email: store.email } : {}),

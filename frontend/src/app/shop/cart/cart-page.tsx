@@ -10,6 +10,7 @@ import "./cart.css";
 import { addDecimals, cartQuantity, lineSubtotal, stepQuantity, type CartItem } from "@/lib/cart";
 import { compareDecimals } from "@/lib/decimal";
 import { displayAmount } from "@/lib/purchase-decimal";
+import { productPath } from "@/lib/product-url";
 import type { ValidatedCartItem } from "@/types/cart";
 
 const units: Record<string, string> = { KG: "kg", G: "g", L: "L", ML: "ml", PIECE: "pièce" };
@@ -35,12 +36,12 @@ function CartLine({ item, checked, index }: { item: CartItem; checked?: Validate
   const status = checked?.valid ? (checked.availabilityStatus === "LOW_STOCK" ? "Stock limité" : "Disponible") : checked?.message ?? "Vérification de la disponibilité…";
   return (
     <article className="sc-line" data-cart-line={item.productId} data-valid={checked ? String(checked.valid) : undefined} aria-label={name ?? "Produit"} style={{ "--i": index } as React.CSSProperties}>
-      <Link href={`/shop/products/${item.productId}`} className="sc-image-link" tabIndex={-1} aria-hidden="true">
+      <Link href={product ? productPath(product) : `/shop/products/${item.productId}`} className="sc-image-link" tabIndex={-1} aria-hidden="true">
         <ProductImage imagePath={product?.mainImagePath} name="" className="sc-image" sizes="96px" fallback={<div className="sc-image sc-placeholder"><LeafIcon /></div>} />
       </Link>
       <div className="sc-info">
         <p className="sc-meta">{product ? <><bdi>{product.classifications[0]?.nameFr ?? product.category.nameFr}</bdi> · {displayAmount(product.salePrice)} TND/{unit}</> : " "}</p>
-        <h2 className={isArabic ? "sc-name-ar" : undefined} {...(isArabic ? { lang: "ar", dir: "rtl" } : {})}>{product ? <Link href={`/shop/products/${item.productId}`}>{name}</Link> : checked ? "Produit indisponible" : "Vérification du produit…"}</h2>
+        <h2 className={isArabic ? "sc-name-ar" : undefined} {...(isArabic ? { lang: "ar", dir: "rtl" } : {})}>{product ? <Link href={productPath(product)}>{name}</Link> : checked ? "Produit indisponible" : "Vérification du produit…"}</h2>
         <p className={`sc-status${checked && !checked.valid ? " sc-warning" : ""}`} role="status"><span aria-hidden="true" />{status}</p>
       </div>
       <form className="sc-quantity-form" onSubmit={(event) => { event.preventDefault(); update(input); }}>

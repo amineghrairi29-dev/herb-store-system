@@ -1,6 +1,7 @@
 import type { MetadataRoute } from "next";
 import { apiBase } from "@/lib/api-base";
 import { siteUrl } from "@/lib/site-url";
+import { productPath } from "@/lib/product-url";
 import type { CatalogueResponse, PublicClassification, PublicProduct } from "@/types/public-product";
 
 export const revalidate = 3600;
@@ -36,6 +37,6 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   return [
     ...pages.map(([path, priority, changeFrequency]) => ({ url: `${siteUrl}${path}`, priority, changeFrequency })),
     ...classifications.map((need) => ({ url: `${siteUrl}/shop/besoins/${encodeURIComponent(need.slug)}`, priority: 0.8, changeFrequency: "weekly" as const })),
-    ...products.map((product) => ({ url: `${siteUrl}/shop/products/${product.id}`, priority: 0.7, changeFrequency: "weekly" as const })),
+    ...products.map((product) => ({ url: `${siteUrl}${productPath(product)}`, priority: 0.7, changeFrequency: "weekly" as const })),
   ];
 }

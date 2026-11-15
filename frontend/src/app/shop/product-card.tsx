@@ -4,6 +4,7 @@ import type { PublicProduct } from "@/types/public-product";
 import { displayAmount } from "@/lib/purchase-decimal";
 import AddToCart from "./add-to-cart";
 import { productImageUrl } from "@/lib/product-image";
+import { productPath } from "@/lib/product-url";
 import { ProductImagePlaceholder } from "./storefront/visuals";
 import "./product-card.css";
 
@@ -22,7 +23,7 @@ export default function ProductCard({ product }: { product: PublicProduct }) {
   const category = product.classifications[0]?.nameFr ?? product.category.nameFr;
   const isArabic = arabic.test(product.name);
   const subtitle = isArabic && product.nameFr && product.nameFr !== product.name ? product.nameFr : null;
-  const href = `/shop/products/${product.id}`;
+  const href = productPath(product);
   return (
     <article className="botanical-product-card" data-product-id={product.id} data-availability={product.availabilityStatus}>
       <Link className="bpc-image-link" href={href} tabIndex={-1} aria-hidden="true">

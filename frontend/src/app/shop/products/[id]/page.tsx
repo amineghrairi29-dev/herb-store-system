@@ -1,7 +1,7 @@
 import { apiBase } from "@/lib/api-base";
 import Link from "next/link";
 import BackLink from "../../back-link";
-import { notFound } from "next/navigation";
+import { notFound, permanentRedirect } from "next/navigation";
 import type { PublicProduct, CatalogueResponse } from "@/types/public-product";
 import { displayAmount } from "@/lib/purchase-decimal";
 import ProductCard from "../../product-card";
@@ -14,13 +14,21 @@ import { productImageUrl } from "@/lib/product-image";
 import ScrollReveal from "../../storefront/scroll-reveal";
 import { JsonLd, breadcrumbJsonLd } from "@/lib/structured-data";
 import { siteUrl } from "@/lib/site-url";
+import { productIdFromSegment, productPath, productSegment } from "@/lib/product-url";
 
-async function loadProduct(id: string): Promise<PublicProduct | null> {
-  if (!/^[1-9]\d*$/.test(id)) return null;
-  const response = await fetch(`${apiBase}/public/products/${encodeURIComponent(id)}`, { cache: "no-store" });
+/** The segment is "12-menthe-sechee" (or an old "12" link): only the number is read. */
+async function loadProduct(segment: string): Promise<PublicProduct | null> {
+  const id = productIdFromSegment(decodeSegment(segment));
+  if (!id) return null;
+  // Cached one minute: the cart and the checkout check price and stock again anyway.
+  const response = await fetch(`${apiBase}/public/products/${id}`, { next: { revalidate: 60 } });
   if (response.status === 404) return null;
   if (!response.ok) throw new Error(`Public product HTTP ${response.status}`);
   return response.json() as Promise<PublicProduct>;
+}
+
+function decodeSegment(segment: string): string {
+  try { return decodeURIComponent(segment); } catch { return segment; }
 }
 
 export async function generateMetadata({ params }: { params: Promise<{ id: string }> }): Promise<Metadata> {
@@ -28,13 +36,15 @@ export async function generateMetadata({ params }: { params: Promise<{ id: strin
   if (!product) return { title: "Produit introuvable" };
   const description = (product.description ?? product.benefits ?? `${product.name} — ${product.classifications.map((c) => c.nameFr).join(", ")}`).slice(0, 160);
   const image = productImageUrl(product.mainImagePath);
-  return { title: product.name, description, alternates: { canonical: `/shop/products/${product.id}` }, openGraph: { title: product.name, description, type: "website", ...(image ? { images: [image] } : {}) } };
+  return { title: product.name, description, alternates: { canonical: productPath(product) }, openGraph: { title: product.name, description, type: "website", ...(image ? { images: [image] } : {}) } };
 }
 
 export default async function ProductPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
   const [product, store] = await Promise.all([loadProduct(id), getStoreInfo()]);
   if (!product) notFound();
+  // Old links (/shop/products/12) and renamed products go to the current address.
+  if (decodeSegment(id) !== productSegment(product)) permanentRedirect(productPath(product));
   const whatsapp = whatsappLink(store?.phone, `Bonjour, je souhaite commander : ${product.name}`);
   const images = [product.mainImagePath, ...(product.gallery ?? [])].filter((path): path is string => !!path);
   const details = ([["Bienfaits", product.benefits], ["Mode d’utilisation", product.usage], ["Précautions", product.precautions]] as const).filter(([, text]) => !!text);
@@ -44,7 +54,7 @@ export default async function ProductPage({ params }: { params: Promise<{ id: st
   let related: PublicProduct[] = [];
   try {
     const query = new URLSearchParams({ classification: product.category.slug, pageSize: "5", sort: "name_asc" });
-    const result = await fetch(`${apiBase}/public/products?${query}`, { cache: "no-store", signal: AbortSignal.timeout(3000) });
+    const result = await fetch(`${apiBase}/public/products?${query}`, { next: { revalidate: 120 }, signal: AbortSignal.timeout(3000) });
     if (result.ok) { const list: CatalogueResponse = await result.json(); related = list.data.filter(item => item.id !== product.id).slice(0, 4); }
   } catch { /* Optional suggestions must not block an otherwise available product. */ }
   const facts = ([["Origine", product.origin], ["Conditionnement", product.packaging], ["Nom scientifique", product.scientificName]] as const).filter(([, value]) => !!value);
@@ -61,7 +71,7 @@ export default async function ProductPage({ params }: { params: Promise<{ id: st
     brand: { "@type": "Brand", name: "Dar Slouma" },
     offers: {
       "@type": "Offer",
-      url: `${siteUrl}/shop/products/${product.id}`,
+      url: `${siteUrl}${productPath(product)}`,
       priceCurrency: "TND",
       price: product.salePrice,
       unitText: unit,
@@ -71,7 +81,7 @@ export default async function ProductPage({ params }: { params: Promise<{ id: st
   };
   return <div className="pp">
     <JsonLd data={productLd} />
-    <JsonLd data={breadcrumbJsonLd([["Boutique", "/shop"], [product.category.nameFr, `/shop/besoins/${encodeURIComponent(product.category.slug)}`], [product.name, `/shop/products/${product.id}`]])} />
+    <JsonLd data={breadcrumbJsonLd([["Boutique", "/shop"], [product.category.nameFr, `/shop/besoins/${encodeURIComponent(product.category.slug)}`], [product.name, productPath(product)]])} />
     <nav className="pp-breadcrumb" aria-label="Fil d’Ariane"><Link href="/shop">Boutique</Link><span aria-hidden="true">›</span><Link href={`/shop/besoins/${encodeURIComponent(product.category.slug)}`}><bdi>{product.category.nameFr}</bdi></Link><span aria-hidden="true">›</span><span aria-current="page"><bdi>{product.name}</bdi></span></nav>
     <article className="pp-overview" aria-labelledby="product-title">
       <div className="pp-enter" style={{ "--i": 0 } as React.CSSProperties}><ProductGalleryView images={images} name={product.name} /></div>

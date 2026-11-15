@@ -56,7 +56,7 @@ export default async function NeedPage({ params, searchParams }: {
   }
   const position = shelf.findIndex((item) => item.id === need.id);
   const [tint, ink] = needTint(position);
-  const photos = preview.products.filter((product) => product.mainImagePath).slice(0, 3).map((product) => ({ id: product.id, name: product.name, path: product.mainImagePath as string }));
+  const photos = preview.products.filter((product) => product.mainImagePath).slice(0, 3).map((product) => ({ id: product.id, name: product.name, nameFr: product.nameFr, path: product.mainImagePath as string }));
   const whatsapp = whatsappLink(store?.phone, `Bonjour, je cherche un conseil pour : ${need.nameFr}`);
   const others = shelf.filter((item) => item.id !== need.id);
 
