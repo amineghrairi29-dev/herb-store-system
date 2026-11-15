@@ -2,9 +2,8 @@ import Link from "next/link";
 import { apiBase } from "@/lib/api-base";
 import type { PublicClassification } from "@/types/public-product";
 import ScrollReveal from "../storefront/scroll-reveal";
+import { needTint } from "../besoins/need-tints";
 
-// Each tile gets a natural tint, in turn, so the grid reads as a colorful shelf.
-const tints = [["#E3EFDC", "#2E5E2B"], ["#FBF0D9", "#8A5A00"], ["#EEF4E4", "#3E7B3A"], ["#F5E9DC", "#8A4B1C"], ["#E7F0E6", "#2E5E2B"], ["#F7EFD3", "#7A5B12"]] as const;
 
 /** "Que cherchez-vous aujourd’hui ?": needs that currently have products. */
 export default async function HomeNeeds() {
@@ -22,7 +21,7 @@ export default async function HomeNeeds() {
       </div>
       <ScrollReveal className="h-reveal h-needs-grid">
         {needs.slice(0, 8).map((need, index) => {
-          const [bg, ink] = tints[index % tints.length];
+          const [bg, ink] = needTint(index); // each tile in turn, so the grid reads as a colorful shelf
           return (
             <Link key={need.id} href={`/shop/besoins/${encodeURIComponent(need.slug)}`} className="h-need" style={{ "--i": index, "--tile": bg, "--tile-ink": ink } as React.CSSProperties}>
               <span lang="ar" dir="rtl" className="h-need-ar">{need.nameAr}</span>

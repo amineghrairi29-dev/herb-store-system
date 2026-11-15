@@ -8,30 +8,42 @@ import { ProductImagePlaceholder } from "./storefront/visuals";
 import "./product-card.css";
 
 const units: Record<string, string> = { KG: "kg", G: "g", L: "L", ML: "ml", PIECE: "pièce" };
+const arabic = /[؀-ۿ]/;
 
+/**
+ * Product card, "étiquette" style: white card, the photo filling its frame, the name
+ * (in the Arabic font when it is written in Arabic), a dotted line like a label, then
+ * the price and a small "Panier" pill.
+ */
 export default function ProductCard({ product }: { product: PublicProduct }) {
   const unavailable = product.availabilityStatus === "OUT_OF_STOCK";
-  const availability = unavailable ? "Indisponible" : product.availabilityStatus === "LOW_STOCK" ? "Stock limité" : "Disponible";
-  const category = product.classifications.map(c => c.nameFr).join(" · ");
+  const low = product.availabilityStatus === "LOW_STOCK";
+  const availability = unavailable ? "Épuisé" : low ? "Stock limité" : "Disponible";
+  const category = product.classifications[0]?.nameFr ?? product.category.nameFr;
+  const isArabic = arabic.test(product.name);
+  const subtitle = isArabic && product.nameFr && product.nameFr !== product.name ? product.nameFr : null;
+  const href = `/shop/products/${product.id}`;
   return (
-    <article className="botanical-product-card" data-product-id={product.id}>
-      <Link className="bpc-image-link" href={`/shop/products/${product.id}`} aria-label={`Découvrir ${product.name}`}>
+    <article className="botanical-product-card" data-product-id={product.id} data-availability={product.availabilityStatus}>
+      <Link className="bpc-image-link" href={href} tabIndex={-1} aria-hidden="true">
         <ProductImage
           imagePath={product.mainImagePath}
-          name={product.name}
+          name=""
           className="bpc-image"
-          sizes="(max-width: 479px) 90vw, (max-width: 759px) 44vw, (max-width: 1099px) 29vw, (max-width: 1439px) 22vw, 270px"
+          sizes="(max-width: 520px) 46vw, (max-width: 899px) 30vw, 280px"
           fallback={<div className="bpc-image bpc-placeholder"><ProductImagePlaceholder /></div>}
         />
       </Link>
       <div className="bpc-body">
-        <p className="bpc-category" title={category}><bdi>{category}</bdi></p>
-        <Link className="bpc-name-link" href={`/shop/products/${product.id}`} title={product.name}>
-          <h3 className="bpc-name"><bdi>{product.name}</bdi></h3>
+        <p className="bpc-meta"><bdi>{category}</bdi><span aria-hidden="true">·</span><span className="bpc-availability">{availability}</span></p>
+        <Link className="bpc-name-link" href={href} title={product.name}>
+          <h3 className={`bpc-name${isArabic ? " bpc-name-ar" : ""}`} {...(isArabic ? { lang: "ar", dir: "rtl" } : {})}>{product.name}</h3>
         </Link>
-        <p className="bpc-price">{displayAmount(product.salePrice)} <span>TND</span> <span className="bpc-unit">/ {units[product.saleUnit] ?? product.saleUnit}</span></p>
-        <p className={`bpc-availability${unavailable ? " bpc-unavailable" : ""}`}><span aria-hidden="true" />{availability}</p>
-        <div className="bpc-cart"><AddToCart productId={product.id} outOfStock={unavailable} imageUrl={productImageUrl(product.mainImagePath)} /></div>
+        {subtitle && <p className="bpc-subtitle"><bdi>{subtitle}</bdi></p>}
+      </div>
+      <div className="bpc-foot">
+        <p className="bpc-price">{displayAmount(product.salePrice)} <span>TND/{units[product.saleUnit] ?? product.saleUnit}</span></p>
+        <AddToCart productId={product.id} outOfStock={unavailable} imageUrl={productImageUrl(product.mainImagePath)} compact />
       </div>
     </article>
   );

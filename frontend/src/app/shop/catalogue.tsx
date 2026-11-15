@@ -1,51 +1,143 @@
 "use client";
-import { apiBase } from "@/lib/api-base";
-
 import Link from "next/link";
-import { useEffect, useState } from "react";
-import type { CatalogueResponse, PublicClassification, Availability } from "@/types/public-product";
-import { availabilityLabels } from "./shop-components";
+import { useRouter } from "next/navigation";
+import { useEffect, useRef, useState, useTransition } from "react";
+import { apiBase } from "@/lib/api-base";
+import type { Availability, CatalogueResponse, PublicClassification } from "@/types/public-product";
 import ProductCard from "./product-card";
+import { Leaf } from "./storefront/leaf";
 
-const api = apiBase;
-export default function Catalogue({ query, need }: { query: string; need: PublicClassification }) {
+const availabilityChoices: { value: "" | Availability; label: string }[] = [
+  { value: "", label: "Tout" },
+  { value: "IN_STOCK", label: "Disponible" },
+  { value: "LOW_STOCK", label: "Stock limité" },
+];
+const sorts = [["name_asc", "Nom : A à Z"], ["name_desc", "Nom : Z à A"], ["price_asc", "Prix croissant"], ["price_desc", "Prix décroissant"]] as const;
+
+/** Page numbers to show: first, last, and two around the current one. */
+function pageList(current: number, last: number): (number | "…")[] {
+  const pages = new Set([1, last, current - 1, current, current + 1].filter((page) => page >= 1 && page <= last));
+  const sorted = [...pages].sort((a, b) => a - b);
+  return sorted.flatMap((page, index) => (index && page - sorted[index - 1] > 1 ? ["…" as const, page] : [page]));
+}
+
+/**
+ * Products of one need, with search, availability and sort. Filters change the URL
+ * (so a filtered page can be shared) without reloading; the previous results stay
+ * visible, dimmed, until the new ones arrive.
+ */
+export default function Catalogue({ query, need, whatsapp }: { query: string; need: PublicClassification; whatsapp: string | null }) {
+  const router = useRouter();
+  const [pending, startTransition] = useTransition();
   const params = new URLSearchParams(query);
+  const route = `/shop/besoins/${encodeURIComponent(need.slug)}`;
   const [result, setResult] = useState<CatalogueResponse | null>(null);
+  const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
   const [retry, setRetry] = useState(0);
+  const [search, setSearch] = useState(params.get("q") ?? "");
+  const top = useRef<HTMLDivElement>(null);
+  const firstLoad = useRef(true);
+
   useEffect(() => {
     const controller = new AbortController();
-    async function load() {
-      try {
-        const search = new URLSearchParams(query);
-        if (need) search.set("classification", need.slug);
-        const response = await fetch(`${api}/public/products?${search}`, { signal: controller.signal, cache: "no-store" });
-        if (!response.ok) throw new Error(`Catalogue HTTP ${response.status}`);
-        const data: CatalogueResponse = await response.json();
-        if (!controller.signal.aborted) setResult(data);
-      } catch (failure: unknown) {
-        if (!controller.signal.aborted) { console.error("Catalogue request failed", failure); setError(true); }
-      }
-    }
-    void load();
+    setLoading(true); setError(false);
+    const search = new URLSearchParams(query);
+    search.set("classification", need.slug);
+    if (!search.get("pageSize")) search.set("pageSize", "12");
+    fetch(`${apiBase}/public/products?${search}`, { cache: "no-store", signal: AbortSignal.any([controller.signal, AbortSignal.timeout(15000)]) })
+      .then(async (response) => { if (!response.ok) throw new Error(`Catalogue HTTP ${response.status}`); return await response.json() as CatalogueResponse; })
+      .then((data) => { if (!controller.signal.aborted) setResult(data); })
+      .catch((failure: unknown) => { if (!controller.signal.aborted) { console.error("Catalogue request failed", failure); setError(true); } })
+      .finally(() => { if (!controller.signal.aborted) setLoading(false); });
     return () => controller.abort();
-  }, [query, retry, need]);
-  const field = "mt-2 w-full min-w-0 rounded-lg border border-stone-300 bg-white px-3 py-2.5 text-sm focus:outline-emerald-700";
-  const route = `/shop/besoins/${encodeURIComponent(need.slug)}`;
-  const pageLink = (page: number) => { const next = new URLSearchParams(query); next.set("page", String(page)); return `${route}?${next}`; };
-  const filtered = ["q", "availability"].some((key) => params.get(key)?.trim());
-  return <>
-    <p className="mb-2 text-sm font-medium uppercase tracking-widest text-emerald-800">La boutique</p><h1 className="text-3xl font-semibold tracking-tight sm:text-4xl">{need ? <bdi>{need.nameFr}</bdi> : "Tous les produits"}</h1><p className="mt-3 text-stone-600">Découvrez nos produits et leur disponibilité.</p>
-    <form action={route} method="get" className="my-6 grid gap-3 rounded-2xl border border-stone-200 bg-white p-5 sm:grid-cols-2 lg:grid-cols-[2fr_1fr_1fr_auto]">
-      <label className="min-w-0 text-sm font-medium">Rechercher<input id="catalogue-search" name="q" type="search" defaultValue={params.get("q") ?? ""} placeholder="Nom, plante, besoin…" maxLength={200} className={field} /></label>
-      <label className="min-w-0 text-sm font-medium">Disponibilité<select name="availability" defaultValue={params.get("availability") ?? ""} className={field}><option value="">Toutes les disponibilités</option>{Object.entries(availabilityLabels).map(([value, label]) => <option key={value} value={value as Availability}>{label}</option>)}</select></label>
-      <label className="min-w-0 text-sm font-medium">Trier par<select name="sort" defaultValue={params.get("sort") ?? "name_asc"} className={field}><option value="name_asc">Nom : A à Z</option><option value="name_desc">Nom : Z à A</option><option value="price_asc">Prix croissant</option><option value="price_desc">Prix décroissant</option></select></label>
-      <div className="flex items-end gap-4"><button className="rounded-lg bg-emerald-900 px-5 py-2.5 text-sm font-medium text-white hover:bg-emerald-800">Rechercher</button><Link className="py-2.5 text-sm underline" href={route}>Réinitialiser</Link></div>
-    </form>
-    {error ? <div role="alert" className="rounded-xl border border-red-200 bg-red-50 p-6"><p>Impossible de charger le catalogue.</p><button className="mt-3 underline" onClick={() => { setError(false); setResult(null); setRetry((value) => value + 1); }}>Réessayer</button></div> : !result ? <p role="status">Chargement du catalogue...</p> : <>
-      <p className="mb-5 text-sm text-stone-500" role="status">{result.pagination.totalItems} produit(s)</p>
-      {!result.data.length ? <p className="rounded-xl bg-white p-8 text-center">{filtered ? "Aucun produit ne correspond à votre recherche." : result.pagination.totalItems ? "Aucun produit sur cette page." : "Aucun produit disponible dans la boutique."}</p> : <div className="botanical-product-grid">{result.data.map((product) => <ProductCard key={product.id} product={product} />)}</div>}
-      <nav aria-label="Pagination du catalogue" className="mt-8 flex flex-wrap items-center justify-center gap-5">{result.pagination.page > 1 && <Link className="rounded-lg border bg-white px-4 py-2" href={pageLink(result.pagination.page - 1)}>Précédent</Link>}<span className="text-sm">Page {result.pagination.page} sur {Math.max(1, result.pagination.totalPages)}</span>{result.pagination.page < result.pagination.totalPages && <Link className="rounded-lg border bg-white px-4 py-2" href={pageLink(result.pagination.page + 1)}>Suivant</Link>}</nav>
-    </>}
-  </>;
+  }, [query, retry, need.slug]);
+
+  // After a filter or a page change, bring the toolbar back into view (not on first load).
+  useEffect(() => {
+    if (firstLoad.current) { firstLoad.current = false; return; }
+    const box = top.current?.getBoundingClientRect();
+    if (box && box.top < 0) top.current?.scrollIntoView({ behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth", block: "start" });
+  }, [query]);
+
+  function go(changes: Record<string, string | null>) {
+    const next = new URLSearchParams(query);
+    for (const [key, value] of Object.entries(changes)) { if (value) next.set(key, value); else next.delete(key); }
+    if (!("page" in changes)) next.delete("page");
+    const text = next.toString();
+    startTransition(() => router.replace(text ? `${route}?${text}` : route, { scroll: false }));
+  }
+  const pageHref = (page: number) => { const next = new URLSearchParams(query); if (page > 1) next.set("page", String(page)); else next.delete("page"); const text = next.toString(); return `${route}${text ? `?${text}` : ""}#nd-results`; };
+
+  const availability = params.get("availability") ?? "";
+  const sort = params.get("sort") ?? "name_asc";
+  const filtered = !!(params.get("q")?.trim() || availability);
+  const busy = pending || (loading && !!result);
+  const total = result?.pagination.totalItems ?? 0;
+  const current = result?.pagination.page ?? 1;
+  const last = Math.max(1, result?.pagination.totalPages ?? 1);
+
+  return (
+    <section className="nd-catalogue" aria-labelledby="nd-results-title">
+      <div ref={top} id="nd-results" className="nd-toolbar">
+        <h2 id="nd-results-title" className="sr-only">Produits : {need.nameFr}</h2>
+        <form role="search" className="nd-search" onSubmit={(event) => { event.preventDefault(); go({ q: search.trim() || null }); }}>
+          <label htmlFor="nd-search" className="sr-only">Rechercher dans ce besoin</label>
+          <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7" fill="none" stroke="currentColor" strokeWidth="2" /><path d="m20 20-3.5-3.5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" /></svg>
+          <input id="nd-search" type="search" value={search} onChange={(event) => setSearch(event.target.value)} placeholder="Chercher une plante…" maxLength={200} />
+          <button type="submit">Chercher</button>
+        </form>
+        <div className="nd-filters" role="group" aria-label="Disponibilité">
+          {availabilityChoices.map((choice) => (
+            <button key={choice.value || "all"} type="button" className="nd-filter" aria-pressed={availability === choice.value} onClick={() => go({ availability: choice.value || null })}>{choice.label}</button>
+          ))}
+        </div>
+        <label className="nd-sort">
+          <span className="sr-only">Trier par</span>
+          <select value={sort} onChange={(event) => go({ sort: event.target.value === "name_asc" ? null : event.target.value })}>
+            {sorts.map(([value, label]) => <option key={value} value={value}>{label}</option>)}
+          </select>
+        </label>
+      </div>
+
+      <p className="nd-count" role="status" aria-live="polite">
+        {result && !error ? <>{total === 1 ? "1 produit" : `${total} produits`}{params.get("q") ? <> pour « <bdi>{params.get("q")}</bdi> »</> : null}</> : null}
+        {filtered && <button type="button" className="nd-reset" onClick={() => { setSearch(""); go({ q: null, availability: null }); }}>Effacer les filtres ×</button>}
+      </p>
+
+      {error ? (
+        <div role="alert" className="nd-empty">
+          <p>Impossible de charger les produits pour le moment.</p>
+          <button type="button" className="nd-btn" onClick={() => setRetry((value) => value + 1)}>Réessayer</button>
+        </div>
+      ) : !result ? (
+        <div className="nd-grid" role="status" aria-label="Chargement des produits">{Array.from({ length: 8 }, (_, index) => <div key={index} className="nd-skeleton" />)}</div>
+      ) : !result.data.length ? (
+        <div className="nd-empty">
+          <span className="nd-empty-leaf" aria-hidden="true"><Leaf color="#A9C68F" /></span>
+          <p className="nd-empty-title">{filtered ? "Aucun produit ne correspond à ces filtres." : "Les produits de ce besoin arrivent bientôt."}</p>
+          <p>Slouma a sûrement une recette pour vous : demandez-lui directement.</p>
+          <div className="nd-empty-actions">
+            {filtered && <button type="button" className="nd-btn nd-btn-line" onClick={() => { setSearch(""); go({ q: null, availability: null }); }}>Effacer les filtres</button>}
+            {whatsapp ? <a href={whatsapp} target="_blank" rel="noopener noreferrer" className="nd-btn">Demander sur WhatsApp</a> : <Link href="/shop/contact" className="nd-btn">Nous contacter</Link>}
+          </div>
+        </div>
+      ) : (
+        <>
+          <div className={`nd-grid${busy ? " nd-busy" : ""}`} aria-busy={busy}>
+            {result.data.map((product, index) => <div key={product.id} className="nd-card-in" style={{ "--i": index } as React.CSSProperties}><ProductCard product={product} /></div>)}
+          </div>
+          {last > 1 && (
+            <nav className="nd-pages" aria-label="Pages">
+              {current > 1 ? <Link href={pageHref(current - 1)} className="nd-page nd-page-step" scroll={false} rel="prev"><span aria-hidden="true">←</span><span className="sr-only">Page précédente</span></Link> : <span className="nd-page nd-page-step" aria-hidden="true">←</span>}
+              {pageList(current, last).map((page, index) => page === "…" ? <span key={`gap${index}`} className="nd-page-gap" aria-hidden="true">…</span> : (
+                <Link key={page} href={pageHref(page)} scroll={false} className="nd-page" aria-current={page === current ? "page" : undefined}><span className="sr-only">Page </span>{page}</Link>
+              ))}
+              {current < last ? <Link href={pageHref(current + 1)} className="nd-page nd-page-step" scroll={false} rel="next"><span aria-hidden="true">→</span><span className="sr-only">Page suivante</span></Link> : <span className="nd-page nd-page-step" aria-hidden="true">→</span>}
+            </nav>
+          )}
+        </>
+      )}
+    </section>
+  );
 }

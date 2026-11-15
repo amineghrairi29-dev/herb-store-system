@@ -8,3 +8,14 @@
   color: #743c3c;
   box-shadow: inset 0 0 0 1px rgb(174 83 83 / 38%);
 }
+
+/* Compact pill used on product cards. */
+.cart-pill { position: relative; display: inline-flex; flex: none; align-items: center; justify-content: center; gap: 6px; min-height: 40px; padding: 0 16px; border: 0; border-radius: 999px; background: var(--c-leaf, #3e7b3a); color: #fff; font: inherit; font-size: 14px; font-weight: 600; white-space: nowrap; cursor: pointer; transition: background 160ms, transform 160ms cubic-bezier(.2, .8, .2, 1), box-shadow 160ms; }
+.cart-pill:hover:not(:disabled) { background: var(--c-leaf-dark, #2e5e2b); transform: translateY(-1px); box-shadow: 0 6px 14px rgb(31 58 36 / 0.18); }
+.cart-pill:active:not(:disabled) { transform: scale(0.96); }
+.cart-pill[data-cart-state="remove"]:not(:disabled) { background: var(--c-sprout, #eef4e4); color: var(--c-leaf-dark, #2e5e2b); box-shadow: inset 0 0 0 1.5px var(--c-leaf, #3e7b3a); }
+.cart-pill[data-cart-state="remove"]:hover:not(:disabled) { background: #fff; }
+.cart-pill:disabled { background: var(--c-line, #dce3d2); color: var(--c-muted, #5d6b57); cursor: not-allowed; }
+.cart-pill svg { flex: none; }
+.cart-pill-live { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+@media (prefers-reduced-motion: reduce) { .cart-pill { transition: none; } .cart-pill:hover:not(:disabled), .cart-pill:active:not(:disabled) { transform: none; } }
