@@ -33,7 +33,7 @@ import type {
 } from '@prisma/orm-postgres/contract/types';
 
 export type StorageHash =
-  StorageHashBase<'6bc518f2e1b046cb63d54557b23d6c0dbeb43fedb6daf3a07b5511b79c088725'>;
+  StorageHashBase<'7201cd94efb02fcb99738a523f0d83dfbbb8d44c520c137b8308043510792b8a'>;
 export type ExecutionHash =
   ExecutionHashBase<'61c9271858a528765fde510b4abf69c10396ea3942af7d5f8941f810942342de'>;
 export type ProfileHash =
@@ -410,6 +410,8 @@ export type FieldOutputTypes = {
       readonly benefits: CodecTypes['pg/text@1']['output'] | null;
       readonly usage: CodecTypes['pg/text@1']['output'] | null;
       readonly precautions: CodecTypes['pg/text@1']['output'] | null;
+      readonly recipeFormat: CodecTypes['pg/text@1']['output'] | null;
+      readonly ingredients: CodecTypes['pg/text@1']['output'] | null;
       readonly isActive: CodecTypes['pg/bool@1']['output'];
       readonly isSellable: CodecTypes['pg/bool@1']['output'];
       readonly isVisibleOnline: CodecTypes['pg/bool@1']['output'];
@@ -731,6 +733,8 @@ export type FieldInputTypes = {
       readonly benefits: CodecTypes['pg/text@1']['input'] | null;
       readonly usage: CodecTypes['pg/text@1']['input'] | null;
       readonly precautions: CodecTypes['pg/text@1']['input'] | null;
+      readonly recipeFormat: CodecTypes['pg/text@1']['input'] | null;
+      readonly ingredients: CodecTypes['pg/text@1']['input'] | null;
       readonly isActive: CodecTypes['pg/bool@1']['input'];
       readonly isSellable: CodecTypes['pg/bool@1']['input'];
       readonly isVisibleOnline: CodecTypes['pg/bool@1']['input'];
@@ -1034,6 +1038,7 @@ export type StorageColumnTypes = {
       readonly createdAt: CodecTypes['pg/timestamptz-string@1']['output'];
       readonly description: CodecTypes['pg/text@1']['output'] | null;
       readonly id: CodecTypes['pg/int4@1']['output'];
+      readonly ingredients: CodecTypes['pg/text@1']['output'] | null;
       readonly isActive: CodecTypes['pg/bool@1']['output'];
       readonly isSellable: CodecTypes['pg/bool@1']['output'];
       readonly isVisibleOnline: CodecTypes['pg/bool@1']['output'];
@@ -1048,6 +1053,7 @@ export type StorageColumnTypes = {
       readonly packaging: CodecTypes['pg/text@1']['output'] | null;
       readonly precautions: CodecTypes['pg/text@1']['output'] | null;
       readonly productType: CodecTypes['pg/text@1']['output'];
+      readonly recipeFormat: CodecTypes['pg/text@1']['output'] | null;
       readonly salePrice: CodecTypes['pg/numeric@1']['output'];
       readonly saleUnit: CodecTypes['pg/text@1']['output'];
       readonly scientificName: CodecTypes['pg/text@1']['output'] | null;
@@ -1355,6 +1361,7 @@ export type StorageColumnInputTypes = {
       readonly createdAt: CodecTypes['pg/timestamptz-string@1']['input'];
       readonly description: CodecTypes['pg/text@1']['input'] | null;
       readonly id: CodecTypes['pg/int4@1']['input'];
+      readonly ingredients: CodecTypes['pg/text@1']['input'] | null;
       readonly isActive: CodecTypes['pg/bool@1']['input'];
       readonly isSellable: CodecTypes['pg/bool@1']['input'];
       readonly isVisibleOnline: CodecTypes['pg/bool@1']['input'];
@@ -1369,6 +1376,7 @@ export type StorageColumnInputTypes = {
       readonly packaging: CodecTypes['pg/text@1']['input'] | null;
       readonly precautions: CodecTypes['pg/text@1']['input'] | null;
       readonly productType: CodecTypes['pg/text@1']['input'];
+      readonly recipeFormat: CodecTypes['pg/text@1']['input'] | null;
       readonly salePrice: CodecTypes['pg/numeric@1']['input'];
       readonly saleUnit: CodecTypes['pg/text@1']['input'];
       readonly scientificName: CodecTypes['pg/text@1']['input'] | null;
@@ -2697,6 +2705,16 @@ type ContractBase = Omit<
                   readonly nullable: true;
                 };
                 readonly precautions: {
+                  readonly nativeType: 'text';
+                  readonly codecId: 'pg/text@1';
+                  readonly nullable: true;
+                };
+                readonly recipeFormat: {
+                  readonly nativeType: 'text';
+                  readonly codecId: 'pg/text@1';
+                  readonly nullable: true;
+                };
+                readonly ingredients: {
                   readonly nativeType: 'text';
                   readonly codecId: 'pg/text@1';
                   readonly nullable: true;
@@ -4936,6 +4954,14 @@ type ContractBase = Omit<
                 readonly nullable: true;
                 readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
               };
+              readonly recipeFormat: {
+                readonly nullable: true;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
+              };
+              readonly ingredients: {
+                readonly nullable: true;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
+              };
               readonly isActive: {
                 readonly nullable: false;
                 readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/bool@1' };
@@ -5017,6 +5043,8 @@ type ContractBase = Omit<
                 readonly benefits: { readonly column: 'benefits' };
                 readonly usage: { readonly column: 'usage' };
                 readonly precautions: { readonly column: 'precautions' };
+                readonly recipeFormat: { readonly column: 'recipeFormat' };
+                readonly ingredients: { readonly column: 'ingredients' };
                 readonly isActive: { readonly column: 'isActive' };
                 readonly isSellable: { readonly column: 'isSellable' };
                 readonly isVisibleOnline: { readonly column: 'isVisibleOnline' };
