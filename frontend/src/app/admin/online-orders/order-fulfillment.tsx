@@ -4,6 +4,9 @@ import { useRef, useState } from "react";
 import type { OnlineOrder } from "@/types/online-order";
 import { saleStatusLabels } from "@/types/sale";
 import { orderRequest } from "./order-api";
+// Manual "Créer la vente" button, kept for exceptional cases; off by default.
+const manualSale = false;
+
 export default function OrderFulfillment({ order, refresh }: { order: OnlineOrder; refresh: () => void }) {
   const [busy, setBusy] = useState(false),
     [error, setError] = useState("");
@@ -40,11 +43,14 @@ export default function OrderFulfillment({ order, refresh }: { order: OnlineOrde
           Voir la vente
         </Link>
         <p className="mt-3 text-sm text-slate-600">
-          La commande reste un historique. Seule la confirmation de la vente enregistre la sortie de stock.
+          {order.sale.status === "CONFIRMED"
+            ? "Vente enregistrée : les recettes sont sorties du stock et le paiement reçu à la livraison est noté."
+            : "La commande reste un historique. Seule la confirmation de la vente enregistre la sortie de stock."}
         </p>
       </section>
     );
-  if (order.status !== "CONFIRMED" || order.saleId !== null) return null;
+  // The sale is now created automatically when the order is marked « Livrée ».
+  if (order.status !== "CONFIRMED" || order.saleId !== null || !manualSale) return null;
   return (
     <section className="mt-6 rounded-xl border bg-white p-5">
       <h2 className="text-xl font-semibold">Préparer la vente</h2>

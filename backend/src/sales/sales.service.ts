@@ -69,8 +69,18 @@ export class SalesService {
     }, true);
   }
   addPayment(id: number, body: unknown) {
+    return withDocumentTransaction((tx) =>
+      this.addPaymentInTransaction(tx, id, body),
+    );
+  }
+  /** Same as addPayment, inside a transaction the caller owns (delivered online orders). */
+  async addPaymentInTransaction(
+    tx: DocumentTransaction,
+    id: number,
+    body: unknown,
+  ) {
     const input = validateSalePayment(body);
-    return withDocumentTransaction(async (tx) => {
+    {
       await tx.client.query(
         'SELECT id FROM public.sale WHERE id = $1 FOR UPDATE',
         [documentId(id)],
@@ -108,7 +118,13 @@ export class SalesService {
         undefined,
         sale.reference,
       );
-    });
+    }
+  }
+  /** Amount of a confirmed sale still to be paid (automatic payment on delivery). */
+  async remainingInTransaction(tx: DocumentTransaction, id: number) {
+    const lines = await tx.orm.public.SaleLine.where({ saleId: id }).all();
+    return paymentSummary(totalAmount(lines), await this.paymentHistory(tx, id))
+      .remainingAmount;
   }
   private async draft(tx: DocumentTransaction, id: number) {
     await tx.client.query(
@@ -263,7 +279,11 @@ export class SalesService {
     );
   }
   confirm(id: number) {
-    return withDocumentTransaction(async (tx) => {
+    return withDocumentTransaction((tx) => this.confirmInTransaction(tx, id));
+  }
+  /** Same as confirm (one stock exit per line), inside a transaction the caller owns. */
+  async confirmInTransaction(tx: DocumentTransaction, id: number) {
+    {
       const sale = await this.draft(tx, id);
       const lines = await tx.orm.public.SaleLine.where({ saleId: id })
         .orderBy((line) => line.id.asc())
@@ -290,6 +310,6 @@ export class SalesService {
         confirmedAt: new Date().toISOString(),
       });
       return audited(tx, 'SALE_CONFIRM', 'SALE', await this.detail(tx, id));
-    });
+    }
   }
 }

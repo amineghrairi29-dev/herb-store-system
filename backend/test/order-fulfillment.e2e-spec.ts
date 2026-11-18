@@ -235,6 +235,46 @@ describe.skipIf(process.env.RUN_DATABASE_TESTS !== '1')(
       expect(await db.orm.public.SalePayment.all()).toEqual(payments);
       expect(await db.orm.public.CashMovement.all()).toEqual(cash);
     });
+    const deliver = (id: number, deliveryStatus: string) =>
+      request(app.getHttpServer())
+        .patch(`/online-orders/${id}/delivery`)
+        .send({ deliveryStatus });
+    it('« Livrée » confirms the sale, takes the stock out and records the cash, once', async () => {
+      const { product, order } = await scenario();
+      await transition(order.id, 'CONFIRMED').expect(200);
+      await deliver(order.id, 'SHIPPED').expect(200);
+      expect(await stock(product.id)).toBe('10.000');
+      await deliver(order.id, 'DELIVERED').expect(200);
+      expect(await stock(product.id)).toBe('8.000');
+      const linked = (await db.orm.public.OnlineOrder.first({ id: order.id }))!;
+      expect(linked.deliveryStatus).toBe('DELIVERED');
+      expect((await sale(linked.saleId!)).status).toBe('CONFIRMED');
+      const payments = await db.orm.public.SalePayment.where({
+        saleId: linked.saleId!,
+      }).all();
+      expect(payments).toHaveLength(1);
+      expect(payments[0].paymentMethod).toBe('CASH');
+      expect(moneyUnits(payments[0].amount)).toBe(
+        moneyUnits(order.totalAmount),
+      );
+      await deliver(order.id, 'DELIVERED').expect(409);
+      expect(await stock(product.id)).toBe('8.000');
+    });
+    it('« Livrée » with too little stock changes nothing', async () => {
+      const { product, order } = await scenario();
+      await transition(order.id, 'CONFIRMED').expect(200);
+      await db.orm.public.StockMovement.create({
+        productId: product.id,
+        type: 'EXIT',
+        quantity: '9',
+        unit: 'KG',
+        quantityInStorageUnit: '9',
+      });
+      const before = await snapshot();
+      await deliver(order.id, 'DELIVERED').expect(409);
+      expect(await snapshot()).toEqual(before);
+      expect(await stock(product.id)).toBe('1.000');
+    });
     it('uses historical decimal price/unit/quantity despite changed product price and online visibility', async () => {
       const { product, order } = await scenario(
         '2.5',
