@@ -74,7 +74,13 @@ export default async function HomeNeeds() {
                     <span className="h-jar-pot">
                       <span className="h-jar-photo">
                         {jar.photo ? (
-                          <ProductImage imagePath={jar.photo} name="" className="h-jar-image" sizes="140px" />
+                          <ProductImage
+                            imagePath={jar.photo}
+                            name=""
+                            className="h-jar-image"
+                            sizes="140px"
+                            fallback={<span className="h-jar-image" />}
+                          />
                         ) : (
                           <span className="h-jar-leaf" aria-hidden="true">
                             <Leaf color={ink} />
