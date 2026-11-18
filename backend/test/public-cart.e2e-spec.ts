@@ -150,6 +150,7 @@ describe.skipIf(process.env.RUN_DATABASE_TESTS !== '1')(
             'salePrice',
             'saleUnit',
             'packaging',
+            'recipeFormat',
             'origin',
             'description',
             'availabilityStatus',
