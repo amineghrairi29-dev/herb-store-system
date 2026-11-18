@@ -159,6 +159,15 @@ describe.skipIf(process.env.RUN_DATABASE_TESTS !== '1')(
           'DELETE FROM public."onlineOrder" WHERE "customerName" = $1',
           [name],
         );
+        // « Livrée » records a cash payment: remove its cash movement and payment first.
+        await client.query(
+          'DELETE FROM public."cashMovement" WHERE "salePaymentId" IN (SELECT p.id FROM public."salePayment" p JOIN public.sale s ON s.id = p."saleId" WHERE s."customerName" = $1)',
+          [name],
+        );
+        await client.query(
+          'DELETE FROM public."salePayment" WHERE "saleId" IN (SELECT id FROM public.sale WHERE "customerName" = $1)',
+          [name],
+        );
         await client.query(
           'DELETE FROM public."saleLine" WHERE "saleId" IN (SELECT id FROM public.sale WHERE "customerName" = $1)',
           [name],
