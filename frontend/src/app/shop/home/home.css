@@ -432,77 +432,209 @@
   }
 }
 
-/* Needs */
-.h-needs-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-  gap: 16px;
+/* Objectives: jars on a wooden shelf */
+.h-needs-ar {
+  margin: 0 0 -4px;
+  font-family: var(--font-arabic), serif;
+  font-weight: 700;
+  font-size: 30px;
+  line-height: 1.4;
+  color: var(--c-leaf-dark);
+  text-align: left;
 }
-.h-need {
+.h-shelf {
   position: relative;
+  margin-top: 10px;
+}
+.h-shelf + .h-shelf {
+  margin-top: 34px;
+}
+.h-shelf-row {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  justify-content: space-around;
+  gap: 16px;
+  margin: 0;
+  padding: 0 12px;
+  list-style: none;
+}
+.h-shelf-row > li {
+  display: flex;
+  flex: 0 1 180px;
+  justify-content: center;
+  min-width: 0;
+}
+.h-jar {
   display: flex;
   flex-direction: column;
-  justify-content: flex-end;
-  min-height: 170px;
-  padding: 22px;
-  overflow: hidden;
-  border-radius: var(--r-card);
-  background: var(--tile);
-  color: var(--tile-ink);
+  align-items: center;
+  gap: 6px;
+  width: 100%;
+  padding-bottom: 10px;
+  color: var(--c-forest);
+  text-align: center;
   text-decoration: none;
+}
+.h-jar-pot {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 150px;
+  max-width: 100%;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background: var(--tile);
+  box-shadow: 0 16px 28px rgb(31 58 36 / 0.14);
   transition:
     transform var(--t-base) var(--ease-out),
     box-shadow var(--t-base) var(--ease-out);
 }
-.h-need::before {
+.h-jar-pot::after {
+  /* a light reflection, like glass */
   content: "";
   position: absolute;
-  width: 160px;
-  height: 160px;
-  right: -50px;
-  top: -50px;
+  left: 18%;
+  top: 12%;
+  width: 22%;
+  height: 12%;
   border-radius: 50%;
-  background: rgb(255 255 255 / 0.5);
-  transition: transform var(--t-slow) var(--ease-out);
+  background: rgb(255 255 255 / 0.55);
+  transform: rotate(-30deg);
+  pointer-events: none;
 }
-.h-need:hover {
-  transform: translateY(-6px) rotate(-0.6deg);
-  box-shadow: 0 18px 36px rgb(31 58 36 / 0.12);
+.h-jar-photo {
+  display: block;
+  width: 79%;
+  aspect-ratio: 1;
+  overflow: hidden;
+  border-radius: 42% 58% 52% 48% / 52% 44% 56% 48%;
+  background: rgb(255 255 255 / 0.6);
 }
-.h-need:hover::before {
-  transform: scale(1.5);
+.h-jar-image {
+  width: 100%;
+  height: 100%;
 }
-.h-need-ar {
-  position: relative;
-  font-family: var(--font-arabic), serif;
-  font-size: 32px;
-  line-height: 1.2;
-  text-align: left;
+.h-jar-image img {
+  object-fit: cover !important;
+  transition: transform 700ms var(--ease-out);
 }
-.h-need-fr {
-  position: relative;
-  font-family: var(--font-display), Georgia, serif;
-  font-size: 22px;
-  color: var(--c-forest);
-}
-.h-need-go {
-  position: absolute;
-  top: 18px;
-  right: 20px;
+.h-jar-leaf {
   display: grid;
   place-items: center;
-  width: 38px;
-  height: 38px;
-  border-radius: 50%;
-  background: var(--c-paper);
-  color: var(--c-forest);
-  transition:
-    transform var(--t-base) var(--ease-out),
-    background var(--t-base);
+  width: 100%;
+  height: 100%;
 }
-.h-need:hover .h-need-go {
-  transform: rotate(-45deg);
+.h-jar-leaf svg {
+  width: 34%;
+  height: auto;
+  rotate: -20deg;
+}
+.h-jar-count {
+  position: absolute;
+  right: 2%;
+  top: 4%;
+  display: grid;
+  place-items: center;
+  min-width: 32px;
+  height: 32px;
+  padding: 0 9px;
+  border: 3px solid var(--c-cream);
+  border-radius: var(--r-pill);
   background: var(--c-honey);
+  color: var(--c-honey-ink);
+  font-size: 13px;
+  font-weight: 700;
+}
+.h-jar-ar {
+  margin-top: 6px;
+  font-family: var(--font-arabic), serif;
+  font-weight: 700;
+  font-size: 27px;
+  line-height: 1.2;
+  color: var(--tile-ink);
+}
+.h-jar-fr {
+  font-size: 15px;
+  font-weight: 600;
+}
+.h-jar:hover .h-jar-pot {
+  transform: translateY(-8px) rotate(-3deg);
+  box-shadow: 0 26px 36px rgb(31 58 36 / 0.18);
+}
+.h-jar:hover .h-jar-image img {
+  transform: scale(1.1);
+}
+.h-jar:focus-visible {
+  outline: none;
+}
+.h-jar:focus-visible .h-jar-pot {
+  outline: 3px solid var(--c-leaf);
+  outline-offset: 4px;
+}
+.h-shelf-board {
+  position: relative;
+  display: block;
+  height: 16px;
+  margin-top: -4px;
+  border-radius: 6px;
+  background:
+    repeating-linear-gradient(90deg, rgb(255 255 255 / 0.06) 0 2px, transparent 2px 38px),
+    linear-gradient(180deg, #cfac72 0%, #b48d55 70%, #9c7744 100%);
+  box-shadow:
+    0 10px 16px rgb(90 60 20 / 0.22),
+    inset 0 2px 0 rgb(255 255 255 / 0.25);
+}
+.h-shelf-board::before,
+.h-shelf-board::after {
+  /* the two brackets under the board */
+  content: "";
+  position: absolute;
+  top: 100%;
+  width: 14px;
+  height: 22px;
+  border-radius: 0 0 6px 6px;
+  background: #9c7744;
+}
+.h-shelf-board::before {
+  left: 12%;
+}
+.h-shelf-board::after {
+  right: 12%;
+}
+/* Jars drop onto the shelf one after the other */
+.h-shelf[data-revealed="false"] .h-shelf-row > li {
+  opacity: 0;
+  transform: translateY(-40px);
+}
+.h-shelf[data-revealed="true"] .h-shelf-row > li {
+  animation: h-jar-drop 700ms cubic-bezier(0.3, 1.4, 0.5, 1) both;
+  animation-delay: calc(var(--i) * 90ms);
+}
+.h-shelf[data-revealed="true"] .h-jar-count {
+  animation: h-jar-pop 450ms var(--ease-out) both;
+  animation-delay: calc(500ms + var(--i) * 90ms);
+}
+@keyframes h-jar-drop {
+  from {
+    opacity: 0;
+    transform: translateY(-40px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+@keyframes h-jar-pop {
+  from {
+    transform: scale(0);
+  }
+}
+/* The generic reveal must not hide the shelf board itself */
+.h-shelf.h-reveal[data-revealed] > * {
+  opacity: 1;
+  transform: none;
+  transition: none;
 }
 
 /* Staggered reveal (ScrollReveal sets data-revealed). */
@@ -794,5 +926,50 @@
   }
   .h-step {
     transition: none;
+  }
+}
+
+@media (max-width: 760px) {
+  .h-shelf-row {
+    justify-content: flex-start;
+    gap: 12px;
+    padding: 6px 16px 0;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    scrollbar-width: none;
+  }
+  .h-shelf-row::-webkit-scrollbar {
+    display: none;
+  }
+  .h-shelf-row > li {
+    flex: 0 0 128px;
+    scroll-snap-align: start;
+  }
+  .h-jar-pot {
+    width: 116px;
+  }
+  .h-jar-ar {
+    font-size: 23px;
+  }
+  .h-jar-fr {
+    font-size: 14px;
+  }
+  .h-needs-ar {
+    font-size: 25px;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .h-shelf[data-revealed] .h-shelf-row > li,
+  .h-shelf[data-revealed] .h-jar-count {
+    opacity: 1;
+    transform: none;
+    animation: none;
+  }
+  .h-jar-pot,
+  .h-jar-image img {
+    transition: none;
+  }
+  .h-jar:hover .h-jar-pot {
+    transform: none;
   }
 }
