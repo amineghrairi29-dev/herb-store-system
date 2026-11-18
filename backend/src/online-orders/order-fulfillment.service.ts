@@ -37,7 +37,9 @@ export class OrderFulfillmentService {
     id: number,
     reference: string,
   ) {
-    let link: Awaited<ReturnType<OrderFulfillmentService['convertInTransaction']>>;
+    let link: Awaited<
+      ReturnType<OrderFulfillmentService['convertInTransaction']>
+    >;
     try {
       link = await this.convertInTransaction(tx, id);
     } catch (error: unknown) {
