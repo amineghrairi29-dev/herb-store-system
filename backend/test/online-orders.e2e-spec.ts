@@ -333,8 +333,19 @@ describe.skipIf(process.env.RUN_DATABASE_TESTS !== '1')(
       const value = lookup.body as Awaited<
         ReturnType<OnlineOrdersService['lookup']>
       >;
+      // Delivery fields (zone fee, total to pay, tracking) were added with delivery zones.
       expect(Object.keys(value).sort()).toEqual(
-        ['reference', 'status', 'totalAmount', 'createdAt', 'items'].sort(),
+        [
+          'reference',
+          'status',
+          'deliveryStatus',
+          'totalAmount',
+          'deliveryFee',
+          'grandTotal',
+          'deliveryGovernorate',
+          'createdAt',
+          'items',
+        ].sort(),
       );
       expect(Object.keys(value.items[0]).sort()).toEqual(
         [

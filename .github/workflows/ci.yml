@@ -59,6 +59,8 @@ jobs:
       AUTH_SECRET: 7f3c9a1e5b2d8c4f6a0e9d3b7c1f5a2e8d4c6b0a9f3e7d1c5b2a8f4e6d0c9b3a
       FRONTEND_ORIGIN: http://localhost:3000
       NODE_ENV: test
+      # Without this flag every database test is skipped (describe.skipIf).
+      RUN_DATABASE_TESTS: "1"
     defaults:
       run:
         working-directory: backend

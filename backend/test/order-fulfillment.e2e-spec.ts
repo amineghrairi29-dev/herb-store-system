@@ -392,11 +392,15 @@ describe.skipIf(process.env.RUN_DATABASE_TESTS !== '1')(
             [linked.saleId, second.order.id],
           ),
         ).rejects.toMatchObject({ code: '23505' });
+        // Refused by a foreign key: RESTRICT (23001) or NO ACTION (23503) depending on
+        // which referencing table PostgreSQL checks first; both mean "cannot delete".
         await expect(
           client.query('DELETE FROM public.sale WHERE id = $1', [
             linked.saleId,
           ]),
-        ).rejects.toMatchObject({ code: '23001' });
+        ).rejects.toMatchObject({
+          code: expect.stringMatching(/^(23001|23503)$/),
+        });
       } finally {
         await client.end();
       }
