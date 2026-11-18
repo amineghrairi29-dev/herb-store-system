@@ -25,7 +25,7 @@ export default async function HomeNeeds() {
           <h2 id="needs-title">Que cherchez-vous aujourd’hui ?</h2>
         </div>
         <p className="h-heading-note">
-          Choisissez un besoin : nous vous montrons les plantes et les recettes qui y répondent.
+          Choisissez votre objectif : nous vous montrons les recettes préparées pour lui.
         </p>
       </div>
       <ScrollReveal className="h-reveal h-needs-grid">

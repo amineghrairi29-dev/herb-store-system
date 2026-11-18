@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from "react";
 const steps = [
   ["Sélection", "Des plantes choisies une à une, à la bonne saison."],
   ["Séchage", "À l’ombre et à l’air, pour garder leur parfum et leur couleur."],
-  ["Préparation", "Les mélanges de Slouma, pesés et dosés à la boutique."],
+  ["Préparation", "Chaque recette faite à la main par Slouma, dosée pour son objectif."],
   ["Livraison", "Chez vous, emballé avec soin, payé à la réception."],
 ] as const;
 

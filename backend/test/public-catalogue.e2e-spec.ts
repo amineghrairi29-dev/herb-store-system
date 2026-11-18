@@ -211,6 +211,7 @@ describe.skipIf(process.env.RUN_DATABASE_TESTS !== '1')(
         'salePrice',
         'saleUnit',
         'packaging',
+        'recipeFormat',
         'origin',
         'description',
         'availabilityStatus',
@@ -226,7 +227,14 @@ describe.skipIf(process.env.RUN_DATABASE_TESTS !== '1')(
           ).body as object,
         ).sort(),
       ).toEqual(
-        [...keys, 'benefits', 'usage', 'precautions', 'gallery'].sort(),
+        [
+          ...keys,
+          'benefits',
+          'usage',
+          'precautions',
+          'ingredients',
+          'gallery',
+        ].sort(),
       );
       for (const q of [
         'MENTHE FRAÎCHE',

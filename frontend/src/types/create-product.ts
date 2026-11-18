@@ -1,3 +1,6 @@
+/** How a recipe is sold: fixed box, food bag by weight, or bottle. */
+export type RecipeFormat = "BOX" | "BAG" | "LIQUID";
+
 export interface CreateProductInput {
   sku: string;
   name: string;
@@ -20,6 +23,8 @@ export interface CreateProductInput {
   benefits?: string;
   usage?: string;
   precautions?: string;
+  ingredients?: string;
+  recipeFormat?: RecipeFormat | null;
   isActive: boolean;
   isSellable: boolean;
   isVisibleOnline: boolean;

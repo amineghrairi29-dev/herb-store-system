@@ -14,6 +14,8 @@ export interface PublicProductDto {
   salePrice: string;
   saleUnit: string;
   packaging: string | null;
+  /** BOX, BAG (sold by weight) or LIQUID; null for products created before recipes. */
+  recipeFormat: 'BOX' | 'BAG' | 'LIQUID' | null;
   origin: string | null;
   description: string | null;
   availabilityStatus: Availability;
@@ -21,6 +23,7 @@ export interface PublicProductDto {
   benefits?: string | null;
   usage?: string | null;
   precautions?: string | null;
+  ingredients?: string | null;
   gallery?: string[];
 }
 export interface PublicClassification {

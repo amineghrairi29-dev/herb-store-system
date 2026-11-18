@@ -9,7 +9,7 @@ import styles from "./public-header.module.css";
 import NeedsDrawer from "./needs-drawer";
 
 const links = [
-  ["/shop#products", "Produits"],
+  ["/shop#products", "Recettes"],
   ["/shop/about", "Notre histoire"],
   ["/shop/faq", "Questions"],
   ["/shop/contact", "Contact"],
@@ -59,7 +59,7 @@ function Search({ id }: { id: string }) {
         Rechercher un produit
       </label>
       <Icon kind="search" />
-      <input id={id} name="q" type="search" placeholder="Menthe, verveine, henné…" autoComplete="off" />
+      <input id={id} name="q" type="search" placeholder="Digestion, sommeil, menthe…" autoComplete="off" />
     </form>
   );
 }

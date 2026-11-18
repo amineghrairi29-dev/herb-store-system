@@ -15,6 +15,8 @@ import ScrollReveal from "../../storefront/scroll-reveal";
 import { JsonLd, breadcrumbJsonLd } from "@/lib/structured-data";
 import { siteUrl } from "@/lib/site-url";
 import { productIdFromSegment, productPath, productSegment } from "@/lib/product-url";
+import { formatLabel, ingredientList, priceUnit } from "@/lib/recipe";
+import { Leaf } from "../../storefront/leaf";
 
 /** The segment is "12-menthe-sechee" (or an old "12" link): only the number is read. */
 async function loadProduct(segment: string): Promise<PublicProduct | null> {
@@ -58,7 +60,7 @@ export default async function ProductPage({ params }: { params: Promise<{ id: st
   if (!product) notFound();
   // Old links (/shop/products/12) and renamed products go to the current address.
   if (decodeSegment(id) !== productSegment(product)) permanentRedirect(productPath(product));
-  const whatsapp = whatsappLink(store?.phone, `Bonjour, je souhaite commander : ${product.name}`);
+  const whatsapp = whatsappLink(store?.phone, `Bonjour, je souhaite commander la recette : ${product.name}`);
   const images = [product.mainImagePath, ...(product.gallery ?? [])].filter((path): path is string => !!path);
   const details = (
     [
@@ -67,8 +69,8 @@ export default async function ProductPage({ params }: { params: Promise<{ id: st
       ["Précautions", product.precautions],
     ] as const
   ).filter(([, text]) => !!text);
-  const units: Record<string, string> = { KG: "kg", G: "g", L: "L", ML: "ml", PIECE: "pièce" };
-  const unit = units[product.saleUnit] ?? product.saleUnit;
+  const unit = priceUnit(product);
+  const ingredients = ingredientList(product.ingredients);
   const unavailable = product.availabilityStatus === "OUT_OF_STOCK";
   let related: PublicProduct[] = [];
   try {
@@ -86,9 +88,9 @@ export default async function ProductPage({ params }: { params: Promise<{ id: st
   }
   const facts = (
     [
+      ["Format", formatLabel(product)],
+      ["Préparation", "Faite à la main, à Ghannouch"],
       ["Origine", product.origin],
-      ["Conditionnement", product.packaging],
-      ["Nom scientifique", product.scientificName],
     ] as const
   ).filter(([, value]) => !!value);
   const imageUrl = productImageUrl(product.mainImagePath);
@@ -144,10 +146,15 @@ export default async function ProductPage({ params }: { params: Promise<{ id: st
         <div className="pp-summary">
           <div className="pp-chips pp-enter" style={{ "--i": 1 } as React.CSSProperties}>
             {product.classifications.map((c) => (
-              <Link key={c.id} href={`/shop/besoins/${encodeURIComponent(c.slug)}`} className="pp-chip">
+              <Link key={c.id} href={`/shop/besoins/${encodeURIComponent(c.slug)}`} className="pp-chip pp-goal">
+                <span className="pp-goal-label">Pour</span>
                 <bdi>{c.nameFr}</bdi>
+                <span lang="ar" dir="rtl">
+                  {c.nameAr}
+                </span>
               </Link>
             ))}
+            <span className="pp-chip pp-handmade">Fait main</span>
             <span
               className={`pp-stock${unavailable ? " pp-stock-out" : product.availabilityStatus === "LOW_STOCK" ? " pp-stock-low" : ""}`}
             >
@@ -222,6 +229,29 @@ export default async function ProductPage({ params }: { params: Promise<{ id: st
           )}
         </div>
       </article>
+      {ingredients.length > 0 && (
+        <ScrollReveal className="pp-reveal">
+          <section className="pp-ingredients" aria-labelledby="ingredients-title">
+            <div>
+              <p lang="ar" dir="rtl" className="pp-ingredients-ar">
+                شنوّة فيها؟
+              </p>
+              <h2 id="ingredients-title">Ce qu’elle contient</h2>
+              <p>Les plantes principales de la recette. Les dosages restent le savoir-faire de la maison.</p>
+            </div>
+            <ul>
+              {ingredients.map((item, index) => (
+                <li key={`${item}-${index}`} style={{ "--i": index } as React.CSSProperties}>
+                  <span className="pp-ingredient-leaf" aria-hidden="true">
+                    <Leaf color={index % 3 === 1 ? "#D99A2B" : index % 3 === 2 ? "#A9C68F" : "#3E7B3A"} />
+                  </span>
+                  <bdi dir="auto">{item}</bdi>
+                </li>
+              ))}
+            </ul>
+          </section>
+        </ScrollReveal>
+      )}
       {details.length > 0 && (
         <ScrollReveal className="pp-reveal pp-details">
           {details.map(([title, text], index) => (
@@ -249,8 +279,8 @@ export default async function ProductPage({ params }: { params: Promise<{ id: st
           <p lang="ar" dir="rtl" className="pp-advice-ar">
             ما عرفتش شنوّة تختار؟
           </p>
-          <h2 id="advice-title">Vous hésitez entre deux plantes ?</h2>
-          <p>Dites-nous ce que vous cherchez : nous vous conseillons la préparation adaptée, gratuitement.</p>
+          <h2 id="advice-title">Vous hésitez entre deux recettes ?</h2>
+          <p>Dites-nous ce que vous cherchez : Slouma vous indique la recette adaptée, gratuitement.</p>
         </div>
         {whatsapp ? (
           <a href={whatsapp} target="_blank" rel="noopener noreferrer" className="pp-advice-btn">
@@ -265,7 +295,7 @@ export default async function ProductPage({ params }: { params: Promise<{ id: st
       {related.length > 0 && (
         <section className="pp-related" aria-labelledby="related-title">
           <div className="pp-related-heading">
-            <h2 id="related-title">Pour les mêmes besoins</h2>
+            <h2 id="related-title">Pour le même objectif</h2>
             <Link href={`/shop/besoins/${encodeURIComponent(product.category.slug)}`}>
               Tout voir <span aria-hidden="true">→</span>
             </Link>
@@ -280,7 +310,7 @@ export default async function ProductPage({ params }: { params: Promise<{ id: st
         </section>
       )}
       <BackLink href="/shop#products" className="mt-7">
-        Retour à la boutique
+        Toutes les recettes
       </BackLink>
     </div>
   );

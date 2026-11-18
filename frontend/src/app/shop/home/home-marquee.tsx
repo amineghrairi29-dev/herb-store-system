@@ -2,8 +2,8 @@ const items = [
   "Recettes éprouvées depuis 2006",
   "Conseil gratuit pour chaque question",
   "Paiement à la réception",
-  "Dès 100 g",
-  "Préparé à Ghannouch, Gabès",
+  "Fait main, en petites quantités",
+  "Préparées à Ghannouch, Gabès",
   "Livraison à domicile",
 ];
 /** Ribbon that scrolls endlessly; the list is drawn twice so the loop has no gap. */

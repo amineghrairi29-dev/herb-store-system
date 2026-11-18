@@ -3,8 +3,8 @@ import Link from "@/components/auth-link";
 import ProductsTable from "./products-table";
 
 export const metadata: Metadata = {
-  title: "Gestion des produits",
-  description: "Catalogue et gestion des produits de votre herboristerie.",
+  title: "Recettes",
+  description: "Les recettes faites main de Dar Slouma : objectif, format, prix et visibilité.",
 };
 
 export default function ProductsPage() {
@@ -14,9 +14,14 @@ export default function ProductsPage() {
         <header className="mb-8 flex flex-col gap-5 sm:flex-row sm:items-center sm:justify-between">
           <div>
             <p className="mb-2 text-xs font-semibold uppercase tracking-widest text-emerald-700">Catalogue</p>
-            <h1 className="text-3xl font-semibold tracking-tight sm:text-4xl">Gestion des produits</h1>
+            <h1 className="text-3xl font-semibold tracking-tight sm:text-4xl">
+              Recettes{" "}
+              <span lang="ar" dir="rtl" className="font-normal text-emerald-800">
+                · الوصفات
+              </span>
+            </h1>
             <p className="mt-3 text-sm text-slate-600">
-              Consultez les prix, le statut et la visibilité de vos produits.
+              Chaque recette répond à un objectif, avec son format, son prix et sa visibilité sur le site.
             </p>
           </div>
           <Link
@@ -26,33 +31,18 @@ export default function ProductsPage() {
             <span aria-hidden="true" className="text-lg leading-none">
               +
             </span>
-            Ajouter un produit
+            Nouvelle recette
           </Link>
         </header>
         <nav aria-label="Navigation du catalogue" className="mb-5 flex flex-wrap gap-5">
-          <Link href="/admin/online-orders" className="text-sm font-semibold text-emerald-800 hover:underline">
-            Commandes en ligne
-          </Link>
-          <Link href="/admin/reports" className="text-sm font-semibold text-emerald-800 hover:underline">
-            Rapports
-          </Link>
-          <Link href="/admin/finance" className="text-sm font-semibold text-emerald-800 hover:underline">
-            Finance
-          </Link>
-          <Link href="/admin/expenses" className="text-sm font-semibold text-emerald-800 hover:underline">
-            Dépenses
-          </Link>
-          <Link href="/admin/cash" className="text-sm font-semibold text-emerald-800 hover:underline">
-            Caisse
-          </Link>
-          <Link href="/admin/sales" className="text-sm font-semibold text-emerald-800 hover:underline">
-            Ventes
-          </Link>
-          <Link href="/admin/suppliers" className="text-sm font-semibold text-emerald-800 hover:underline">
-            Fournisseurs
+          <Link href="/admin/classifications" className="text-sm font-semibold text-emerald-800 hover:underline">
+            Gérer les objectifs (besoins)
           </Link>
           <Link href="/admin/stock" className="text-sm font-semibold text-emerald-800 hover:underline">
-            Consulter le stock →
+            Saisir le stock →
+          </Link>
+          <Link href="/admin/online-orders" className="text-sm font-semibold text-emerald-800 hover:underline">
+            Commandes en ligne
           </Link>
         </nav>
         <ProductsTable />

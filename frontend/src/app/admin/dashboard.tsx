@@ -17,6 +17,8 @@ const statusLabels: Record<string, string> = {
   CANCELLED: "Annulé(e)",
   PENDING: "En attente",
 };
+const showAccounting = false;
+
 export default function OperationalDashboard() {
   const { user } = useAuth();
   const [data, setData] = useState<Dashboard | null>(null),
@@ -38,11 +40,9 @@ export default function OperationalDashboard() {
     };
   }, [role, attempt]);
   const actions = [
-    ["/admin/sales/new", "Nouvelle vente"],
-    ["/admin/purchases/new", "Nouvel achat"],
-    ["/admin/stock/new-entry", "Entrée stock"],
-    ["/admin/expenses/new", "Nouvelle dépense"],
     ["/admin/online-orders", "Commandes en ligne"],
+    ["/admin/products/new", "Nouvelle recette"],
+    ["/admin/stock/new-entry", "Entrée stock"],
   ];
   function retry() {
     setData(null);
@@ -113,7 +113,7 @@ export default function OperationalDashboard() {
           label: "Ruptures de stock",
           value: String(data.alerts.outOfStockProducts),
           href: "/admin/stock",
-          helper: "Tous les produits",
+          helper: "Toutes les recettes",
           money: false,
         },
         {
@@ -128,7 +128,7 @@ export default function OperationalDashboard() {
   const primary = [cards[0], cards[1], cards[4], cards[5]];
   const secondary = [cards[2], cards[3], cards[6]];
   const alerts = cards.slice(7);
-  const actionIcons: AdminIconName[] = ["sales", "purchases", "stock", "expenses", "orders"];
+  const actionIcons: AdminIconName[] = ["orders", "products", "stock"];
   const metric = (card: (typeof cards)[number]) => (
     <Link key={card.label} href={card.href} data-dashboard-metric={card.label} className={styles.metric}>
       <h2>{card.label}</h2>
@@ -174,12 +174,17 @@ export default function OperationalDashboard() {
           </p>
         ) : (
           <>
-            <section aria-label="Indicateurs principaux" className={styles.primary}>
-              {primary.map(metric)}
-            </section>
-            <section aria-label="Indicateurs complémentaires" className={styles.secondary}>
-              {secondary.map(metric)}
-            </section>
+            {/* Sales, cash and finance figures come back with those sections (see hiddenSections in admin-shell). */}
+            {showAccounting && (
+              <>
+                <section aria-label="Indicateurs principaux" className={styles.primary}>
+                  {primary.map(metric)}
+                </section>
+                <section aria-label="Indicateurs complémentaires" className={styles.secondary}>
+                  {secondary.map(metric)}
+                </section>
+              </>
+            )}
             <section aria-label="Alertes opérationnelles" className={styles.alerts}>
               {alerts.map((card, index) => (
                 <Link key={card.label} href={card.href} data-dashboard-metric={card.label} className={styles.alert}>

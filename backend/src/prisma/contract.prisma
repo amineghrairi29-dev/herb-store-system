@@ -380,6 +380,10 @@ model Product {
   benefits        String?
   usage           String?
   precautions     String?
+  /// Recipe packaging: BOX (fixed box), BAG (food bag sold by weight), LIQUID (bottle).
+  recipeFormat    String?
+  /// Main ingredients shown to customers, one per line (no quantities).
+  ingredients     String?
   isActive        Boolean  @default(true)
   isSellable      Boolean  @default(true)
   isVisibleOnline Boolean  @default(false)
@@ -391,6 +395,7 @@ model Product {
   @@check(expression: "\"minStock\" >= 0 AND \"minStock\" < 'Infinity'::numeric", name: "product_min_stock_nonnegative")
   @@check(expression: "\"maxStock\" >= 0 AND \"maxStock\" < 'Infinity'::numeric", name: "product_max_stock_nonnegative")
   @@check(expression: "\"maxStock\" >= \"minStock\"", name: "product_stock_range")
+  @@check(expression: "\"recipeFormat\" IN ('BOX', 'BAG', 'LIQUID')", name: "product_recipe_format")
 }
 
 // Extra product photos shown in the storefront gallery, after mainImagePath.

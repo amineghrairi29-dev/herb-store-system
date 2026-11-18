@@ -92,12 +92,12 @@ export default function HomeHero() {
             </span>
           </h1>
           <p className="h-hero-text h-enter" style={{ "--i": 6 } as React.CSSProperties}>
-            Plantes, mélanges et épices préparés à la boutique de Ghannouch, avec un conseil pour chaque question.
-            Commandez en ligne, payez à la livraison.
+            Des recettes faites à la main à Ghannouch, chacune pour un objectif précis, avec un conseil pour chaque
+            question. Commandez en ligne, payez à la livraison.
           </p>
           <div className="h-actions h-enter" style={{ "--i": 7 } as React.CSSProperties}>
             <Link href="/shop#products" className="h-btn h-btn-honey">
-              Découvrir les produits <span aria-hidden="true">→</span>
+              Découvrir les recettes <span aria-hidden="true">→</span>
             </Link>
             {whatsapp ? (
               <a href={whatsapp} target="_blank" rel="noopener noreferrer" className="h-btn h-btn-line">

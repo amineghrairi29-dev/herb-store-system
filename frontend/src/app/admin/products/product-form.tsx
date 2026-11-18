@@ -5,7 +5,7 @@ import { authFetch } from "@/lib/auth";
 import Link from "@/components/auth-link";
 import { useEffect, useRef, useState, type FormEvent } from "react";
 import ClassificationPicker from "@/components/classification-picker";
-import type { CreateProductInput } from "@/types/create-product";
+import type { CreateProductInput, RecipeFormat } from "@/types/create-product";
 import type { ProductDetails } from "@/types/product";
 import { compareDecimals, normalizeDecimal } from "@/lib/decimal";
 import Image from "next/image";
@@ -14,13 +14,42 @@ import { imageFileError } from "@/lib/product-image";
 
 const inputClass =
   "mt-2 w-full rounded-lg border border-slate-300 bg-white px-3 py-2.5 text-sm text-slate-900 focus:border-emerald-700 focus:outline-2 focus:outline-emerald-700";
-const optionalFields = [
-  { name: "nameFr", label: "Nom français" },
-  { name: "scientificName", label: "Nom scientifique" },
-  { name: "barcode", label: "Code-barres" },
-  { name: "origin", label: "Origine" },
-  { name: "packaging", label: "Conditionnement" },
-] as const;
+/** The three ways a recipe is sold, and the stock/price units each one implies. */
+const formats: Record<
+  RecipeFormat,
+  { title: string; titleAr: string; hint: string; price: string; content: string | null }
+> = {
+  BOX: { title: "Boîte", titleAr: "علبة", hint: "Prix fixe pour une boîte", price: "Prix d’une boîte", content: "g" },
+  BAG: {
+    title: "Sachet au poids",
+    titleAr: "كيس بالميزان",
+    hint: "Le client choisit la quantité",
+    price: "Prix du kilo",
+    content: null,
+  },
+  LIQUID: {
+    title: "Flacon (liquide)",
+    titleAr: "قارورة",
+    hint: "Prix fixe pour un flacon",
+    price: "Prix d’un flacon",
+    content: "ml",
+  },
+};
+
+/** Format of an existing product: the saved one, or guessed from its sale unit for older products. */
+function initialFormat(product?: ProductDetails): RecipeFormat {
+  if (product?.recipeFormat) return product.recipeFormat;
+  if (!product) return "BOX";
+  if (product.saleUnit === "KG" || product.saleUnit === "G") return "BAG";
+  if (product.saleUnit === "ML" || product.saleUnit === "L") return "LIQUID";
+  return "BOX";
+}
+
+/** "Boîte 100 g" -> "100". */
+function contentAmount(packaging: string | null | undefined): string {
+  const match = /(\d+(?:[.,]\d+)?)\s*(?:g|ml)\b/i.exec(packaging ?? "");
+  return match ? match[1].replace(".", ",") : "";
+}
 
 export default function ProductForm({ product }: { product?: ProductDetails }) {
   const [submitting, setSubmitting] = useState(false);
@@ -46,16 +75,10 @@ export default function ProductForm({ product }: { product?: ProductDetails }) {
   }
   const [selectedClassifications, setSelectedClassifications] = useState<number[]>(product?.classificationIds ?? []);
   const [hasActiveNeed, setHasActiveNeed] = useState(false);
-  const [mode, setMode] = useState(product?.measurementMode ?? "FLEXIBLE");
-  const [storage, setStorage] = useState(product?.storageUnit ?? "");
-  const [sale, setSale] = useState(product?.saleUnit ?? "");
-  const choices: Record<string, string[]> = {
-    WEIGHT: ["G", "KG"],
-    VOLUME: ["ML", "L"],
-    WEIGHT_AND_VOLUME: ["G", "KG", "ML", "L"],
-    FLEXIBLE: ["G", "KG", "ML", "L", "PIECE"],
-  };
-  const units = choices[mode] ?? [];
+  const [format, setFormat] = useState<RecipeFormat>(() => initialFormat(product));
+  // One recipe = one objective: picking another need replaces the previous one.
+  const pickNeed = (ids: number[]) => setSelectedClassifications(ids.length > 1 ? [ids[ids.length - 1]] : ids);
+  const [sku] = useState(() => product?.sku ?? `REC-${Date.now().toString(36).toUpperCase()}`);
 
   function showError(message: string) {
     setError(message);
@@ -67,97 +90,63 @@ export default function ProductForm({ product }: { product?: ProductDetails }) {
     if (pending.current) return;
     setError(null);
     if (!hasActiveNeed) {
-      showError("Sélectionnez au moins un besoin actif.");
+      showError("Choisissez l’objectif de la recette.");
       return;
     }
     if ((!product && !imageFile) || imageError || (imageFile && imageFileError(imageFile))) {
-      showError(
-        imageError ||
-          (imageFile ? imageFileError(imageFile) : null) ||
-          "Sélectionnez une image principale pour ce nouveau produit.",
-      );
+      showError(imageError || (imageFile ? imageFileError(imageFile) : null) || "Ajoutez une photo de la recette.");
       return;
     }
     const form = new FormData(event.currentTarget);
     const text = (name: string) => String(form.get(name) ?? "").trim();
-    const sku = text("sku");
     const name = text("name");
-    const productType = text("productType");
-    const rawPrice = text("salePrice");
-    const storageUnit = text("storageUnit");
-    const saleUnit = text("saleUnit");
-
-    if (
-      !sku ||
-      !name ||
-      !productType ||
-      !rawPrice ||
-      !selectedClassifications.length ||
-      !storageUnit ||
-      !saleUnit ||
-      !text("conversionFactor")
-    ) {
-      showError(
-        "Veuillez renseigner tous les champs obligatoires : SKU, nom, type, classification, unités, facteur de conversion et prix.",
-      );
+    if (!name) {
+      showError("Donnez un nom à la recette.");
       return;
     }
-    if (productType !== "VRAC" && productType !== "EMBALLE") {
-      showError("Veuillez sélectionner un type de produit valide.");
-      return;
-    }
-    const salePrice = normalizeDecimal(rawPrice);
+    const salePrice = normalizeDecimal(text("salePrice"));
     if (salePrice === null || compareDecimals(salePrice, "0.000") <= 0) {
-      showError("Le prix de vente doit être un nombre décimal supérieur à 0 (exemple : 12,500).");
+      showError("Le prix doit être un nombre supérieur à 0 (exemple : 12,500).");
       return;
     }
-
-    if (!units.includes(storageUnit) || !units.includes(saleUnit)) {
-      showError("Veuillez sélectionner des unités valides.");
-      return;
-    }
-    const conversionFactor = normalizeDecimal(text("conversionFactor"));
-    if (conversionFactor === null || compareDecimals(conversionFactor, "0.000") <= 0) {
-      showError("Le facteur de conversion doit être un nombre décimal supérieur à 0.");
-      return;
+    const spec = formats[format];
+    let packaging = "Sachet alimentaire";
+    if (spec.content) {
+      const amount = normalizeDecimal(text("contentAmount"));
+      if (amount === null || compareDecimals(amount, "0.000") <= 0) {
+        showError(`Indiquez la contenance (${spec.content}) : par exemple ${format === "BOX" ? "100" : "250"}.`);
+        return;
+      }
+      packaging = `${spec.title.split(" ")[0]} ${amount.replace(/\.?0+$/, "").replace(".", ",")} ${spec.content}`;
     }
     const minStock = text("minStock") ? normalizeDecimal(text("minStock")) : null;
-    const maxStock = text("maxStock") ? normalizeDecimal(text("maxStock")) : null;
-    if ((text("minStock") && minStock === null) || (text("maxStock") && maxStock === null)) {
-      showError("Les stocks minimum et maximum doivent être des nombres décimaux supérieurs ou égaux à 0.");
+    if (text("minStock") && minStock === null) {
+      showError("Le seuil d’alerte doit être un nombre supérieur ou égal à 0.");
       return;
     }
-    if (minStock !== null && maxStock !== null && compareDecimals(maxStock, minStock) < 0) {
-      showError("Le stock maximum doit être supérieur ou égal au stock minimum.");
-      return;
-    }
+    const byWeight = format === "BAG";
     const payload: CreateProductInput = {
       sku,
       name,
-      productType,
+      productType: byWeight ? "VRAC" : "EMBALLE",
       salePrice,
       classificationIds: selectedClassifications,
-      measurementMode: mode,
-      storageUnit,
-      saleUnit,
-      conversionFactor,
+      // Bag: stock and price per kilo. Box and bottle: counted and priced per unit.
+      measurementMode: byWeight ? "WEIGHT" : "FLEXIBLE",
+      storageUnit: byWeight ? "KG" : "PIECE",
+      saleUnit: byWeight ? "KG" : "PIECE",
+      conversionFactor: "1",
       minStock,
-      maxStock,
-      location: text("location") || null,
+      maxStock: null,
+      recipeFormat: format,
+      packaging,
       isActive: form.has("isActive"),
-      isSellable: form.has("isSellable"),
+      isSellable: product?.isSellable ?? true,
       isVisibleOnline: form.has("isVisibleOnline"),
     };
-    for (const field of optionalFields) {
-      const value = text(field.name);
-      if (field.name === "barcode") payload.barcode = value || null;
-      else if (value || savedId) payload[field.name] = value;
-    }
-    const description = text("description");
-    if (description || savedId) payload.description = description;
-    for (const name of ["benefits", "usage", "precautions"] as const) {
-      const value = text(name);
-      if (value || savedId) payload[name] = value;
+    for (const field of ["nameFr", "description", "ingredients", "benefits", "usage", "precautions"] as const) {
+      const value = text(field);
+      if (value || savedId) payload[field] = value;
     }
 
     pending.current = true;
@@ -170,7 +159,7 @@ export default function ProductForm({ product }: { product?: ProductDetails }) {
         body: JSON.stringify(payload),
       });
       if (!response.ok) {
-        let message = `Impossible d’enregistrer le produit (HTTP ${response.status}).`;
+        let message = `Impossible d’enregistrer la recette (HTTP ${response.status}).`;
         const details: unknown = await response.json().catch(() => null);
         if (typeof details === "object" && details !== null && "message" in details) {
           if (typeof details.message === "string" && details.message.trim()) {
@@ -222,7 +211,7 @@ export default function ProductForm({ product }: { product?: ProductDetails }) {
             : "Une erreur inattendue est survenue.";
       showError(
         fieldsSaved
-          ? `Les informations du produit sont enregistrées, mais l’image n’a pas pu être confirmée. ${product?.mainImagePath ? "L’image précédente est conservée si le remplacement a échoué. " : ""}Réessayez : le même produit sera utilisé. ${message}`
+          ? `Les informations de la recette sont enregistrées, mais l’image n’a pas pu être confirmée. ${product?.mainImagePath ? "L’image précédente est conservée si le remplacement a échoué. " : ""}Réessayez : la même recette sera utilisée. ${message}`
           : message,
       );
       pending.current = false;
@@ -246,21 +235,21 @@ export default function ProductForm({ product }: { product?: ProductDetails }) {
       {error && savedId && !product && (
         <p className="mx-6 mt-3 text-sm text-emerald-800">
           <Link href={`/admin/products/${savedId}/edit`} className="underline">
-            Reprendre la modification de ce produit
+            Reprendre la modification de cette recette
           </Link>
         </p>
       )}
       <fieldset disabled={submitting} className="space-y-8 p-6 sm:p-8 disabled:opacity-70">
-        <legend className="sr-only">Informations du produit</legend>
+        <legend className="sr-only">Informations de la recette</legend>
         <section aria-labelledby="image-heading">
           <h2 id="image-heading" className="font-semibold">
-            Image principale{!product ? " *" : ""}
+            Photo de la recette{!product ? " *" : ""}
           </h2>
           <p id="image-help" className="mt-2 text-sm text-slate-500">
             JPG, PNG ou WebP · 3 Mo maximum · image fixe, 25 mégapixels maximum.{" "}
             {product
               ? "Sans nouveau fichier, l’image actuelle est conservée."
-              : "Une image est requise pour créer un produit depuis ce formulaire."}
+              : "Une photo est requise pour créer une recette."}
           </p>
           <div className="mt-4 flex flex-col gap-4 sm:flex-row sm:items-center">
             {preview ? (
@@ -308,204 +297,151 @@ export default function ProductForm({ product }: { product?: ProductDetails }) {
         </section>
         <section aria-labelledby="required-heading">
           <h2 id="required-heading" className="font-semibold">
-            Informations générales
+            La recette
           </h2>
           <div className="mt-5 grid gap-5 sm:grid-cols-2">
             <label className="text-sm font-medium">
-              SKU *
+              Nom de la recette *
               <input
-                name="sku"
-                defaultValue={product?.sku ?? ""}
+                name="name"
+                defaultValue={product?.name ?? ""}
                 required
                 dir="auto"
-                autoComplete="off"
+                placeholder="خلطة الهضم"
                 className={inputClass}
               />
             </label>
             <label className="text-sm font-medium">
-              Nom du produit *
-              <input name="name" defaultValue={product?.name ?? ""} required dir="auto" className={inputClass} />
-            </label>
-            <label className="text-sm font-medium">
-              Type de produit *
-              <select name="productType" required defaultValue={product?.productType ?? ""} className={inputClass}>
-                <option value="" disabled>
-                  Sélectionner un type
-                </option>
-                <option value="VRAC">VRAC</option>
-                <option value="EMBALLE">EMBALLE</option>
-              </select>
+              Nom en français
+              <input
+                name="nameFr"
+                defaultValue={product?.nameFr ?? ""}
+                dir="auto"
+                placeholder="Mélange digestion"
+                className={inputClass}
+              />
             </label>
           </div>
+          <p className="mt-3 text-xs text-slate-500">
+            Référence interne : <span className="font-mono">{sku}</span>
+          </p>
         </section>
         <section aria-labelledby="classification-heading" className="border-t border-slate-100 pt-6">
           <h2 id="classification-heading" className="font-semibold">
-            Classifications / besoins *
+            Objectif de la recette *
           </h2>
+          <p className="mt-1 text-sm text-slate-500">
+            Une recette répond à un seul besoin. Choisir un autre besoin remplace le précédent.
+          </p>
           <ClassificationPicker
             selected={selectedClassifications}
-            onChange={setSelectedClassifications}
+            onChange={pickNeed}
             onValidityChange={setHasActiveNeed}
           />
         </section>
-        <section aria-labelledby="storage-heading" className="border-t border-slate-100 pt-6">
-          <h2 id="storage-heading" className="font-semibold">
-            Unités et stockage
+        <section aria-labelledby="format-heading" className="border-t border-slate-100 pt-6">
+          <h2 id="format-heading" className="font-semibold">
+            Format et prix *
           </h2>
-          <label className="mt-4 block text-sm font-medium">
-            Mode de mesure du produit *
-            <select
-              name="measurementMode"
-              value={mode}
-              onChange={(e) => setMode(e.target.value)}
-              required
-              className={inputClass}
-            >
-              <option value="WEIGHT">Poids</option>
-              <option value="VOLUME">Volume</option>
-              <option value="FLEXIBLE">Flexible</option>
-              <option value="WEIGHT_AND_VOLUME">Poids et volume</option>
-            </select>
-          </label>
-          <p className="mt-2 text-xs text-slate-500">
-            Le facteur indique le nombre d’unités de vente dans une unité de stockage (exemple : 1 KG = 1000 G). Les
-            seuils sont exprimés en unité de stockage.
-          </p>
-          <div className="mt-5 grid gap-5 sm:grid-cols-2">
-            {[
-              { name: "storageUnit", label: "Unité de stockage" },
-              { name: "saleUnit", label: "Unité de vente" },
-            ].map((field) => (
-              <label key={field.name} className="text-sm font-medium">
-                {field.label} *
-                <select
-                  name={field.name}
-                  required
-                  value={field.name === "storageUnit" ? storage : sale}
-                  onChange={(event) =>
-                    field.name === "storageUnit" ? setStorage(event.target.value) : setSale(event.target.value)
-                  }
-                  className={inputClass}
+          <div role="radiogroup" aria-labelledby="format-heading" className="mt-4 grid gap-3 sm:grid-cols-3">
+            {(Object.keys(formats) as RecipeFormat[]).map((key) => {
+              const item = formats[key];
+              const active = format === key;
+              return (
+                <label
+                  key={key}
+                  className={`flex cursor-pointer flex-col gap-1 rounded-xl border-2 p-4 transition ${active ? "border-emerald-700 bg-emerald-50" : "border-slate-200 bg-white hover:border-emerald-300"}`}
                 >
-                  <option value="" disabled>
-                    Sélectionner une unité
-                  </option>
-                  {units.map((unit) => (
-                    <option key={unit} value={unit}>
-                      {unit}
-                    </option>
-                  ))}
-                </select>
-              </label>
-            ))}
-            <label className="text-sm font-medium">
-              Facteur de conversion *
-              <input
-                name="conversionFactor"
-                required
-                inputMode="decimal"
-                defaultValue={product?.conversionFactor ?? ""}
-                placeholder="1000"
-                className={inputClass}
-              />
-            </label>
-            <label className="text-sm font-medium">
-              Emplacement
-              <input
-                name="location"
-                dir="auto"
-                defaultValue={product?.location ?? ""}
-                placeholder="Rayon A / Bac 03"
-                className={inputClass}
-              />
-            </label>
-            <label className="text-sm font-medium">
-              Stock minimum
-              <input
-                name="minStock"
-                inputMode="decimal"
-                defaultValue={product?.minStock ?? ""}
-                placeholder="0"
-                className={inputClass}
-              />
-            </label>
-            <label className="text-sm font-medium">
-              Stock maximum
-              <input
-                name="maxStock"
-                inputMode="decimal"
-                defaultValue={product?.maxStock ?? ""}
-                placeholder="10"
-                className={inputClass}
-              />
-            </label>
+                  <input
+                    type="radio"
+                    name="recipeFormat"
+                    value={key}
+                    checked={active}
+                    onChange={() => setFormat(key)}
+                    className="sr-only"
+                  />
+                  <span className="flex items-baseline justify-between gap-2">
+                    <span className="font-semibold text-slate-900">{item.title}</span>
+                    <span lang="ar" dir="rtl" className="text-lg text-emerald-800">
+                      {item.titleAr}
+                    </span>
+                  </span>
+                  <span className="text-xs text-slate-500">{item.hint}</span>
+                </label>
+              );
+            })}
           </div>
-        </section>
-        <section aria-labelledby="price-heading" className="border-t border-slate-100 pt-6">
-          <h2 id="price-heading" className="font-semibold">
-            Prix
-          </h2>
           <div className="mt-5 grid gap-5 sm:grid-cols-2">
             <label className="text-sm font-medium">
-              Prix de vente *
+              {formats[format].price} (DT) *
               <input
                 name="salePrice"
                 defaultValue={product?.salePrice ?? ""}
                 required
                 inputMode="decimal"
-                placeholder="12,500"
-                aria-describedby="price-help"
+                placeholder={format === "BAG" ? "45,000" : "18,500"}
                 className={inputClass}
               />
-              <span id="price-help" className="mt-2 block text-xs font-normal text-slate-500">
-                Prix supérieur à 0. Virgule ou point accepté pour les valeurs décimales.
-              </span>
+              {format === "BAG" && (
+                <span className="mt-2 block text-xs font-normal text-slate-500">
+                  Le site calcule le prix selon le poids choisi par le client.
+                </span>
+              )}
             </label>
+            {formats[format].content && (
+              <label className="text-sm font-medium">
+                Contenance ({formats[format].content}) *
+                <input
+                  key={format}
+                  name="contentAmount"
+                  defaultValue={
+                    product?.recipeFormat === format || !product?.recipeFormat ? contentAmount(product?.packaging) : ""
+                  }
+                  required
+                  inputMode="decimal"
+                  placeholder={format === "BOX" ? "100" : "250"}
+                  className={inputClass}
+                />
+              </label>
+            )}
           </div>
         </section>
-        <section aria-labelledby="optional-heading" className="border-t border-slate-100 pt-6">
-          <h2 id="optional-heading" className="font-semibold">
-            Informations complémentaires
+        <section aria-labelledby="content-heading" className="border-t border-slate-100 pt-6">
+          <h2 id="content-heading" className="font-semibold">
+            Ce que voit le client
           </h2>
-          <div className="mt-5 grid gap-5 sm:grid-cols-2">
-            {optionalFields.map((field) => (
-              <label key={field.name} className="text-sm font-medium">
-                {field.label}
-                <input name={field.name} defaultValue={product?.[field.name] ?? ""} dir="auto" className={inputClass} />
-              </label>
-            ))}
-            <label className="text-sm font-medium sm:col-span-2">
-              Description
-              <textarea
-                name="description"
-                defaultValue={product?.description ?? ""}
-                dir="auto"
-                rows={4}
-                className={`${inputClass} resize-y`}
-              />
-            </label>
+          <div className="mt-5 grid gap-5">
             {(
               [
-                ["benefits", "Bienfaits", "Ex. : Aide à la digestion, apaise après le repas."],
                 [
-                  "usage",
-                  "Mode d’utilisation",
-                  "Ex. : 1 cuillère à café pour une tasse d’eau chaude, infuser 5 minutes.",
+                  "ingredients",
+                  "Ingrédients principaux",
+                  "Un par ligne, sans les quantités. Ex. :\nCamomille\nFenouil\nMenthe",
+                  4,
                 ],
+                ["benefits", "Bienfaits", "Ex. : Aide à la digestion, apaise après le repas.", 3],
+                ["usage", "Mode d’utilisation", "Ex. : 1 cuillère à café dans une tasse d’eau chaude, 5 minutes.", 3],
                 [
                   "precautions",
                   "Précautions",
-                  "Ex. : Déconseillé aux femmes enceintes. Demandez l’avis d’un médecin en cas de traitement.",
+                  "Ex. : Déconseillé aux femmes enceintes. Avis médical en cas de traitement.",
+                  3,
+                ],
+                [
+                  "description",
+                  "L’histoire de la recette",
+                  "Facultatif : d’où vient-elle, pour qui l’avez-vous créée…",
+                  3,
                 ],
               ] as const
-            ).map(([name, label, hint]) => (
-              <label key={name} className="text-sm font-medium sm:col-span-2">
-                {label} <span className="font-normal text-slate-500">(affiché sur la fiche produit si rempli)</span>
+            ).map(([field, label, hint, rows]) => (
+              <label key={field} className="text-sm font-medium">
+                {label}
                 <textarea
-                  name={name}
-                  defaultValue={product?.[name] ?? ""}
+                  name={field}
+                  defaultValue={product?.[field] ?? ""}
                   dir="auto"
-                  rows={3}
+                  rows={rows}
                   maxLength={4000}
                   placeholder={hint}
                   className={`${inputClass} resize-y`}
@@ -516,13 +452,27 @@ export default function ProductForm({ product }: { product?: ProductDetails }) {
         </section>
         <section aria-labelledby="visibility-heading" className="border-t border-slate-100 pt-6">
           <h2 id="visibility-heading" className="font-semibold">
-            Statut et visibilité
+            Stock et visibilité
           </h2>
+          <div className="mt-5 grid gap-5 sm:grid-cols-2">
+            <label className="text-sm font-medium">
+              Alerte stock bas ({format === "BAG" ? "kg" : format === "BOX" ? "boîtes" : "flacons"})
+              <input
+                name="minStock"
+                inputMode="decimal"
+                defaultValue={product?.minStock ?? ""}
+                placeholder={format === "BAG" ? "1" : "5"}
+                className={inputClass}
+              />
+              <span className="mt-2 block text-xs font-normal text-slate-500">
+                En dessous, la recette s’affiche « Stock limité ». Le stock lui-même se saisit dans Stock.
+              </span>
+            </label>
+          </div>
           <div className="mt-5 flex flex-wrap gap-x-8 gap-y-4">
             {[
-              { name: "isActive", label: "Actif", checked: product?.isActive ?? true },
-              { name: "isSellable", label: "Vendable", checked: product?.isSellable ?? true },
-              { name: "isVisibleOnline", label: "Visible en ligne", checked: product?.isVisibleOnline ?? false },
+              { name: "isVisibleOnline", label: "Visible sur le site", checked: product?.isVisibleOnline ?? true },
+              { name: "isActive", label: "Active", checked: product?.isActive ?? true },
             ].map((field) => (
               <label key={field.name} className="flex items-center gap-2 text-sm font-medium">
                 <input
@@ -559,7 +509,7 @@ export default function ProductForm({ product }: { product?: ProductDetails }) {
           disabled={submitting}
           className="rounded-lg bg-emerald-800 px-5 py-3 text-sm font-semibold text-white hover:bg-emerald-900 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-700 disabled:cursor-wait disabled:opacity-70"
         >
-          {submitting ? (imagePending ? "Envoi de l’image..." : "Enregistrement...") : "Enregistrer le produit"}
+          {submitting ? (imagePending ? "Envoi de l’image..." : "Enregistrement...") : "Enregistrer la recette"}
         </button>
         <span role="status" className="sr-only">
           {submitting ? "Enregistrement..." : ""}

@@ -23,8 +23,10 @@ const optionalText = [
   'benefits',
   'usage',
   'precautions',
+  'ingredients',
 ] as const;
-const longText = ['benefits', 'usage', 'precautions'];
+const longText = ['benefits', 'usage', 'precautions', 'ingredients'];
+export const recipeFormats = ['BOX', 'BAG', 'LIQUID'] as const;
 const decimals = [
   'salePrice',
   'conversionFactor',
@@ -84,6 +86,7 @@ export function validateProductInput(
     ...decimals,
     ...booleans,
     'classificationIds',
+    'recipeFormat',
   ];
   for (const key of Object.keys(values)) {
     if (!allowed.includes(key))
@@ -91,6 +94,14 @@ export function validateProductInput(
   }
   if (!partial || values.classificationIds !== undefined)
     values.classificationIds = classificationIds(values.classificationIds);
+  if (
+    values.recipeFormat !== undefined &&
+    values.recipeFormat !== null &&
+    !(recipeFormats as readonly unknown[]).includes(values.recipeFormat)
+  )
+    throw new BadRequestException(
+      'Format de recette invalide (BOX, BAG ou LIQUID).',
+    );
   if (
     values.measurementMode !== undefined &&
     !Object.hasOwn(measurementUnits, String(values.measurementMode))

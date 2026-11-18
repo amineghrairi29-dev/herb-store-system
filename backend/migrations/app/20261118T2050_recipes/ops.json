@@ -1,0 +1,128 @@
+[
+  {
+    "id": "column.public.product.ingredients",
+    "label": "Add column \"ingredients\" to \"product\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "column",
+        "name": "ingredients",
+        "table": "product"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure column \"ingredients\" is missing",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3)) AS \"result\"",
+        "params": [
+          "public",
+          "product",
+          "ingredients"
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add column \"ingredients\"",
+        "sql": "ALTER TABLE \"public\".\"product\" ADD COLUMN \"ingredients\" text"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify column \"ingredients\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3)) AS \"result\"",
+        "params": [
+          "public",
+          "product",
+          "ingredients"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "column.public.product.recipeFormat",
+    "label": "Add column \"recipeFormat\" to \"product\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "column",
+        "name": "recipeFormat",
+        "table": "product"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure column \"recipeFormat\" is missing",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3)) AS \"result\"",
+        "params": [
+          "public",
+          "product",
+          "recipeFormat"
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add column \"recipeFormat\"",
+        "sql": "ALTER TABLE \"public\".\"product\" ADD COLUMN \"recipeFormat\" text"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify column \"recipeFormat\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3)) AS \"result\"",
+        "params": [
+          "public",
+          "product",
+          "recipeFormat"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "checkConstraint.product.product_recipe_format_349a8c94",
+    "label": "Add check constraint \"product_recipe_format_349a8c94\" on \"product\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "checkConstraint",
+        "name": "product_recipe_format_349a8c94",
+        "table": "product"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure constraint \"product_recipe_format_349a8c94\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "product_recipe_format_349a8c94",
+          "public",
+          "\"public\".\"product\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add check constraint \"product_recipe_format_349a8c94\"",
+        "sql": "ALTER TABLE \"public\".\"product\" ADD CONSTRAINT \"product_recipe_format_349a8c94\" CHECK (\"recipeFormat\" IN ('BOX', 'BAG', 'LIQUID'))"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify constraint \"product_recipe_format_349a8c94\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "product_recipe_format_349a8c94",
+          "public",
+          "\"public\".\"product\""
+        ]
+      }
+    ]
+  }
+]

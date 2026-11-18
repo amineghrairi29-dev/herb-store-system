@@ -5,22 +5,23 @@ import { displayAmount } from "@/lib/purchase-decimal";
 import AddToCart from "./add-to-cart";
 import { productImageUrl } from "@/lib/product-image";
 import { productPath } from "@/lib/product-url";
+import { formatLabel, priceUnit } from "@/lib/recipe";
 import { ProductImagePlaceholder } from "./storefront/visuals";
 import "./product-card.css";
 
-const units: Record<string, string> = { KG: "kg", G: "g", L: "L", ML: "ml", PIECE: "pièce" };
 const arabic = /[؀-ۿ]/;
 
 /**
- * Product card, "étiquette" style: white card, the photo filling its frame, the name
- * (in the Arabic font when it is written in Arabic), a dotted line like a label, then
- * the price and a small "Panier" pill.
+ * Recipe card, "étiquette" style: the photo with a "Fait main" ribbon, the objective,
+ * the name (Arabic font when written in Arabic), the format, a dotted line like a label,
+ * then the price and a small "Panier" pill.
  */
 export default function ProductCard({ product }: { product: PublicProduct }) {
   const unavailable = product.availabilityStatus === "OUT_OF_STOCK";
   const low = product.availabilityStatus === "LOW_STOCK";
   const availability = unavailable ? "Épuisé" : low ? "Stock limité" : "Disponible";
-  const category = product.classifications[0]?.nameFr ?? product.category.nameFr;
+  const goal = product.classifications[0]?.nameFr ?? product.category.nameFr;
+  const format = formatLabel(product);
   const isArabic = arabic.test(product.name);
   const subtitle = isArabic && product.nameFr && product.nameFr !== product.name ? product.nameFr : null;
   const href = productPath(product);
@@ -42,10 +43,13 @@ export default function ProductCard({ product }: { product: PublicProduct }) {
             </div>
           }
         />
+        <span className="bpc-handmade">Fait main</span>
       </Link>
       <div className="bpc-body">
         <p className="bpc-meta">
-          <bdi>{category}</bdi>
+          <span className="bpc-goal">
+            Pour <bdi>{goal}</bdi>
+          </span>
           <span aria-hidden="true">·</span>
           <span className="bpc-availability">{availability}</span>
         </p>
@@ -59,10 +63,11 @@ export default function ProductCard({ product }: { product: PublicProduct }) {
             <bdi>{subtitle}</bdi>
           </p>
         )}
+        {format && <p className="bpc-format">{format}</p>}
       </div>
       <div className="bpc-foot">
         <p className="bpc-price">
-          {displayAmount(product.salePrice)} <span>TND/{units[product.saleUnit] ?? product.saleUnit}</span>
+          {displayAmount(product.salePrice)} <span>TND/{priceUnit(product)}</span>
         </p>
         <AddToCart
           productId={product.id}

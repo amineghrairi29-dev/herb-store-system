@@ -227,3 +227,51 @@
     transition: none;
   }
 }
+
+/* Recipe additions */
+.bpc-image-link {
+  position: relative;
+}
+.bpc-handmade {
+  position: absolute;
+  left: 10px;
+  top: 10px;
+  padding: 4px 10px;
+  border-radius: 999px;
+  background: rgb(251 250 245 / 0.92);
+  color: var(--c-leaf-dark, #2e5e2b);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  box-shadow: 0 2px 8px rgb(31 58 36 / 0.12);
+}
+.bpc-goal {
+  color: var(--c-leaf-dark, #2e5e2b);
+  font-weight: 700;
+}
+.bpc-goal bdi {
+  text-transform: none;
+  letter-spacing: 0;
+  font-size: 12px;
+}
+.bpc-format {
+  align-self: flex-start;
+  margin: 6px 0 0;
+  padding: 3px 10px;
+  border-radius: 999px;
+  background: var(--c-sprout, #eef4e4);
+  color: var(--c-forest, #1f3a24);
+  font-size: 12px;
+  font-weight: 600;
+}
+@media (max-width: 520px) {
+  .bpc-handmade {
+    left: 6px;
+    top: 6px;
+    font-size: 9px;
+  }
+  .bpc-format {
+    font-size: 11px;
+  }
+}

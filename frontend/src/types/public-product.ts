@@ -12,6 +12,8 @@ export interface PublicProduct {
   salePrice: string;
   saleUnit: string;
   packaging: string | null;
+  /** BOX, BAG (by weight) or LIQUID; missing or null for older products. */
+  recipeFormat?: "BOX" | "BAG" | "LIQUID" | null;
   origin: string | null;
   description: string | null;
   availabilityStatus: Availability;
@@ -19,6 +21,7 @@ export interface PublicProduct {
   benefits?: string | null;
   usage?: string | null;
   precautions?: string | null;
+  ingredients?: string | null;
   gallery?: string[];
 }
 export interface CatalogueResponse {

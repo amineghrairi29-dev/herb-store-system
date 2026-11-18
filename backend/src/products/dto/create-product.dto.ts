@@ -20,6 +20,8 @@ export class CreateProductDto {
   benefits?: string;
   usage?: string;
   precautions?: string;
+  ingredients?: string;
+  recipeFormat?: 'BOX' | 'BAG' | 'LIQUID' | null;
   isActive?: boolean;
   isSellable?: boolean;
   isVisibleOnline?: boolean;

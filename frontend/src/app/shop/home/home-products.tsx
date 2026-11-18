@@ -57,20 +57,20 @@ export default function HomeProducts({ query }: { query: string }) {
                 Résultats pour « <bdi>{query}</bdi> »
               </>
             ) : (
-              "Nos produits"
+              "Nos recettes"
             )}
           </h2>
         </div>
         <form role="search" action="/shop" method="get" className="h-search">
           <label htmlFor="home-search" className="sr-only">
-            Rechercher un produit
+            Rechercher une recette
           </label>
           <input
             id="home-search"
             name="q"
             type="search"
             defaultValue={query}
-            placeholder="Rechercher une plante…"
+            placeholder="Une recette, une plante, un objectif…"
             maxLength={200}
           />
           <button type="submit" className="h-btn h-btn-leaf">
@@ -80,7 +80,7 @@ export default function HomeProducts({ query }: { query: string }) {
       </div>
       {error ? (
         <div role="alert" className="h-empty">
-          <p>Nos produits ne sont pas disponibles pour le moment.</p>
+          <p>Nos recettes ne sont pas disponibles pour le moment.</p>
           <button
             type="button"
             className="h-btn h-btn-line"
@@ -94,7 +94,7 @@ export default function HomeProducts({ query }: { query: string }) {
           </button>
         </div>
       ) : !products ? (
-        <div className="h-grid" role="status" aria-label="Chargement des produits">
+        <div className="h-grid" role="status" aria-label="Chargement des recettes">
           {Array.from({ length: 4 }, (_, index) => (
             <div key={index} className="h-skeleton" />
           ))}
@@ -122,7 +122,7 @@ export default function HomeProducts({ query }: { query: string }) {
                 disabled={loading}
                 onClick={() => setPage((value) => value + 1)}
               >
-                {loading ? "Chargement…" : `Voir plus de produits (${remaining})`}
+                {loading ? "Chargement…" : `Voir plus de recettes (${remaining})`}
               </button>
             </div>
           )}
