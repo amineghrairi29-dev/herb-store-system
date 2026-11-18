@@ -398,7 +398,9 @@ describe.skipIf(process.env.RUN_DATABASE_TESTS !== '1')(
           client.query('DELETE FROM public.sale WHERE id = $1', [
             linked.saleId,
           ]),
-        ).rejects.toMatchObject({ code: expect.stringMatching(/^(23001|23503)$/) });
+        ).rejects.toMatchObject({
+          code: expect.stringMatching(/^(23001|23503)$/),
+        });
       } finally {
         await client.end();
       }
