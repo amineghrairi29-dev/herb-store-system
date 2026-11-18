@@ -139,15 +139,17 @@ export default function ProductsTable() {
             <caption className="sr-only">Recettes : objectif, format, prix, statut et visibilité sur le site</caption>
             <thead className="bg-slate-50 text-xs text-slate-600">
               <tr>
-                {["Recette", "Nom français", "Objectif", "Format", "Prix", "Statut", "Sur le site", "Actions"].map((heading) => (
-                  <th
-                    key={heading}
-                    scope="col"
-                    className={`whitespace-nowrap px-5 py-4 font-semibold ${heading === "Prix" ? "text-right" : ""}`}
-                  >
-                    {heading}
-                  </th>
-                ))}
+                {["Recette", "Nom français", "Objectif", "Format", "Prix", "Statut", "Sur le site", "Actions"].map(
+                  (heading) => (
+                    <th
+                      key={heading}
+                      scope="col"
+                      className={`whitespace-nowrap px-5 py-4 font-semibold ${heading === "Prix" ? "text-right" : ""}`}
+                    >
+                      {heading}
+                    </th>
+                  ),
+                )}
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100">
@@ -178,9 +180,7 @@ export default function ProductsTable() {
                   <td className="min-w-32 max-w-56 break-words px-5 py-5 text-slate-600">
                     <bdi dir="auto">{product.category}</bdi>
                   </td>
-                  <td className="whitespace-nowrap px-5 py-5 text-slate-600">
-                    {formatLabel(product)}
-                  </td>
+                  <td className="whitespace-nowrap px-5 py-5 text-slate-600">{formatLabel(product)}</td>
                   <td className="whitespace-nowrap px-5 py-5 text-right font-medium tabular-nums">
                     {priceFormatter.format(Number(product.salePrice))}
                     {product.saleUnit === "KG" && <span className="font-normal text-slate-500"> / kg</span>}

@@ -226,7 +226,9 @@ export default function Catalogue({
             <Leaf color="#A9C68F" />
           </span>
           <p className="nd-empty-title">
-            {filtered ? "Aucune recette ne correspond à ces filtres." : "Les recettes de cet objectif arrivent bientôt."}
+            {filtered
+              ? "Aucune recette ne correspond à ces filtres."
+              : "Les recettes de cet objectif arrivent bientôt."}
           </p>
           <p>Slouma a sûrement une recette pour vous : demandez-lui directement.</p>
           <div className="nd-empty-actions">

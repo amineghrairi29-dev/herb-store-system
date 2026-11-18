@@ -15,10 +15,25 @@ import { imageFileError } from "@/lib/product-image";
 const inputClass =
   "mt-2 w-full rounded-lg border border-slate-300 bg-white px-3 py-2.5 text-sm text-slate-900 focus:border-emerald-700 focus:outline-2 focus:outline-emerald-700";
 /** The three ways a recipe is sold, and the stock/price units each one implies. */
-const formats: Record<RecipeFormat, { title: string; titleAr: string; hint: string; price: string; content: string | null }> = {
+const formats: Record<
+  RecipeFormat,
+  { title: string; titleAr: string; hint: string; price: string; content: string | null }
+> = {
   BOX: { title: "Boîte", titleAr: "علبة", hint: "Prix fixe pour une boîte", price: "Prix d’une boîte", content: "g" },
-  BAG: { title: "Sachet au poids", titleAr: "كيس بالميزان", hint: "Le client choisit la quantité", price: "Prix du kilo", content: null },
-  LIQUID: { title: "Flacon (liquide)", titleAr: "قارورة", hint: "Prix fixe pour un flacon", price: "Prix d’un flacon", content: "ml" },
+  BAG: {
+    title: "Sachet au poids",
+    titleAr: "كيس بالميزان",
+    hint: "Le client choisit la quantité",
+    price: "Prix du kilo",
+    content: null,
+  },
+  LIQUID: {
+    title: "Flacon (liquide)",
+    titleAr: "قارورة",
+    hint: "Prix fixe pour un flacon",
+    price: "Prix d’un flacon",
+    content: "ml",
+  },
 };
 
 /** Format of an existing product: the saved one, or guessed from its sale unit for older products. */
@@ -79,11 +94,7 @@ export default function ProductForm({ product }: { product?: ProductDetails }) {
       return;
     }
     if ((!product && !imageFile) || imageError || (imageFile && imageFileError(imageFile))) {
-      showError(
-        imageError ||
-          (imageFile ? imageFileError(imageFile) : null) ||
-          "Ajoutez une photo de la recette.",
-      );
+      showError(imageError || (imageFile ? imageFileError(imageFile) : null) || "Ajoutez une photo de la recette.");
       return;
     }
     const form = new FormData(event.currentTarget);
@@ -383,7 +394,9 @@ export default function ProductForm({ product }: { product?: ProductDetails }) {
                 <input
                   key={format}
                   name="contentAmount"
-                  defaultValue={product?.recipeFormat === format || !product?.recipeFormat ? contentAmount(product?.packaging) : ""}
+                  defaultValue={
+                    product?.recipeFormat === format || !product?.recipeFormat ? contentAmount(product?.packaging) : ""
+                  }
                   required
                   inputMode="decimal"
                   placeholder={format === "BOX" ? "100" : "250"}
@@ -414,7 +427,12 @@ export default function ProductForm({ product }: { product?: ProductDetails }) {
                   "Ex. : Déconseillé aux femmes enceintes. Avis médical en cas de traitement.",
                   3,
                 ],
-                ["description", "L’histoire de la recette", "Facultatif : d’où vient-elle, pour qui l’avez-vous créée…", 3],
+                [
+                  "description",
+                  "L’histoire de la recette",
+                  "Facultatif : d’où vient-elle, pour qui l’avez-vous créée…",
+                  3,
+                ],
               ] as const
             ).map(([field, label, hint, rows]) => (
               <label key={field} className="text-sm font-medium">

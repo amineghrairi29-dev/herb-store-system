@@ -15,7 +15,10 @@ export default function ProductsPage() {
           <div>
             <p className="mb-2 text-xs font-semibold uppercase tracking-widest text-emerald-700">Catalogue</p>
             <h1 className="text-3xl font-semibold tracking-tight sm:text-4xl">
-              Recettes <span lang="ar" dir="rtl" className="font-normal text-emerald-800">· الوصفات</span>
+              Recettes{" "}
+              <span lang="ar" dir="rtl" className="font-normal text-emerald-800">
+                · الوصفات
+              </span>
             </h1>
             <p className="mt-3 text-sm text-slate-600">
               Chaque recette répond à un objectif, avec son format, son prix et sa visibilité sur le site.
