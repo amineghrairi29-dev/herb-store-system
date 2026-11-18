@@ -59,7 +59,9 @@ export default async function HomeNeeds() {
           </p>
           <h2 id="needs-title">Que cherchez-vous aujourd’hui ?</h2>
         </div>
-        <p className="h-heading-note">Choisissez votre objectif : nous vous montrons les recettes préparées pour lui.</p>
+        <p className="h-heading-note">
+          Choisissez votre objectif : nous vous montrons les recettes préparées pour lui.
+        </p>
       </div>
       {shelves(jars, 6).map((row, shelfIndex) => (
         <ScrollReveal key={shelfIndex} className="h-reveal h-shelf">
