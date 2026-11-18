@@ -17,6 +17,13 @@ export default function OrderDetails({ id }: { id: string }) {
     [failure, setFailure] = useState("");
   async function moveDelivery(deliveryStatus: DeliveryStatus) {
     if (busy) return;
+    if (
+      deliveryStatus === "DELIVERED" &&
+      !window.confirm(
+        `La commande ${order?.reference} est livrée et payée ? Les recettes sortent du stock et le paiement en espèces est enregistré.`,
+      )
+    )
+      return;
     setBusy(true);
     setFailure("");
     try {
@@ -104,8 +111,8 @@ export default function OrderDetails({ id }: { id: string }) {
         <section className="min-w-0 rounded-xl border bg-white p-5">
           <h2 className="text-xl font-semibold">Traitement</h2>
           <p className="mt-3 text-sm text-slate-600">
-            Confirmer signifie accepter la demande client. Aucune vente, déduction ou réservation de stock, ni aucun
-            paiement ne sera créé.
+            1. « Confirmer » après avoir appelé le client. 2. Suivez la livraison. 3. « Livrée » enregistre la vente,
+            sort le stock et note le paiement en espèces.
           </p>
           {order.status === "PENDING" && order.saleId === null && (
             <div className="mt-5 flex flex-wrap gap-3">
@@ -128,6 +135,11 @@ export default function OrderDetails({ id }: { id: string }) {
           {order.status === "CONFIRMED" && (
             <div className="mt-5 border-t pt-4">
               <h3 className="font-semibold">Livraison</h3>
+              {order.deliveryStatus !== "DELIVERED" && order.deliveryStatus !== "RETURNED" && (
+                <p className="mt-1 text-xs text-slate-500">
+                  « Livrée » sort les recettes du stock et enregistre le paiement reçu à la livraison.
+                </p>
+              )}
               <p className="mt-1 text-sm" data-delivery-status>
                 {order.deliveryStatus ? deliveryStatusLabels[order.deliveryStatus] : "Pas encore suivie"}
                 {order.deliveryStatusAt && ` · ${new Date(order.deliveryStatusAt).toLocaleString("fr-FR")}`}

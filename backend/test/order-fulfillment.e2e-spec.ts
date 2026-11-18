@@ -159,6 +159,15 @@ describe.skipIf(process.env.RUN_DATABASE_TESTS !== '1')(
           'DELETE FROM public."onlineOrder" WHERE "customerName" = $1',
           [name],
         );
+        // « Livrée » records a cash payment: remove its cash movement and payment first.
+        await client.query(
+          'DELETE FROM public."cashMovement" WHERE "salePaymentId" IN (SELECT p.id FROM public."salePayment" p JOIN public.sale s ON s.id = p."saleId" WHERE s."customerName" = $1)',
+          [name],
+        );
+        await client.query(
+          'DELETE FROM public."salePayment" WHERE "saleId" IN (SELECT id FROM public.sale WHERE "customerName" = $1)',
+          [name],
+        );
         await client.query(
           'DELETE FROM public."saleLine" WHERE "saleId" IN (SELECT id FROM public.sale WHERE "customerName" = $1)',
           [name],
@@ -234,6 +243,46 @@ describe.skipIf(process.env.RUN_DATABASE_TESTS !== '1')(
       await transition(order.id, 'CANCELLED').expect(409);
       expect(await db.orm.public.SalePayment.all()).toEqual(payments);
       expect(await db.orm.public.CashMovement.all()).toEqual(cash);
+    });
+    const deliver = (id: number, deliveryStatus: string) =>
+      request(app.getHttpServer())
+        .patch(`/online-orders/${id}/delivery`)
+        .send({ deliveryStatus });
+    it('« Livrée » confirms the sale, takes the stock out and records the cash, once', async () => {
+      const { product, order } = await scenario();
+      await transition(order.id, 'CONFIRMED').expect(200);
+      await deliver(order.id, 'SHIPPED').expect(200);
+      expect(await stock(product.id)).toBe('10.000');
+      await deliver(order.id, 'DELIVERED').expect(200);
+      expect(await stock(product.id)).toBe('8.000');
+      const linked = (await db.orm.public.OnlineOrder.first({ id: order.id }))!;
+      expect(linked.deliveryStatus).toBe('DELIVERED');
+      expect((await sale(linked.saleId!)).status).toBe('CONFIRMED');
+      const payments = await db.orm.public.SalePayment.where({
+        saleId: linked.saleId!,
+      }).all();
+      expect(payments).toHaveLength(1);
+      expect(payments[0].paymentMethod).toBe('CASH');
+      expect(moneyUnits(payments[0].amount)).toBe(
+        moneyUnits(order.totalAmount),
+      );
+      await deliver(order.id, 'DELIVERED').expect(409);
+      expect(await stock(product.id)).toBe('8.000');
+    });
+    it('« Livrée » with too little stock changes nothing', async () => {
+      const { product, order } = await scenario();
+      await transition(order.id, 'CONFIRMED').expect(200);
+      await db.orm.public.StockMovement.create({
+        productId: product.id,
+        type: 'EXIT',
+        quantity: '9',
+        unit: 'KG',
+        quantityInStorageUnit: '9',
+      });
+      const before = await snapshot();
+      await deliver(order.id, 'DELIVERED').expect(409);
+      expect(await snapshot()).toEqual(before);
+      expect(await stock(product.id)).toBe('1.000');
     });
     it('uses historical decimal price/unit/quantity despite changed product price and online visibility', async () => {
       const { product, order } = await scenario(

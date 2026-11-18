@@ -5,7 +5,10 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { SalesService } from '../sales/sales.service.js';
-import { withPurchaseTransaction } from '../purchases/purchase-transaction.js';
+import {
+  withPurchaseTransaction,
+  type PurchaseTransaction,
+} from '../purchases/purchase-transaction.js';
 import { moneyUnits, purchaseId } from '../purchases/purchase-validation.js';
 import { businessDate } from '../cash/cash-values.js';
 import { isUniqueViolation } from '../suppliers/supplier-validation.js';
@@ -17,7 +20,51 @@ export class OrderFulfillmentService {
   async convert(id: number) {
     purchaseId(id);
     try {
-      return await withPurchaseTransaction(async (tx) => {
+      return await withPurchaseTransaction((tx) =>
+        this.convertInTransaction(tx, id),
+      );
+    } catch (error: unknown) {
+      throw conversionError(error);
+    }
+  }
+  /**
+   * Delivered online order: makes sure its sale exists, confirms it (stock exit) and
+   * records the cash received at the door, all in the caller's transaction. Each step
+   * is skipped when already done, so a sale handled by hand before is respected.
+   */
+  async deliverInTransaction(
+    tx: PurchaseTransaction,
+    id: number,
+    reference: string,
+  ) {
+    let link: Awaited<
+      ReturnType<OrderFulfillmentService['convertInTransaction']>
+    >;
+    try {
+      link = await this.convertInTransaction(tx, id);
+    } catch (error: unknown) {
+      throw conversionError(error);
+    }
+    if (link.saleStatus === 'DRAFT')
+      await this.sales.confirmInTransaction(tx, link.saleId);
+    else if (link.saleStatus !== 'CONFIRMED')
+      throw new ConflictException(
+        `La vente ${link.saleReference} n’est pas confirmable (${link.saleStatus}).`,
+      );
+    const remaining = await this.sales.remainingInTransaction(tx, link.saleId);
+    if (moneyUnits(remaining) > 0n)
+      await this.sales.addPaymentInTransaction(tx, link.saleId, {
+        amount: remaining,
+        paymentMethod: 'CASH',
+        paymentDate: businessDate().today,
+        reference,
+        notes: 'Payé à la livraison',
+      });
+    return link;
+  }
+  async convertInTransaction(tx: PurchaseTransaction, id: number) {
+    {
+      {
         // Every converter locks the same order before checking or creating its sale.
         await tx.client.query(
           'SELECT id FROM public."onlineOrder" WHERE id = $1 FOR UPDATE',
@@ -91,17 +138,19 @@ export class OrderFulfillmentService {
           id,
           order.reference,
         );
-      });
-    } catch (error: unknown) {
-      if (isUniqueViolation(error))
-        throw new ConflictException(
-          'La référence de vente est déjà utilisée ou cette commande possède déjà une vente. Rechargez la commande.',
-        );
-      if (error instanceof BadRequestException)
-        throw new ConflictException(
-          `Les données historiques ne sont pas compatibles avec les règles de vente actuelles. ${error.message}`,
-        );
-      throw error;
+      }
     }
   }
+}
+
+function conversionError(error: unknown): unknown {
+  if (isUniqueViolation(error))
+    return new ConflictException(
+      'La référence de vente est déjà utilisée ou cette commande possède déjà une vente. Rechargez la commande.',
+    );
+  if (error instanceof BadRequestException)
+    return new ConflictException(
+      `Les données historiques ne sont pas compatibles avec les règles de vente actuelles. ${error.message}`,
+    );
+  return error;
 }

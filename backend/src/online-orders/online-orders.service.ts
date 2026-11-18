@@ -3,6 +3,7 @@ import {
   ConflictException,
   Injectable,
   NotFoundException,
+  Optional,
 } from '@nestjs/common';
 import { withPurchaseTransaction as transaction } from '../purchases/purchase-transaction.js';
 import { audited } from '../audit/audit.service.js';
@@ -24,6 +25,8 @@ import { notifyNewOrder } from './order-notifier.js';
 import { activeDeliveryZones } from '../delivery/delivery-zones.service.js';
 import { deliveryFee, isGovernorate } from '../delivery/delivery-values.js';
 import { canMoveDelivery, isDeliveryStatus } from './delivery-status.js';
+import { OrderFulfillmentService } from './order-fulfillment.service.js';
+import { SalesService } from '../sales/sales.service.js';
 
 /**
  * Delivery for an order. With no active zone (delivery prices not set up yet), orders keep working without a fee.
@@ -79,6 +82,12 @@ async function orderQuote(client: Client, items: CartInput[]) {
 
 @Injectable()
 export class OnlineOrdersService {
+  private readonly fulfillment: OrderFulfillmentService;
+  // Optional so tests can still build the service on its own.
+  constructor(@Optional() fulfillment?: OrderFulfillmentService) {
+    this.fulfillment =
+      fulfillment ?? new OrderFulfillmentService(new SalesService());
+  }
   preview(body: unknown) {
     const value = orderObject(body, ['items', 'deliveryGovernorate']);
     const items = cartInput({ items: value.items });
@@ -373,6 +382,11 @@ export class OnlineOrdersService {
         throw new ConflictException(
           'Ce changement de statut de livraison n’est pas possible.',
         );
+      // Delivered: the sale is created and confirmed (stock exit) and the cash
+      // received at the door is recorded, in the same transaction. If stock is
+      // missing, nothing changes and the message says which recipe.
+      if (deliveryStatus === 'DELIVERED')
+        await this.fulfillment.deliverInTransaction(tx, id, order.reference);
       const updated = await tx.orm.public.OnlineOrder.where({ id }).update({
         deliveryStatus,
         deliveryStatusAt: new Date().toISOString(),
