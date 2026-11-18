@@ -10,7 +10,7 @@ import { stockCatalogue } from '../stock-movements/stock-read.js';
 // PostgreSQL numeric SUM/comparisons retain exact decimals. No per-product queries.
 export const catalogue = stockCatalogue('public');
 const activeClassifications = `(SELECT COALESCE(jsonb_agg(jsonb_build_object('id', c.id, 'slug', c.slug, 'nameAr', c."nameAr", 'nameFr', c."nameFr") ORDER BY c."sortOrder",c."nameFr",c.id), '[]'::jsonb) FROM public.classification c JOIN public."productClassification" pc ON pc."classificationId"=c.id WHERE pc."productId"=catalogue.id AND c."isActive")`;
-export const fields = `id, "mainImagePath", sku, name, "nameFr", "scientificName", ${activeClassifications} AS classifications, ${activeClassifications}->0 AS category, NULL::jsonb AS subcategory, "salePrice"::text, "saleUnit", packaging, origin, description, "availabilityStatus"`;
+export const fields = `id, "mainImagePath", sku, name, "nameFr", "scientificName", ${activeClassifications} AS classifications, ${activeClassifications}->0 AS category, NULL::jsonb AS subcategory, "salePrice"::text, "saleUnit", packaging, "recipeFormat", origin, description, "availabilityStatus"`;
 
 @Injectable()
 export class PublicCatalogueService {
@@ -52,9 +52,9 @@ export class PublicCatalogueService {
     if (!/^[1-9]\d*$/.test(id) || Number(id) > 2147483647)
       throw new NotFoundException('Produit introuvable.');
     return withPurchaseTransaction(async ({ client }) => {
-      // Detail only: long texts and the photo gallery are not needed by catalogue cards.
+      // Detail only: long texts (ingredients included) and the photo gallery are not needed by catalogue cards.
       const result = await client.query<PublicProductDto>(
-        `${catalogue} SELECT ${fields}, benefits, usage, precautions,
+        `${catalogue} SELECT ${fields}, benefits, usage, precautions, ingredients,
         (SELECT COALESCE(jsonb_agg(pi.path ORDER BY pi."sortOrder", pi.id), '[]'::jsonb) FROM public."productImage" pi WHERE pi."productId" = catalogue.id) AS gallery
         FROM catalogue WHERE id = $2`,
         [positiveTypes, Number(id)],

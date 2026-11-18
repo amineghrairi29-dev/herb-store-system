@@ -8,42 +8,39 @@ import AdminAccountMenu from "./admin-account-menu";
 import AdminIcon, { type AdminIconName } from "./admin-icon";
 import styles from "./admin-shell.module.css";
 
+// Recipes shop: only what running the online shop needs. The other sections (sales in
+// the shop, purchases, suppliers, cash, expenses, finance, reports, users, audit) still
+// exist and keep their data; they are only out of the menu. To bring one back, move it
+// from hiddenSections into a group.
 const groups: { label: string; links: [string, string, AdminIconName][] }[] = [
   { label: "Principal", links: [["/admin/dashboard", "Tableau de bord", "dashboard"]] },
   {
-    label: "Commerce",
+    label: "Boutique",
     links: [
-      ["/admin/products", "Produits", "products"],
+      ["/admin/products", "Recettes", "products"],
+      ["/admin/classifications", "Objectifs", "suppliers"],
       ["/admin/stock", "Stock", "stock"],
-      ["/admin/online-orders", "Commandes en ligne", "orders"],
-      ["/admin/sales", "Ventes", "sales"],
+      ["/admin/online-orders", "Commandes", "orders"],
     ],
   },
   {
-    label: "Approvisionnement",
+    label: "Réglages",
     links: [
-      ["/admin/purchases", "Achats", "purchases"],
-      ["/admin/suppliers", "Fournisseurs", "suppliers"],
-    ],
-  },
-  {
-    label: "Finance",
-    links: [
-      ["/admin/cash", "Caisse", "cash"],
-      ["/admin/expenses", "Dépenses", "expenses"],
-      ["/admin/finance", "Finance", "finance"],
-      ["/admin/reports", "Rapports", "reports"],
-    ],
-  },
-  {
-    label: "Administration",
-    links: [
-      ["/admin/users", "Utilisateurs", "users"],
       ["/admin/settings/store", "Paramètres", "settings"],
       ["/admin/settings/delivery", "Livraison", "orders"],
-      ["/admin/audit", "Journal d’audit", "audit"],
     ],
   },
+];
+export const hiddenSections: [string, string, AdminIconName][] = [
+  ["/admin/sales", "Ventes", "sales"],
+  ["/admin/purchases", "Achats", "purchases"],
+  ["/admin/suppliers", "Fournisseurs", "suppliers"],
+  ["/admin/cash", "Caisse", "cash"],
+  ["/admin/expenses", "Dépenses", "expenses"],
+  ["/admin/finance", "Finance", "finance"],
+  ["/admin/reports", "Rapports", "reports"],
+  ["/admin/users", "Utilisateurs", "users"],
+  ["/admin/audit", "Journal d’audit", "audit"],
 ];
 const matches = (path: string, href: string) => path === href || path.startsWith(`${href}/`);
 

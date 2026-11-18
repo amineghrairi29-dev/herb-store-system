@@ -26,20 +26,20 @@ export default function EditProduct({ id }: { id: string }) {
     async function loadProduct() {
       try {
         if (!/^[1-9]\d*$/.test(id) || !Number.isSafeInteger(Number(id))) {
-          throw new Error("Identifiant de produit invalide.");
+          throw new Error("Identifiant de recette invalide.");
         }
         const response = await authFetch(`${apiBase}/products/${encodeURIComponent(id)}`, {
           cache: "no-store",
           signal: controller.signal,
         });
-        if (response.status === 404) throw new Error("Produit introuvable.");
-        if (!response.ok) throw new Error(`Impossible de charger le produit (HTTP ${response.status}).`);
+        if (response.status === 404) throw new Error("Recette introuvable.");
+        if (!response.ok) throw new Error(`Impossible de charger la recette (HTTP ${response.status}).`);
         const body = await response.text();
-        if (!body.trim()) throw new Error("Produit introuvable.");
+        if (!body.trim()) throw new Error("Recette introuvable.");
         const data: unknown = JSON.parse(body);
-        if (data === null) throw new Error("Produit introuvable.");
+        if (data === null) throw new Error("Recette introuvable.");
         if (!isProductDetails(data) || data.id !== Number(id)) {
-          throw new Error("Les données du produit reçues du serveur sont invalides.");
+          throw new Error("Les données de la recette reçues du serveur sont invalides.");
         }
         if (!controller.signal.aborted) setState({ status: "success", product: data });
       } catch (error: unknown) {
@@ -78,16 +78,16 @@ export default function EditProduct({ id }: { id: string }) {
 
   return (
     <section
-      aria-label="Chargement du produit"
+      aria-label="Chargement de la recette"
       className="rounded-xl border border-slate-200 bg-white p-6 shadow-sm sm:p-8"
     >
       {state.status === "loading" ? (
         <p role="status" className="py-10 text-center text-sm text-slate-600">
-          Chargement du produit…
+          Chargement de la recette…
         </p>
       ) : (
         <div role="alert" className="rounded-lg border border-red-200 bg-red-50 p-4 text-sm text-red-900">
-          <p className="font-semibold">Impossible de charger le produit</p>
+          <p className="font-semibold">Impossible de charger la recette</p>
           <p className="mt-2">{state.message}</p>
           <button
             type="button"

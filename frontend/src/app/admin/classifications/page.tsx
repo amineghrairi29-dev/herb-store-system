@@ -52,8 +52,10 @@ export default function ClassificationsPage() {
   return (
     <main className="min-h-screen bg-slate-50 px-4 py-8 text-slate-900 sm:px-8">
       <div className="mx-auto max-w-6xl">
-        <h1 className="text-3xl font-semibold">Besoins produits</h1>
-        <p className="mt-2 text-sm text-slate-600">Des besoins réutilisables pour organiser vos produits.</p>
+        <h1 className="text-3xl font-semibold">
+          Objectifs <span lang="ar" dir="rtl" className="font-normal text-emerald-800">· الأهداف</span>
+        </h1>
+        <p className="mt-2 text-sm text-slate-600">Chaque recette répond à un objectif (digestion, sommeil, cheveux…). Sur le site, chaque objectif a sa page et sa tuile sur l’accueil.</p>
         {error && (
           <div role="alert" className="my-4 rounded-lg bg-red-50 p-4 text-red-800">
             {error}{" "}

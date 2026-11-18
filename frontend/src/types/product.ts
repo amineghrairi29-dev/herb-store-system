@@ -15,6 +15,8 @@ export interface Product {
   saleUnit: string;
   isActive: boolean;
   isVisibleOnline: boolean;
+  packaging?: string | null;
+  recipeFormat?: "BOX" | "BAG" | "LIQUID" | null;
 }
 
 export interface ProductDetails extends Product {
@@ -34,6 +36,8 @@ export interface ProductDetails extends Product {
   benefits?: string | null;
   usage?: string | null;
   precautions?: string | null;
+  ingredients?: string | null;
+  recipeFormat?: "BOX" | "BAG" | "LIQUID" | null;
   gallery?: { id: number; path: string }[];
 }
 

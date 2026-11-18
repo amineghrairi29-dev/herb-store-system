@@ -17,6 +17,13 @@ const priceFormatter = new Intl.NumberFormat("fr-FR", {
   maximumFractionDigits: 3,
 });
 
+/** "Boîte 100 g", "Sachet au poids", "Flacon 250 ml"; older products fall back to their packaging. */
+function formatLabel(product: Product): string {
+  if (product.recipeFormat === "BAG") return "Sachet au poids";
+  if (product.recipeFormat) return product.packaging || (product.recipeFormat === "BOX" ? "Boîte" : "Flacon");
+  return product.packaging || (product.saleUnit === "KG" || product.saleUnit === "G" ? "Au poids" : "—");
+}
+
 export default function ProductsTable() {
   const [state, setState] = useState<ProductsState>({ status: "loading" });
   const [attempt, setAttempt] = useState(0);
@@ -73,17 +80,17 @@ export default function ProductsTable() {
 
   return (
     <section
-      aria-label="Liste des produits"
+      aria-label="Liste des recettes"
       aria-busy={state.status === "loading"}
       className="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm"
     >
       <div className="flex items-center justify-between gap-4 border-b border-slate-200 px-6 py-5">
         <h2 ref={headingRef} tabIndex={-1} className="font-semibold">
-          Tous les produits
+          Toutes les recettes
         </h2>
         {state.status === "success" && (
           <span className="rounded-full bg-slate-100 px-3 py-1 text-xs font-medium text-slate-600">
-            {state.products.length} produit{state.products.length > 1 ? "s" : ""}
+            {state.products.length} recette{state.products.length > 1 ? "s" : ""}
           </span>
         )}
       </div>
@@ -94,13 +101,13 @@ export default function ProductsTable() {
             aria-hidden="true"
             className="h-5 w-5 rounded-full border-2 border-slate-200 border-t-emerald-700 motion-safe:animate-spin"
           />
-          Chargement des produits…
+          Chargement des recettes…
         </div>
       )}
 
       {state.status === "error" && (
         <div role="alert" className="m-6 rounded-lg border border-red-200 bg-red-50 p-5">
-          <p className="font-semibold text-red-900">Impossible de charger les produits</p>
+          <p className="font-semibold text-red-900">Impossible de charger les recettes</p>
           <p className="mt-2 text-sm text-red-800">{state.message}</p>
           <button
             type="button"
@@ -117,37 +124,26 @@ export default function ProductsTable() {
 
       {state.status === "success" && state.products.length === 0 && (
         <p role="status" className="px-6 py-20 text-center text-sm text-slate-600">
-          Aucun produit disponible
+          Aucune recette pour le moment
         </p>
       )}
 
       {state.status === "success" && state.products.length > 0 && (
         <div
           role="region"
-          aria-label="Tableau des produits, défilement horizontal disponible"
+          aria-label="Tableau des recettes, défilement horizontal disponible"
           tabIndex={0}
           className="overflow-x-auto focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-emerald-700"
         >
-          <table className="w-full min-w-[1050px] text-left text-sm">
-            <caption className="sr-only">Catalogue des produits, prix, statut et visibilité en ligne</caption>
+          <table className="w-full min-w-[900px] text-left text-sm">
+            <caption className="sr-only">Recettes : objectif, format, prix, statut et visibilité sur le site</caption>
             <thead className="bg-slate-50 text-xs text-slate-600">
               <tr>
-                {[
-                  "SKU",
-                  "Nom du produit",
-                  "Nom français",
-                  "Catégorie",
-                  "Type de produit",
-                  "Prix de vente",
-                  "Stockage / Vente",
-                  "Statut",
-                  "Visibilité en ligne",
-                  "Actions",
-                ].map((heading) => (
+                {["Recette", "Nom français", "Objectif", "Format", "Prix", "Statut", "Sur le site", "Actions"].map((heading) => (
                   <th
                     key={heading}
                     scope="col"
-                    className={`whitespace-nowrap px-5 py-4 font-semibold ${heading === "Prix de vente" ? "text-right" : ""}`}
+                    className={`whitespace-nowrap px-5 py-4 font-semibold ${heading === "Prix" ? "text-right" : ""}`}
                   >
                     {heading}
                   </th>
@@ -157,9 +153,6 @@ export default function ProductsTable() {
             <tbody className="divide-y divide-slate-100">
               {state.products.map((product) => (
                 <tr key={product.id} className="hover:bg-slate-50/80">
-                  <td className="px-5 py-5 font-mono text-xs text-slate-500">
-                    <bdi>{product.sku}</bdi>
-                  </td>
                   <th scope="row" className="min-w-40 max-w-64 break-words px-5 py-5 font-semibold">
                     <div className="flex items-center gap-3">
                       <ProductImage
@@ -185,28 +178,26 @@ export default function ProductsTable() {
                   <td className="min-w-32 max-w-56 break-words px-5 py-5 text-slate-600">
                     <bdi dir="auto">{product.category}</bdi>
                   </td>
-                  <td className="px-5 py-5 text-slate-600">
-                    <bdi>{product.productType}</bdi>
+                  <td className="whitespace-nowrap px-5 py-5 text-slate-600">
+                    {formatLabel(product)}
                   </td>
                   <td className="whitespace-nowrap px-5 py-5 text-right font-medium tabular-nums">
                     {priceFormatter.format(Number(product.salePrice))}
-                  </td>
-                  <td className="whitespace-nowrap px-5 py-5 text-slate-600">
-                    <bdi>{product.storageUnit}</bdi> / <bdi>{product.saleUnit}</bdi>
+                    {product.saleUnit === "KG" && <span className="font-normal text-slate-500"> / kg</span>}
                   </td>
                   <td className="px-5 py-5">
                     <span
                       className={`inline-flex items-center gap-1.5 whitespace-nowrap rounded-full px-2.5 py-1 text-xs font-medium ${product.isActive ? "bg-emerald-50 text-emerald-800" : "bg-slate-100 text-slate-600"}`}
                     >
                       <span aria-hidden="true" className="h-1.5 w-1.5 rounded-full bg-current" />
-                      {product.isActive ? "Actif" : "Inactif"}
+                      {product.isActive ? "Active" : "Inactive"}
                     </span>
                   </td>
                   <td className="px-5 py-5">
                     <span
                       className={`whitespace-nowrap rounded-full px-2.5 py-1 text-xs font-medium ${product.isVisibleOnline ? "bg-blue-50 text-blue-800" : "bg-slate-100 text-slate-600"}`}
                     >
-                      {product.isVisibleOnline ? "Visible" : "Non visible"}
+                      {product.isVisibleOnline ? "Visible" : "Masquée"}
                     </span>
                   </td>
                   <td className="whitespace-nowrap px-5 py-5">

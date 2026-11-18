@@ -102,6 +102,8 @@ export const auditFields = [
   'benefits',
   'usage',
   'precautions',
+  'ingredients',
+  'recipeFormat',
   'gallery',
   'origin',
   'packaging',

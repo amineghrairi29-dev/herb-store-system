@@ -36,7 +36,7 @@ export default function DeleteProductDialog({ product, onCancel, onDeleted }: De
         method: "DELETE",
       });
       if (!response.ok) {
-        let message = `Impossible de supprimer le produit (HTTP ${response.status}).`;
+        let message = `Impossible de supprimer la recette (HTTP ${response.status}).`;
         const details: unknown = await response.json().catch(() => null);
         if (typeof details === "object" && details !== null && "message" in details) {
           if (typeof details.message === "string" && details.message.trim()) {
@@ -76,15 +76,15 @@ export default function DeleteProductDialog({ product, onCancel, onDeleted }: De
     >
       <div className="p-6 sm:p-8">
         <h2 id="delete-product-title" className="text-xl font-semibold">
-          Supprimer le produit
+          Supprimer la recette
         </h2>
         <div id="delete-product-description" className="mt-3 text-sm">
-          <p className="text-slate-600">Êtes-vous sûr de vouloir supprimer ce produit ?</p>
+          <p className="text-slate-600">Êtes-vous sûr de vouloir supprimer cette recette ?</p>
           <p className="mt-2 font-semibold text-red-700">Cette action est irréversible.</p>
         </div>
         <dl id="delete-product-identity" className="mt-5 space-y-3 rounded-lg bg-slate-50 p-4 text-sm">
           <div>
-            <dt className="text-slate-500">Nom du produit</dt>
+            <dt className="text-slate-500">Nom de la recette</dt>
             <dd className="mt-1 break-words font-semibold">
               <bdi dir="auto">{product.name}</bdi>
             </dd>
