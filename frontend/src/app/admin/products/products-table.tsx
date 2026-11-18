@@ -129,7 +129,10 @@ export default function ProductsTable() {
       )}
 
       {state.status === "success" && state.products.some((product) => !product.recipeFormat) && (
-        <p role="note" className="mx-6 mt-5 rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-900">
+        <p
+          role="note"
+          className="mx-6 mt-5 rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-900"
+        >
           {(() => {
             const missing = state.products.filter((product) => !product.recipeFormat).length;
             return missing === 1 ? "1 recette n’a pas de format" : `${missing} recettes n’ont pas de format`;

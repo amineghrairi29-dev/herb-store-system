@@ -103,13 +103,13 @@ export default function ClassificationsPage() {
                         )}
                       </span>
                       <div className="min-w-0">
-                      <p className="break-words font-medium">
-                        <bdi>{c.nameFr}</bdi>
-                      </p>
-                      <p className="text-xs text-slate-500">
-                        {c.productCount ?? 0} recette(s) · {c.isActive ? "Active" : "Désactivée"}
-                        {!c.imagePath && " · sans photo"}
-                      </p>
+                        <p className="break-words font-medium">
+                          <bdi>{c.nameFr}</bdi>
+                        </p>
+                        <p className="text-xs text-slate-500">
+                          {c.productCount ?? 0} recette(s) · {c.isActive ? "Active" : "Désactivée"}
+                          {!c.imagePath && " · sans photo"}
+                        </p>
                       </div>
                     </div>
                     <button

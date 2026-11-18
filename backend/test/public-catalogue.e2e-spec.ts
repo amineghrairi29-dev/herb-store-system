@@ -195,9 +195,9 @@ describe.skipIf(process.env.RUN_DATABASE_TESTS !== '1')(
       ).toEqual([ids[0]]);
     });
     it('filters recipes by format', async () => {
-      expect(
-        (await list({ format: 'box' })).data.map((row) => row.id),
-      ).toEqual([ids[1]]);
+      expect((await list({ format: 'box' })).data.map((row) => row.id)).toEqual(
+        [ids[1]],
+      );
       expect(
         (await list({ format: 'LIQUID' })).data.map((row) => row.id),
       ).toEqual([ids[2]]);
@@ -318,7 +318,13 @@ describe.skipIf(process.env.RUN_DATABASE_TESTS !== '1')(
       }
     });
     it('validates HTTP queries and uses two bulk SELECTs regardless of page size', async () => {
-      for (const query of ['page=0', 'sort=bad', 'q=a&q=b', 'availability=bad', 'format=jar'])
+      for (const query of [
+        'page=0',
+        'sort=bad',
+        'q=a&q=b',
+        'availability=bad',
+        'format=jar',
+      ])
         await request(app.getHttpServer())
           .get(`/public/products?${query}`)
           .expect(400);
