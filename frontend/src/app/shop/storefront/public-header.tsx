@@ -133,7 +133,8 @@ export default function PublicHeader() {
     fetch(`${apiBase}/public/store-info`)
       .then((response) => (response.ok ? response.json() : null))
       .then((value: unknown) => {
-        if (isStoreInfo(value)) setWhatsapp(whatsappLink(value.phone, "Bonjour, je cherche un conseil pour une recette."));
+        if (isStoreInfo(value))
+          setWhatsapp(whatsappLink(value.phone, "Bonjour, je cherche un conseil pour une recette."));
       })
       .catch(() => {});
   }
