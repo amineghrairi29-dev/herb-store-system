@@ -6,6 +6,8 @@ export const availabilityValues = [
   'IN_STOCK',
 ] as const;
 export type Availability = (typeof availabilityValues)[number];
+export const formatValues = ['BOX', 'BAG', 'LIQUID'] as const;
+export type RecipeFormat = (typeof formatValues)[number];
 export const sorts = {
   name_asc: 'lower(name) ASC, id ASC',
   name_desc: 'lower(name) DESC, id ASC',
@@ -19,6 +21,7 @@ export function catalogueQuery(query: Record<string, unknown>) {
     'category',
     'subcategory',
     'availability',
+    'format',
     'sort',
     'page',
     'pageSize',
@@ -45,18 +48,22 @@ export function catalogueQuery(query: Record<string, unknown>) {
     return Number(value);
   };
   const sort = text('sort') || 'name_asc',
-    availability = text('availability');
+    availability = text('availability'),
+    format = text('format').toUpperCase();
   if (
     !Object.hasOwn(sorts, sort) ||
     (availability && !availabilityValues.includes(availability as Availability))
   )
     throw new BadRequestException('Tri ou disponibilité invalide.');
+  if (format && !formatValues.includes(format as RecipeFormat))
+    throw new BadRequestException('Format invalide.');
   return {
     q: text('q'),
     classification: text('classification') || text('category'),
     category: text('category'),
     subcategory: text('subcategory'),
     availability,
+    format,
     sort: sort as keyof typeof sorts,
     page: integer('page', 1),
     pageSize: Math.min(integer('pageSize', 24), 60),

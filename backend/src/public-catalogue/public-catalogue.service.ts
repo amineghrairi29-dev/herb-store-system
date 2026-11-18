@@ -18,13 +18,14 @@ export class PublicCatalogueService {
     const query = catalogueQuery(raw);
     const where = `WHERE ($2 = '' OR strpos(lower(concat_ws(' ', name, "nameFr", "scientificName", ingredients, ${activeClassifications}::text)), lower($2)) > 0)
       AND ($3 = '' OR EXISTS (SELECT 1 FROM public.classification c JOIN public."productClassification" pc ON pc."classificationId"=c.id WHERE pc."productId"=catalogue.id AND c."isActive" AND (c.slug=$3 OR c.id::text=$3)))
-      AND ($4 = '' OR EXISTS (SELECT 1 FROM public.classification c JOIN public."productClassification" pc ON pc."classificationId"=c.id WHERE pc."productId"=catalogue.id AND c."isActive" AND c."legacySubcategoryId"::text=$4)) AND ($5 = '' OR "availabilityStatus" = $5)`;
+      AND ($4 = '' OR EXISTS (SELECT 1 FROM public.classification c JOIN public."productClassification" pc ON pc."classificationId"=c.id WHERE pc."productId"=catalogue.id AND c."isActive" AND c."legacySubcategoryId"::text=$4)) AND ($5 = '' OR "availabilityStatus" = $5) AND ($6 = '' OR "recipeFormat" = $6)`;
     const values = [
       positiveTypes,
       query.q,
       query.classification,
       query.subcategory,
       query.availability,
+      query.format,
     ];
     return withPurchaseTransaction(async ({ client }) => {
       const count = await client.query<{ count: string }>(
@@ -33,7 +34,7 @@ export class PublicCatalogueService {
       );
       const totalItems = Number(count.rows[0].count);
       const result = await client.query<PublicProductDto>(
-        `${catalogue} SELECT ${fields} FROM catalogue ${where} ORDER BY ${sorts[query.sort]} LIMIT $6 OFFSET $7`,
+        `${catalogue} SELECT ${fields} FROM catalogue ${where} ORDER BY ${sorts[query.sort]} LIMIT $7 OFFSET $8`,
         [...values, query.pageSize, (query.page - 1) * query.pageSize],
       );
       return {

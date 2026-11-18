@@ -9,6 +9,12 @@ import { withPurchaseTransaction } from '../purchases/purchase-transaction.js';
 import type { ProductTransaction } from '../prisma/product-transaction.js';
 import { isUniqueViolation } from '../suppliers/supplier-validation.js';
 import { audited } from '../audit/audit.service.js';
+import {
+  discardUnreferencedImage,
+  normalizeProductImage,
+  storeProductImage,
+  type ProductImageUpload,
+} from '../products/product-image-storage.js';
 
 export function classificationIds(value: unknown): number[] {
   if (
@@ -186,6 +192,55 @@ export class ClassificationsService {
         'CLASSIFICATION_UPDATE',
         'CLASSIFICATION',
         await tx.orm.public.Classification.where({ id }).update(value),
+      );
+    });
+  }
+  /** Photo shown for this objective on the shop shelf; replaces the previous one. */
+  async replaceImage(id: number, file?: ProductImageUpload) {
+    classificationIds([id]);
+    const image = await normalizeProductImage(file);
+    let nextPath: string | undefined,
+      oldPath: string | null = null;
+    try {
+      const result = await this.setImage(id, async (old) => {
+        oldPath = old;
+        nextPath = await storeProductImage(image);
+        return nextPath;
+      });
+      await discardUnreferencedImage(oldPath);
+      return result;
+    } catch (error: unknown) {
+      await discardUnreferencedImage(nextPath);
+      throw error;
+    }
+  }
+  async removeImage(id: number) {
+    classificationIds([id]);
+    let oldPath: string | null = null;
+    const result = await this.setImage(id, (old) => {
+      oldPath = old;
+      return Promise.resolve(null);
+    });
+    await discardUnreferencedImage(oldPath);
+    return result;
+  }
+  private setImage(
+    id: number,
+    next: (old: string | null) => Promise<string | null>,
+  ) {
+    return withPurchaseTransaction(async (tx) => {
+      await tx.client.query(
+        'SELECT id FROM public.classification WHERE id = $1 FOR UPDATE',
+        [id],
+      );
+      const old = await tx.orm.public.Classification.first({ id });
+      if (!old) throw new NotFoundException('Classification introuvable.');
+      const imagePath = await next(old.imagePath ?? null);
+      return audited(
+        tx,
+        'CLASSIFICATION_UPDATE',
+        'CLASSIFICATION',
+        await tx.orm.public.Classification.where({ id }).update({ imagePath }),
       );
     });
   }

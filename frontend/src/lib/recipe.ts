@@ -1,5 +1,6 @@
 /** How a recipe is presented, from its format (BOX, BAG, LIQUID) and packaging text. */
-type RecipeLike = { recipeFormat?: "BOX" | "BAG" | "LIQUID" | null; packaging?: string | null; saleUnit: string };
+export type RecipeFormat = "BOX" | "BAG" | "LIQUID";
+type RecipeLike = { recipeFormat?: RecipeFormat | null; packaging?: string | null; saleUnit: string };
 
 const fallbackUnits: Record<string, string> = { KG: "kg", G: "g", L: "L", ML: "ml", PIECE: "pièce" };
 
@@ -25,4 +26,10 @@ export function ingredientList(text: string | null | undefined): string[] {
     .map((item) => item.replace(/^[-•*\s]+/, "").trim())
     .filter(Boolean)
     .slice(0, 24);
+}
+
+/** Reads a format from the URL ("box", "BOX"); anything else means no filter. */
+export function parseFormat(value: string | null | undefined): "" | RecipeFormat {
+  const upper = (value ?? "").toUpperCase();
+  return upper === "BOX" || upper === "BAG" || upper === "LIQUID" ? upper : "";
 }

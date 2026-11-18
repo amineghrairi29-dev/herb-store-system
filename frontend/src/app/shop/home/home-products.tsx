@@ -2,7 +2,9 @@
 import { useEffect, useRef, useState } from "react";
 import { apiBase } from "@/lib/api-base";
 import type { CatalogueResponse, PublicProduct } from "@/types/public-product";
+import type { RecipeFormat } from "@/lib/recipe";
 import ProductCard from "../product-card";
+import FormatFilter from "../storefront/format-filter";
 
 const PAGE_SIZE = 8;
 
@@ -11,9 +13,10 @@ export default function HomeProducts({ query }: { query: string }) {
   const [products, setProducts] = useState<PublicProduct[] | null>(null);
   const [page, setPage] = useState(1),
     [total, setTotal] = useState(0),
-    [attempt, setAttempt] = useState(0);
+    [attempt, setAttempt] = useState(0),
+    [format, setFormat] = useState<"" | RecipeFormat>("");
   // The last answer is tagged with its request: a newer request means "loading", with no setState when it starts.
-  const requestKey = `${query}|${page}|${attempt}`;
+  const requestKey = `${query}|${format}|${page}|${attempt}`;
   const [answer, setAnswer] = useState<{ key: string; error: boolean } | null>(null);
   const loading = answer?.key !== requestKey;
   const error = !loading && !!answer?.error;
@@ -26,6 +29,7 @@ export default function HomeProducts({ query }: { query: string }) {
     const key = requestKey;
     const params = new URLSearchParams({ pageSize: String(PAGE_SIZE), page: String(page), sort: "name_asc" });
     if (query) params.set("q", query);
+    if (format) params.set("format", format);
     fetch(`${apiBase}/public/products?${params}`, {
       cache: "no-store",
       signal: AbortSignal.any([controller.signal, AbortSignal.timeout(15000)]),
@@ -44,7 +48,7 @@ export default function HomeProducts({ query }: { query: string }) {
         if (!controller.signal.aborted) setAnswer({ key, error: true });
       });
     return () => controller.abort();
-  }, [query, page, requestKey]);
+  }, [query, format, page, requestKey]);
   const remaining = products ? total - products.length : 0;
   return (
     <section ref={section} id="products" className="h-section h-products" aria-labelledby="products-title">
@@ -78,6 +82,16 @@ export default function HomeProducts({ query }: { query: string }) {
           </button>
         </form>
       </div>
+      <div className="h-format">
+        <FormatFilter
+          value={format}
+          onChange={(next) => {
+            if (next === format) return;
+            setPage(1);
+            setFormat(next);
+          }}
+        />
+      </div>
       {error ? (
         <div role="alert" className="h-empty">
           <p>Nos recettes ne sont pas disponibles pour le moment.</p>
@@ -102,8 +116,10 @@ export default function HomeProducts({ query }: { query: string }) {
       ) : !products.length ? (
         <p className="h-empty">
           {query
-            ? "Aucun produit ne correspond. Essayez un autre mot, ou demandez-nous conseil sur WhatsApp."
-            : "Aucun produit disponible pour le moment."}
+            ? "Aucune recette ne correspond. Essayez un autre mot, ou demandez-nous conseil sur WhatsApp."
+            : format
+              ? "Pas encore de recette dans ce format. Essayez un autre format."
+              : "Aucune recette disponible pour le moment."}
         </p>
       ) : (
         <>

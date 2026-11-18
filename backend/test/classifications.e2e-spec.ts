@@ -1,5 +1,8 @@
 import 'dotenv/config';
 import { Client } from 'pg';
+import { rm } from 'node:fs/promises';
+import { resolve } from 'node:path';
+import sharp from 'sharp';
 import { Test } from '@nestjs/testing';
 import type { INestApplication } from '@nestjs/common';
 import request from 'supertest';
@@ -166,6 +169,51 @@ describe.skipIf(process.env.RUN_DATABASE_TESTS !== '1')(
       await post('/classifications')
         .send({ nameFr: 'Invalid', measurementMode: 'VOLUME' })
         .expect(400);
+    });
+    it('stores one photo per objective, replaces it and removes it', async () => {
+      const previous = process.env.PRODUCT_IMAGE_DIR,
+        directory = resolve('../.tmp', tag);
+      process.env.PRODUCT_IMAGE_DIR = directory;
+      try {
+        const png = await sharp({
+          create: { width: 24, height: 16, channels: 3, background: '#7a5c2e' },
+        })
+          .png()
+          .toBuffer();
+        const upload = () =>
+          post(`/classifications/${a}/image`).attach('image', png, {
+            filename: 'objectif.png',
+            contentType: 'image/png',
+          });
+        await request(app.getHttpServer())
+          .post(`/classifications/${a}/image`)
+          .set('Origin', 'http://localhost:3000')
+          .attach('image', png, { filename: 'x.png', contentType: 'image/png' })
+          .expect(401);
+        const first = (await upload().expect(201)).body.imagePath as string;
+        expect(first).toMatch(/^\/uploads\/products\/[0-9a-f-]+\.webp$/);
+        const second = (await upload().expect(201)).body.imagePath as string;
+        expect(second).not.toBe(first);
+        await request(app.getHttpServer()).get(first).expect(404);
+        await request(app.getHttpServer()).get(second).expect(200);
+        await post(`/classifications/${a}/image`)
+          .attach('image', Buffer.from('<svg/>'), {
+            filename: 'x.svg',
+            contentType: 'image/svg+xml',
+          })
+          .expect(400);
+        const removed = await request(app.getHttpServer())
+          .delete(`/classifications/${a}/image`)
+          .set('Cookie', cookie)
+          .set('Origin', 'http://localhost:3000')
+          .expect(200);
+        expect(removed.body.imagePath).toBeNull();
+        await request(app.getHttpServer()).get(second).expect(404);
+      } finally {
+        if (previous === undefined) delete process.env.PRODUCT_IMAGE_DIR;
+        else process.env.PRODUCT_IMAGE_DIR = previous;
+        await rm(directory, { recursive: true, force: true });
+      }
     });
     it('rejects create without classifications, empty selection or unavailable identifiers', async () => {
       const { classificationIds: _ids, ...rest } = input();
