@@ -21,7 +21,7 @@ const arabic = Aref_Ruqaa({
 export const metadata: Metadata = {
   title: { default: "دار سلومة · Dar Slouma, herboristerie à Gabès depuis 2006", template: "%s | دار سلومة" },
   description:
-    "Herboristerie à Ghannouch (Gabès) depuis 2006 : plantes, mélanges et épices, conseils personnalisés, livraison et paiement à la réception.",
+    "Recettes faites main à Ghannouch (Gabès) depuis 2006, chacune pour un objectif : digestion, sommeil, cheveux… Conseil gratuit, livraison et paiement à la réception.",
   robots: { index: true, follow: true },
   metadataBase: new URL(siteUrl),
   openGraph: {

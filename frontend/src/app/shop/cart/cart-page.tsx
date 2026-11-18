@@ -11,9 +11,9 @@ import { addDecimals, cartQuantity, lineSubtotal, stepQuantity, type CartItem } 
 import { compareDecimals } from "@/lib/decimal";
 import { displayAmount } from "@/lib/purchase-decimal";
 import { productPath } from "@/lib/product-url";
+import { priceUnit } from "@/lib/recipe";
 import type { ValidatedCartItem } from "@/types/cart";
 
-const units: Record<string, string> = { KG: "kg", G: "g", L: "L", ML: "ml", PIECE: "pièce" };
 const arabic = /[؀-ۿ]/;
 const trash = (
   <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true">
@@ -50,7 +50,7 @@ function CartLine({ item, checked, index }: { item: CartItem; checked?: Validate
   }
   const lower = stepQuantity(item.quantity, -1),
     higher = stepQuantity(item.quantity, 1);
-  const unit = product ? (units[product.saleUnit] ?? product.saleUnit) : "";
+  const unit = product ? priceUnit(product) : "";
   const name = product?.name;
   const isArabic = !!name && arabic.test(name);
   const status = checked?.valid

@@ -8,7 +8,7 @@ import { mapLinks, shopContent } from "@/lib/shop-content";
 import "./site-footer.css";
 
 const shop = [
-  ["/shop#products", "Tous les produits"],
+  ["/shop#products", "Toutes les recettes"],
   ["/shop/suivi", "Suivre ma commande"],
   ["/shop/profile", "Mon compte"],
 ] as const;

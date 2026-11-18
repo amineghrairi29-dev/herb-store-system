@@ -16,7 +16,7 @@ export const fields = `id, "mainImagePath", sku, name, "nameFr", "scientificName
 export class PublicCatalogueService {
   async list(raw: Record<string, unknown>) {
     const query = catalogueQuery(raw);
-    const where = `WHERE ($2 = '' OR strpos(lower(concat_ws(' ', name, "nameFr", "scientificName", ${activeClassifications}::text)), lower($2)) > 0)
+    const where = `WHERE ($2 = '' OR strpos(lower(concat_ws(' ', name, "nameFr", "scientificName", ingredients, ${activeClassifications}::text)), lower($2)) > 0)
       AND ($3 = '' OR EXISTS (SELECT 1 FROM public.classification c JOIN public."productClassification" pc ON pc."classificationId"=c.id WHERE pc."productId"=catalogue.id AND c."isActive" AND (c.slug=$3 OR c.id::text=$3)))
       AND ($4 = '' OR EXISTS (SELECT 1 FROM public.classification c JOIN public."productClassification" pc ON pc."classificationId"=c.id WHERE pc."productId"=catalogue.id AND c."isActive" AND c."legacySubcategoryId"::text=$4)) AND ($5 = '' OR "availabilityStatus" = $5)`;
     const values = [

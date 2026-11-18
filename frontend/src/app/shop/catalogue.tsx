@@ -126,7 +126,7 @@ export default function Catalogue({
     <section className="nd-catalogue" aria-labelledby="nd-results-title">
       <div ref={top} id="nd-results" className="nd-toolbar">
         <h2 id="nd-results-title" className="sr-only">
-          Produits : {need.nameFr}
+          Recettes : {need.nameFr}
         </h2>
         <form
           role="search"
@@ -148,7 +148,7 @@ export default function Catalogue({
             type="search"
             value={search}
             onChange={(event) => setSearch(event.target.value)}
-            placeholder="Chercher une plante…"
+            placeholder="Recette ou plante…"
             maxLength={200}
           />
           <button type="submit">Chercher</button>
@@ -184,7 +184,7 @@ export default function Catalogue({
       <p className="nd-count" role="status" aria-live="polite">
         {result && !error ? (
           <>
-            {total === 1 ? "1 produit" : `${total} produits`}
+            {total === 1 ? "1 recette" : `${total} recettes`}
             {params.get("q") ? (
               <>
                 {" "}
@@ -209,13 +209,13 @@ export default function Catalogue({
 
       {error ? (
         <div role="alert" className="nd-empty">
-          <p>Impossible de charger les produits pour le moment.</p>
+          <p>Impossible de charger les recettes pour le moment.</p>
           <button type="button" className="nd-btn" onClick={() => setRetry((value) => value + 1)}>
             Réessayer
           </button>
         </div>
       ) : !result ? (
-        <div className="nd-grid" role="status" aria-label="Chargement des produits">
+        <div className="nd-grid" role="status" aria-label="Chargement des recettes">
           {Array.from({ length: 8 }, (_, index) => (
             <div key={index} className="nd-skeleton" />
           ))}
@@ -226,7 +226,7 @@ export default function Catalogue({
             <Leaf color="#A9C68F" />
           </span>
           <p className="nd-empty-title">
-            {filtered ? "Aucun produit ne correspond à ces filtres." : "Les produits de ce besoin arrivent bientôt."}
+            {filtered ? "Aucune recette ne correspond à ces filtres." : "Les recettes de cet objectif arrivent bientôt."}
           </p>
           <p>Slouma a sûrement une recette pour vous : demandez-lui directement.</p>
           <div className="nd-empty-actions">

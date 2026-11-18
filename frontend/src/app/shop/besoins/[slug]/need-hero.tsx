@@ -48,7 +48,7 @@ export default function NeedHero({
       if (frame) cancelAnimationFrame(frame);
     };
   }, []);
-  const count = total === 0 ? "Bientôt en boutique" : total === 1 ? "1 produit" : `${total} produits`;
+  const count = total === 0 ? "Bientôt en boutique" : total === 1 ? "1 recette" : `${total} recettes`;
   return (
     <section ref={root} className="nd-hero" aria-labelledby="nd-title" data-photos={photos.length}>
       <div className="nd-hero-copy">
@@ -68,7 +68,7 @@ export default function NeedHero({
           <bdi>{need.nameFr}</bdi>
         </h1>
         <p className="nd-lead nd-enter" style={{ "--i": 3 } as React.CSSProperties}>
-          Les plantes et les recettes que la boutique prépare pour ce besoin, avec un conseil pour bien les utiliser.
+          Les recettes faites main pour cet objectif, avec un conseil pour bien les utiliser.
         </p>
         <ul className="nd-pills nd-enter" style={{ "--i": 4 } as React.CSSProperties}>
           <li>
@@ -78,7 +78,7 @@ export default function NeedHero({
           <li>Paiement à la livraison</li>
         </ul>
         <a href="#nd-results" className="nd-jump nd-enter" style={{ "--i": 5 } as React.CSSProperties}>
-          Voir les produits <span aria-hidden="true">↓</span>
+          Voir les recettes <span aria-hidden="true">↓</span>
         </a>
       </div>
       <div className="nd-hero-visual" aria-hidden="true">

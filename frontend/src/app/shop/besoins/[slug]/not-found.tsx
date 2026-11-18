@@ -15,7 +15,7 @@ export default function NeedNotFound() {
             Voir les besoins
           </Link>
           <Link href="/shop#products" className="nd-btn nd-btn-line">
-            Tous les produits
+            Toutes les recettes
           </Link>
         </div>
       </section>
