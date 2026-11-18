@@ -6,7 +6,10 @@ import { SloumaIcon, SloumaStamp } from "@/components/brand/slouma-logo";
 import { useCart } from "../cart-provider";
 import { useCustomerAuth } from "../customer-auth-provider";
 import styles from "./public-header.module.css";
-import NeedsDrawer from "./needs-drawer";
+import { apiBase } from "@/lib/api-base";
+import { isStoreInfo, whatsappLink } from "@/lib/store-info";
+import type { CatalogueResponse, PublicClassification } from "@/types/public-product";
+import { needTint } from "../besoins/need-tints";
 
 const links = [
   ["/shop#products", "Recettes"],
@@ -72,6 +75,10 @@ export default function PublicHeader() {
     [busy, setBusy] = useState(false),
     [error, setError] = useState(""),
     [scrolled, setScrolled] = useState(false);
+  // Phone menu content, loaded the first time it opens: objectives (with recipe counts) and WhatsApp.
+  const [needs, setNeeds] = useState<(PublicClassification & { count: number })[] | null>(null),
+    [whatsapp, setWhatsapp] = useState<string | null>(null),
+    loaded = useRef(false);
   const menu = useRef<HTMLButtonElement>(null),
     panel = useRef<HTMLDivElement>(null),
     account = useRef<HTMLDetailsElement>(null);
@@ -101,6 +108,35 @@ export default function PublicHeader() {
       document.body.style.overflow = overflow;
     };
   }, [open]);
+
+  function loadMenu() {
+    if (loaded.current) return;
+    loaded.current = true;
+    fetch(`${apiBase}/public/classifications?withProducts=true`)
+      .then((response) => (response.ok ? (response.json() as Promise<PublicClassification[]>) : []))
+      .then((list) =>
+        Promise.all(
+          list.slice(0, 12).map(async (need) => {
+            try {
+              const params = new URLSearchParams({ classification: need.slug, pageSize: "1", page: "1" });
+              const response = await fetch(`${apiBase}/public/products?${params}`);
+              const result = response.ok ? ((await response.json()) as CatalogueResponse) : null;
+              return { ...need, count: result?.pagination.totalItems ?? 0 };
+            } catch {
+              return { ...need, count: 0 };
+            }
+          }),
+        ),
+      )
+      .then(setNeeds)
+      .catch(() => setNeeds([]));
+    fetch(`${apiBase}/public/store-info`)
+      .then((response) => (response.ok ? response.json() : null))
+      .then((value: unknown) => {
+        if (isStoreInfo(value)) setWhatsapp(whatsappLink(value.phone, "Bonjour, je cherche un conseil pour une recette."));
+      })
+      .catch(() => {});
+  }
 
   async function logout() {
     if (busy) return;
@@ -164,7 +200,6 @@ export default function PublicHeader() {
     >
       <div className={styles.row}>
         <div className={styles.brandGroup}>
-          <NeedsDrawer />
           <Link href="/shop" className={styles.brand} aria-label="Dar Slouma, accueil">
             <SloumaStamp size={64} className={styles.stamp} />
             <SloumaIcon size={42} className={styles.icon} />
@@ -221,7 +256,7 @@ export default function PublicHeader() {
             aria-label={open ? "Fermer le menu" : "Ouvrir le menu"}
             onClick={() => {
               setOpen(!open);
-              if (!open) requestAnimationFrame(() => panel.current?.querySelector("input")?.focus());
+              if (!open) loadMenu();
             }}
           >
             <Icon kind={open ? "close" : "menu"} />
@@ -239,28 +274,79 @@ export default function PublicHeader() {
         }}
       >
         <Search id="shop-search-mobile" />
+        <p lang="ar" dir="rtl" className={styles.mobileAr}>
+          شنوّة تحب تداوي؟
+        </p>
+        <p className={styles.mobileTitle}>Nos objectifs</p>
+        {needs === null ? (
+          <div className={styles.mobileNeeds} aria-hidden="true">
+            {[0, 1, 2, 3].map((key) => (
+              <span key={key} className={styles.needSkeleton} />
+            ))}
+          </div>
+        ) : (
+          needs.length > 0 && (
+            <ul className={styles.mobileNeeds}>
+              {needs.map((need, index) => {
+                const [bg, ink] = needTint(index);
+                return (
+                  <li key={need.id} style={{ animationDelay: `${40 + index * 40}ms` }}>
+                    <Link
+                      href={`/shop/besoins/${encodeURIComponent(need.slug)}`}
+                      className={styles.needTile}
+                      style={{ "--tile": bg, "--tile-ink": ink } as React.CSSProperties}
+                    >
+                      <span lang="ar" dir="rtl" className={styles.needAr}>
+                        {need.nameAr}
+                      </span>
+                      <span className={styles.needFr}>
+                        <bdi>{need.nameFr}</bdi>
+                      </span>
+                      {need.count > 0 && (
+                        <span className={styles.needCount}>
+                          {need.count} recette{need.count > 1 ? "s" : ""} →
+                        </span>
+                      )}
+                    </Link>
+                  </li>
+                );
+              })}
+            </ul>
+          )
+        )}
         <nav aria-label="Boutique mobile" className={styles.mobileNav}>
-          {links.map(([href, label], index) => (
+          {(
+            [
+              ["/shop#products", "Toutes les recettes"],
+              ["/shop/suivi", "Suivre ma commande"],
+              ["/shop/about", "Notre histoire"],
+              ["/shop/faq", "Questions"],
+              ["/shop/contact", "Contact"],
+            ] as const
+          ).map(([href, label], index) => (
             <Link
               key={href}
               href={href}
-              style={{ animationDelay: `${60 + index * 50}ms` }}
+              style={{ animationDelay: `${120 + index * 50}ms` }}
               aria-current={active(href) ? "page" : undefined}
             >
               {label}
               <span aria-hidden="true">→</span>
             </Link>
           ))}
-          <Link href="/shop/suivi" style={{ animationDelay: "260ms" }}>
-            Suivre ma commande<span aria-hidden="true">→</span>
-          </Link>
         </nav>
         {auth.customer ? (
           <div className={styles.mobileAccount}>{accountContent}</div>
         ) : (
           <Link href="/shop/auth" className={styles.mobileLogin}>
+            <Icon kind="user" />
             Se connecter
           </Link>
+        )}
+        {whatsapp && (
+          <a href={whatsapp} target="_blank" rel="noopener noreferrer" className={styles.mobileWhatsapp}>
+            Demander conseil sur WhatsApp
+          </a>
         )}
       </div>
       {error && (

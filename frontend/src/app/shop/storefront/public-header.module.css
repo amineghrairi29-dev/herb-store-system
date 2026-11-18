@@ -402,26 +402,106 @@
   .menuButton {
     display: inline-grid;
   }
+  /* Phone menu: one panel with everything, forest green like the footer. */
   .mobilePanel {
     display: block;
     max-height: calc(100dvh - 64px);
     overflow-y: auto;
-    padding: 8px 16px 20px;
-    border-top: 1px solid var(--c-line);
-    background: var(--c-cream);
+    padding: 14px 18px 24px;
+    background: var(--c-forest);
+    color: #fff;
+    animation: panel-in var(--t-base) var(--ease-out) both;
+  }
+  @keyframes panel-in {
+    from {
+      opacity: 0;
+      transform: translateY(-8px);
+    }
   }
   .mobilePanel[hidden] {
     display: none;
   }
-  .mobilePanel .search {
-    margin-bottom: 8px;
-  }
   .mobilePanel .search input {
     width: 100%;
+    border-color: rgb(255 255 255 / 0.18);
+    background: rgb(255 255 255 / 0.08);
+    color: #fff;
     font-size: 16px;
+  }
+  .mobilePanel .search input::placeholder {
+    color: rgb(255 255 255 / 0.6);
+  }
+  .mobilePanel .search svg {
+    color: rgb(255 255 255 / 0.7);
+  }
+  .mobileAr {
+    margin: 18px 0 -2px;
+    font-family: var(--font-arabic), serif;
+    font-weight: 700;
+    font-size: 24px;
+    line-height: 1.4;
+    color: var(--c-honey-light);
+    text-align: left;
+  }
+  .mobileTitle {
+    margin: 0 0 12px;
+    font-family: var(--font-display), Georgia, serif;
+    font-size: 24px;
+  }
+  .mobileNeeds {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 8px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .mobileNeeds li {
+    min-width: 0;
+    animation: slide-in var(--t-base) var(--ease-out) both;
+  }
+  .needTile {
+    display: flex;
+    flex-direction: column;
+    min-height: 92px;
+    padding: 12px 14px;
+    border-radius: 16px;
+    background: var(--tile);
+    color: var(--c-forest);
+    text-decoration: none;
+    transition: transform var(--t-fast) var(--ease-out);
+  }
+  .needTile:active {
+    transform: scale(0.97);
+  }
+  .needAr {
+    font-family: var(--font-arabic), serif;
+    font-weight: 700;
+    font-size: 22px;
+    line-height: 1.25;
+    color: var(--tile-ink);
+  }
+  .needFr {
+    font-size: 14px;
+    font-weight: 600;
+    overflow-wrap: anywhere;
+  }
+  .needCount {
+    margin-top: auto;
+    padding-top: 6px;
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--tile-ink);
+  }
+  .needSkeleton {
+    height: 92px;
+    border-radius: 16px;
+    background: rgb(255 255 255 / 0.08);
   }
   .mobileNav {
     display: grid;
+    margin-top: 16px;
+    border-top: 1px solid rgb(255 255 255 / 0.12);
   }
   /* Links slide in one after the other when the menu opens. */
   .mobileNav a {
@@ -429,18 +509,18 @@
     justify-content: space-between;
     align-items: center;
     min-height: 52px;
-    border-bottom: 1px solid var(--c-line);
-    color: var(--c-forest);
+    border-bottom: 1px solid rgb(255 255 255 / 0.12);
+    color: #fff;
     font-family: var(--font-display), Georgia, serif;
-    font-size: 22px;
+    font-size: 20px;
     text-decoration: none;
     animation: slide-in var(--t-base) var(--ease-out) both;
   }
   .mobileNav a span {
-    color: var(--c-leaf);
+    color: var(--c-honey-light);
   }
   .mobileNav a[aria-current="page"] {
-    color: var(--c-leaf);
+    color: var(--c-honey-light);
   }
   @keyframes slide-in {
     from {
@@ -453,23 +533,45 @@
     }
   }
   .mobileAccount {
-    margin-top: 14px;
+    margin-top: 16px;
     padding: 8px;
-    border: 1px solid var(--c-line);
     border-radius: 16px;
     background: var(--c-paper);
+    color: var(--c-forest);
   }
   .mobileLogin {
     display: flex;
     justify-content: center;
     align-items: center;
+    gap: 8px;
     min-height: 48px;
     margin-top: 16px;
+    border: 1.5px solid rgb(255 255 255 / 0.35);
+    border-radius: var(--r-pill);
+    color: #fff;
+    font-weight: 600;
+    text-decoration: none;
+  }
+  .mobileLogin svg {
+    width: 18px;
+    height: 18px;
+  }
+  .mobileWhatsapp {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 52px;
+    margin-top: 10px;
     border-radius: var(--r-pill);
     background: var(--c-honey);
     color: var(--c-honey-ink);
-    font-weight: 600;
+    font-weight: 700;
     text-decoration: none;
+    box-shadow: 0 10px 24px rgb(0 0 0 / 0.25);
+  }
+  .mobilePanel :is(a, input):focus-visible {
+    outline: 3px solid var(--c-honey-light);
+    outline-offset: 2px;
   }
 }
 @media (max-width: 380px) {
@@ -486,6 +588,8 @@
   }
   .badge,
   .dropdown,
+  .mobilePanel,
+  .mobileNeeds li,
   .mobileNav a {
     animation: none;
   }
