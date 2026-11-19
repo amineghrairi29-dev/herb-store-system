@@ -17,7 +17,7 @@ export default function ProductGalleryView({ images, name }: { images: string[];
     event.currentTarget.style.setProperty("--zy", `${((event.clientY - box.top) / box.height) * 100}%`);
   }
   const fallback = (
-    <div className="pp-main-image pp-placeholder" aria-label="Image du produit non disponible">
+    <div className="pp-main-image pp-placeholder" aria-label="Image de la recette non disponible">
       <LeafIcon />
       <span>Photo à venir</span>
     </div>
@@ -47,7 +47,7 @@ export default function ProductGalleryView({ images, name }: { images: string[];
         </div>
       </div>
       {images.length > 1 && (
-        <div className="pp-thumbs" role="group" aria-label="Photos du produit">
+        <div className="pp-thumbs" role="group" aria-label="Photos de la recette">
           {images.map((path, position) => (
             <button
               key={path}

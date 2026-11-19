@@ -39,7 +39,7 @@ function decodeSegment(segment: string): string {
 
 export async function generateMetadata({ params }: { params: Promise<{ id: string }> }): Promise<Metadata> {
   const product = await loadProduct((await params).id).catch(() => null);
-  if (!product) return { title: "Produit introuvable" };
+  if (!product) return { title: "Recette introuvable" };
   const description = (
     product.description ??
     product.benefits ??
@@ -124,14 +124,14 @@ export default async function ProductPage({ params }: { params: Promise<{ id: st
       <JsonLd
         data={breadcrumbJsonLd([
           ["Boutique", "/shop"],
-          [product.category.nameFr, `/shop/besoins/${encodeURIComponent(product.category.slug)}`],
+          [product.category.nameFr, `/shop/objectifs/${encodeURIComponent(product.category.slug)}`],
           [product.name, productPath(product)],
         ])}
       />
       <nav className="pp-breadcrumb" aria-label="Fil d’Ariane">
         <Link href="/shop">Boutique</Link>
         <span aria-hidden="true">›</span>
-        <Link href={`/shop/besoins/${encodeURIComponent(product.category.slug)}`}>
+        <Link href={`/shop/objectifs/${encodeURIComponent(product.category.slug)}`}>
           <bdi>{product.category.nameFr}</bdi>
         </Link>
         <span aria-hidden="true">›</span>
@@ -146,7 +146,7 @@ export default async function ProductPage({ params }: { params: Promise<{ id: st
         <div className="pp-summary">
           <div className="pp-chips pp-enter" style={{ "--i": 1 } as React.CSSProperties}>
             {product.classifications.map((c) => (
-              <Link key={c.id} href={`/shop/besoins/${encodeURIComponent(c.slug)}`} className="pp-chip pp-goal">
+              <Link key={c.id} href={`/shop/objectifs/${encodeURIComponent(c.slug)}`} className="pp-chip pp-goal">
                 <span className="pp-goal-label">Pour</span>
                 <bdi>{c.nameFr}</bdi>
                 <span lang="ar" dir="rtl">
@@ -296,7 +296,7 @@ export default async function ProductPage({ params }: { params: Promise<{ id: st
         <section className="pp-related" aria-labelledby="related-title">
           <div className="pp-related-heading">
             <h2 id="related-title">Pour le même objectif</h2>
-            <Link href={`/shop/besoins/${encodeURIComponent(product.category.slug)}`}>
+            <Link href={`/shop/objectifs/${encodeURIComponent(product.category.slug)}`}>
               Tout voir <span aria-hidden="true">→</span>
             </Link>
           </div>

@@ -11,7 +11,7 @@ import ShopMap from "../storefront/shop-map";
 export const metadata: Metadata = {
   title: "Contact",
   description:
-    "Téléphone, WhatsApp et adresse de la boutique. Une question sur un produit ou une commande ? Écrivez-nous.",
+    "Téléphone, WhatsApp et adresse de la boutique. Une question sur une recette ou une commande ? Écrivez-nous.",
 };
 
 const stroke = {
@@ -33,7 +33,7 @@ export default async function ContactPage() {
         ar="تحب تسأل؟ احنا هنا"
         eyebrow="Contact"
         title="À votre écoute"
-        lead="Une question sur une plante, une commande ou une livraison ? Le plus rapide, c’est WhatsApp."
+        lead="Une question sur une recette, une commande ou une livraison ? Le plus rapide, c’est WhatsApp."
       />
       <div className="ct-grid">
         {whatsapp && (
@@ -115,10 +115,10 @@ export default async function ContactPage() {
             ما عرفتش شنوّة تختار؟
           </p>
           <h2>Dites-nous ce que vous cherchez</h2>
-          <p>Slouma vous conseille la plante et la préparation adaptées, gratuitement.</p>
+          <p>Slouma vous conseille la recette adaptée à votre objectif, gratuitement.</p>
         </div>
         <Link href="/shop#needs-title" className="ip-btn">
-          Voir les besoins <span aria-hidden="true">→</span>
+          Voir les objectifs <span aria-hidden="true">→</span>
         </Link>
       </aside>
     </div>

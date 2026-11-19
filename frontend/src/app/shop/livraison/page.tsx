@@ -19,7 +19,7 @@ const stroke = {
 const steps = [
   {
     title: "Vous commandez",
-    text: "Ajoutez vos produits au panier, puis indiquez votre gouvernorat, votre adresse et votre téléphone.",
+    text: "Ajoutez vos recettes au panier, puis indiquez votre gouvernorat, votre adresse et votre téléphone.",
     icon: (
       <svg viewBox="0 0 24 24" aria-hidden="true">
         <path d="M6 8h12l-1 12H7L6 8Zm3 0a3 3 0 0 1 6 0" {...stroke} />

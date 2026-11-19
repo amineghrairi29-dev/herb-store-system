@@ -45,7 +45,7 @@ export default function Catalogue({
   const router = useRouter();
   const [pending, startTransition] = useTransition();
   const params = new URLSearchParams(query);
-  const route = `/shop/besoins/${encodeURIComponent(need.slug)}`;
+  const route = `/shop/objectifs/${encodeURIComponent(need.slug)}`;
   const [retry, setRetry] = useState(0);
   // One state per answer, tagged with the request it answers: "loading" means the
   // latest answer is for an older request (no setState needed when a request starts).
@@ -140,7 +140,7 @@ export default function Catalogue({
           }}
         >
           <label htmlFor="nd-search" className="sr-only">
-            Rechercher dans ce besoin
+            Rechercher dans cet objectif
           </label>
           <svg viewBox="0 0 24 24" aria-hidden="true">
             <circle cx="11" cy="11" r="7" fill="none" stroke="currentColor" strokeWidth="2" />
@@ -151,7 +151,7 @@ export default function Catalogue({
             type="search"
             value={search}
             onChange={(event) => setSearch(event.target.value)}
-            placeholder="Recette ou plante…"
+            placeholder="Recette ou ingrédient…"
             maxLength={200}
           />
           <button type="submit">Chercher</button>

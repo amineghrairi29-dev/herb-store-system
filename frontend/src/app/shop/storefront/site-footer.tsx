@@ -48,7 +48,7 @@ export default function SiteFooter() {
             <span lang="ar" dir="rtl" className="site-footer-ask">
               اسأل سلومة
             </span>{" "}
-            Une question sur une plante ou une recette ? Nous répondons à tout.
+            Une question sur une recette ou un objectif ? Nous répondons à tout.
           </p>
           {whatsapp ? (
             <a href={whatsapp} target="_blank" rel="noopener noreferrer" className="site-footer-button">

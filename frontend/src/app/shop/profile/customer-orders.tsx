@@ -61,7 +61,7 @@ export default function CustomerOrders() {
           </p>
           <p>Vos commandes apparaîtront ici, avec leur suivi.</p>
           <Link href="/shop#products" className={styles.save}>
-            Découvrir les produits <span aria-hidden="true">→</span>
+            Découvrir les recettes <span aria-hidden="true">→</span>
           </Link>
         </div>
       ) : (

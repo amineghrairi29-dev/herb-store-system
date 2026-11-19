@@ -27,7 +27,7 @@ const stroke = {
 
 export default async function AboutPage() {
   const store = await getStoreInfo();
-  const whatsapp = whatsappLink(store?.phone, "Bonjour, j’ai une question sur une plante ou une recette.");
+  const whatsapp = whatsappLink(store?.phone, "Bonjour, j’ai une question sur une recette.");
   const years = yearsOfExperience();
   const place = [store?.address, store?.city].filter(Boolean).join(", ");
   const values = [
@@ -52,7 +52,7 @@ export default async function AboutPage() {
     },
     {
       title: "Un conseil pour chaque question",
-      text: "Une plante, une préparation, une façon de l’utiliser : on prend le temps de répondre.",
+      text: "Quelle recette pour votre objectif, comment l’utiliser : on prend le temps de répondre.",
       icon: (
         <svg viewBox="0 0 24 24" aria-hidden="true">
           <path d="M4 5h16v11H9l-5 4V5Z" {...stroke} />
@@ -76,7 +76,7 @@ export default async function AboutPage() {
             {years} ans de recettes, <em>une seule boutique.</em>
           </h1>
           <p className="ip-lead ip-in" style={{ "--i": 3 } as React.CSSProperties}>
-            Depuis {shopContent.foundedYear}, à Ghannouch, Slouma prépare des plantes et des recettes traditionnelles,
+            Depuis {shopContent.foundedYear}, à Ghannouch, Slouma prépare à la main des recettes traditionnelles,
             affinées au fil des années avec ses clients.
           </p>
           <div className="ab-stats ip-in" style={{ "--i": 4 } as React.CSSProperties}>
@@ -121,7 +121,7 @@ export default async function AboutPage() {
               chez vous. Le paiement se fait à la réception.
             </p>
             <Link href="/shop#products" className="ip-link">
-              Découvrir nos produits <span aria-hidden="true">→</span>
+              Découvrir nos recettes <span aria-hidden="true">→</span>
             </Link>
           </div>
           <blockquote className="ab-quote">

@@ -53,7 +53,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   return [
     ...pages.map(([path, priority, changeFrequency]) => ({ url: `${siteUrl}${path}`, priority, changeFrequency })),
     ...classifications.map((need) => ({
-      url: `${siteUrl}/shop/besoins/${encodeURIComponent(need.slug)}`,
+      url: `${siteUrl}/shop/objectifs/${encodeURIComponent(need.slug)}`,
       priority: 0.8,
       changeFrequency: "weekly" as const,
     })),

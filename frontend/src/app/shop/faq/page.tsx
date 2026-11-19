@@ -31,20 +31,20 @@ const questions: [string, string][] = [
     "Sur la page « Suivre ma commande », saisissez votre référence (ex. ORD-000123) et votre numéro de téléphone. Si vous avez un compte, vos commandes apparaissent aussi dans « Mon compte ».",
   ],
   [
-    "Je ne sais pas quelle plante choisir. Pouvez-vous m’aider ?",
-    "Oui, c’est notre métier depuis 2006. Écrivez-nous sur WhatsApp ou appelez la boutique : nous vous conseillons la plante ou la préparation adaptée, et la façon de l’utiliser.",
+    "Je ne sais pas quelle recette choisir. Pouvez-vous m’aider ?",
+    "Oui, c’est notre métier depuis 2006. Écrivez-nous sur WhatsApp ou appelez la boutique : nous vous conseillons la recette adaptée à votre objectif, et la façon de l’utiliser.",
   ],
   [
-    "Les plantes remplacent-elles un traitement médical ?",
+    "Les recettes remplacent-elles un traitement médical ?",
     "Non. Nos conseils s’appuient sur l’usage traditionnel des plantes. En cas de maladie, de grossesse, d’allaitement ou de traitement en cours, demandez l’avis de votre médecin ou de votre pharmacien.",
   ],
   [
-    "Comment conserver les plantes ?",
-    "Dans un bocal ou un sachet bien fermé, à l’abri de la lumière, de la chaleur et de l’humidité. Elles gardent ainsi leur parfum plus longtemps.",
+    "Comment conserver une recette ?",
+    "Refermez bien la boîte, le sachet ou le flacon après chaque usage, et gardez-le à l’abri de la lumière, de la chaleur et de l’humidité.",
   ],
   [
     "Puis-je acheter une petite quantité ?",
-    "Oui. Sur chaque fiche produit, choisissez une quantité rapide (100 g, 250 g…) ou saisissez la quantité de votre choix.",
+    "Oui pour les recettes en sachet, vendues au poids : choisissez une quantité rapide (100 g, 250 g…) ou saisissez la vôtre. Les boîtes et les flacons se vendent à l’unité.",
   ],
 ];
 

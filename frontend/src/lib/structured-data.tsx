@@ -21,7 +21,7 @@ export function storeJsonLd(store: StoreInfo | null) {
     name: "دار سلومة · Dar Slouma",
     alternateName: "Dar Slouma",
     description:
-      "Herboristerie à Ghannouch (Gabès) depuis 2006 : plantes, mélanges et épices, recettes traditionnelles et conseils.",
+      "Herboristerie à Ghannouch (Gabès) depuis 2006 : recettes faites main, chacune pour un objectif, et conseil gratuit.",
     url: `${siteUrl}/shop`,
     logo: `${siteUrl}/icon.svg`,
     image: `${siteUrl}/images/shop/og.jpg`,

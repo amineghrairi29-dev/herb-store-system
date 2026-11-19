@@ -41,11 +41,11 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   const { slug } = await params;
   const need = (await loadNeeds(false).catch((): PublicClassification[] => [])).find((item) => item.slug === slug);
   if (!need) return { title: "Besoin introuvable" };
-  const description = `Plantes, mélanges et recettes de دار سلومة pour : ${need.nameFr}. Conseil gratuit, paiement à la livraison.`;
+  const description = `Recettes faites main de دار سلومة pour l’objectif ${need.nameFr}. Conseil gratuit, paiement à la réception.`;
   return {
     title: `${need.nameFr} · ${need.nameAr}`,
     description,
-    alternates: { canonical: `/shop/besoins/${encodeURIComponent(need.slug)}` },
+    alternates: { canonical: `/shop/objectifs/${encodeURIComponent(need.slug)}` },
     openGraph: { title: need.nameFr, description },
   };
 }
@@ -91,21 +91,21 @@ export default async function NeedPage({
       <JsonLd
         data={breadcrumbJsonLd([
           ["Boutique", "/shop"],
-          [need.nameFr, `/shop/besoins/${encodeURIComponent(need.slug)}`],
+          [need.nameFr, `/shop/objectifs/${encodeURIComponent(need.slug)}`],
         ])}
       />
       <NeedHero need={need} total={preview.total} photos={photos} />
 
       {others.length > 0 && (
-        <nav className="nd-shelf" aria-label="Autres besoins">
-          <span className="nd-shelf-label">Autres besoins</span>
+        <nav className="nd-shelf" aria-label="Autres objectifs">
+          <span className="nd-shelf-label">Autres objectifs</span>
           <ul>
             {others.map((item) => {
               const [bg, color] = needTint(shelf.indexOf(item));
               return (
                 <li key={item.id}>
                   <Link
-                    href={`/shop/besoins/${encodeURIComponent(item.slug)}`}
+                    href={`/shop/objectifs/${encodeURIComponent(item.slug)}`}
                     className="nd-chip"
                     style={{ "--chip": bg, "--chip-ink": color } as React.CSSProperties}
                   >
@@ -130,9 +130,7 @@ export default async function NeedPage({
               قلّنا على حاجتك، نعطيوك الوصفة المناسبة
             </p>
             <h2 id="nd-advice-title">Pas sûr de ce qui vous convient ?</h2>
-            <p>
-              Expliquez-nous votre besoin : Slouma vous indique la plante et la préparation qui marchent, gratuitement.
-            </p>
+            <p>Expliquez-nous votre besoin : Slouma vous indique la recette qui vous convient, gratuitement.</p>
           </div>
           {whatsapp ? (
             <a href={whatsapp} target="_blank" rel="noopener noreferrer" className="nd-advice-btn">

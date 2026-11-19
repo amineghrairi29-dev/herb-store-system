@@ -4,7 +4,7 @@ import ProductImage from "@/components/product-image";
 import type { CatalogueResponse, PublicCategory, PublicClassification } from "@/types/public-product";
 import ScrollReveal from "../storefront/scroll-reveal";
 import { Leaf } from "../storefront/leaf";
-import { needTint } from "../besoins/need-tints";
+import { needTint } from "../objectifs/need-tints";
 
 type Jar = PublicClassification & { count: number; photo: string | null };
 type Need = PublicClassification & { imagePath?: string | null };
@@ -75,7 +75,7 @@ export default async function HomeNeeds() {
               const [bg, ink] = needTint(shelfIndex * 6 + index);
               return (
                 <li key={jar.id} style={{ "--i": index, "--tile": bg, "--tile-ink": ink } as React.CSSProperties}>
-                  <Link href={`/shop/besoins/${encodeURIComponent(jar.slug)}`} className="h-jar">
+                  <Link href={`/shop/objectifs/${encodeURIComponent(jar.slug)}`} className="h-jar">
                     <span className="h-jar-pot">
                       <span className="h-jar-photo">
                         {jar.photo ? (

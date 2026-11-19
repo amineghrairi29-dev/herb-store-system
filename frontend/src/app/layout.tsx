@@ -18,7 +18,7 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: { default: "Dar Slouma", template: "%s | Dar Slouma" },
-  description: "Plantes, herbes, épices et produits naturels sélectionnés avec soin.",
+  description: "Recettes faites main depuis 2006, chacune pour un objectif.",
   // Back-office pages stay out of search engines; the shop layout opts back in.
   robots: { index: false, follow: false },
 };

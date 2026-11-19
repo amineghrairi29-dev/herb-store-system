@@ -190,7 +190,7 @@ export default function Checkout({ customer }: { customer: Customer | null }) {
         <div className="co-empty">
           <p>Votre panier est vide.</p>
           <Link href="/shop#products" className="co-primary">
-            Découvrir les produits
+            Découvrir les recettes
           </Link>
         </div>
       ) : (
@@ -384,7 +384,7 @@ export default function Checkout({ customer }: { customer: Customer | null }) {
                         className={isArabic ? "co-name-ar" : undefined}
                         {...(isArabic ? { lang: "ar", dir: "rtl" } : {})}
                       >
-                        {name ?? "Produit en cours de vérification"}
+                        {name ?? "Recette en cours de vérification"}
                       </h3>
                       {line && (
                         <p>
@@ -437,7 +437,7 @@ export default function Checkout({ customer }: { customer: Customer | null }) {
             {zone?.delay && <p className="co-delay">Livraison estimée : {zone.delay}</p>}
             {cart.validation?.some((line) => !line.valid) ? (
               <p className="co-warning" role="status">
-                Certains produits ne sont plus disponibles : <Link href="/shop/cart">modifiez le panier</Link>.
+                Certaines recettes ne sont plus disponibles : <Link href="/shop/cart">modifiez le panier</Link>.
               </p>
             ) : (
               !valid &&
