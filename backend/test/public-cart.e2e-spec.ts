@@ -169,7 +169,7 @@ describe.skipIf(process.env.RUN_DATABASE_TESTS !== '1')(
           availabilityStatus: null,
           currentPrice: null,
           product: null,
-          message: 'Produit indisponible',
+          message: 'Recette indisponible',
         });
     });
     it('rejects zero stock, excessive quantities and inexact conversions without exposing stock', async () => {

@@ -108,13 +108,13 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
         : [...previous, { productId: id, quantity }];
       const checked = await validateCart(next);
       const target = checked.find((item) => item.productId === id);
-      if (!target?.valid) return target?.message ?? "Produit indisponible";
+      if (!target?.valid) return target?.message ?? "Recette indisponible";
       if (itemsRef.current !== previous) return "Le panier a changé dans un autre onglet. Réessayez.";
       commit(next);
       return null;
     } catch (failure: unknown) {
       console.error("Add to cart failed", failure);
-      return "Impossible de vérifier le produit. Réessayez.";
+      return "Impossible de vérifier la recette. Réessayez.";
     } finally {
       lock.current = false;
       setBusy(false);

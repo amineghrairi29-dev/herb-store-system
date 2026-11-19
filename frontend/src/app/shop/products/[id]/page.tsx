@@ -39,7 +39,7 @@ function decodeSegment(segment: string): string {
 
 export async function generateMetadata({ params }: { params: Promise<{ id: string }> }): Promise<Metadata> {
   const product = await loadProduct((await params).id).catch(() => null);
-  if (!product) return { title: "Produit introuvable" };
+  if (!product) return { title: "Recette introuvable" };
   const description = (
     product.description ??
     product.benefits ??

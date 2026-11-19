@@ -34,7 +34,7 @@ export default async function PrivacyPage() {
           <ul>
             <li>
               Lors d’une commande : nom, téléphone, adresse de livraison, gouvernorat et ville, email (facultatif),
-              notes, produits commandés.
+              notes, recettes commandées.
             </li>
             <li>
               Si vous créez un compte : email, mot de passe (enregistré de façon chiffrée, jamais en clair), nom,

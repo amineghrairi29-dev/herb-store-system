@@ -41,7 +41,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   const { slug } = await params;
   const need = (await loadNeeds(false).catch((): PublicClassification[] => [])).find((item) => item.slug === slug);
   if (!need) return { title: "Besoin introuvable" };
-  const description = `Plantes, mélanges et recettes de دار سلومة pour : ${need.nameFr}. Conseil gratuit, paiement à la livraison.`;
+  const description = `Recettes faites main de دار سلومة pour l’objectif ${need.nameFr}. Conseil gratuit, paiement à la réception.`;
   return {
     title: `${need.nameFr} · ${need.nameAr}`,
     description,
@@ -131,7 +131,7 @@ export default async function NeedPage({
             </p>
             <h2 id="nd-advice-title">Pas sûr de ce qui vous convient ?</h2>
             <p>
-              Expliquez-nous votre besoin : Slouma vous indique la plante et la préparation qui marchent, gratuitement.
+              Expliquez-nous votre besoin : Slouma vous indique la recette qui vous convient, gratuitement.
             </p>
           </div>
           {whatsapp ? (

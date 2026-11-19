@@ -42,7 +42,7 @@ function CartLine({ item, checked, index }: { item: CartItem; checked?: Validate
       return;
     }
     if (unavailable && compareDecimals(quantity, item.quantity) > 0) {
-      setError("Ce produit est indisponible. L’augmentation est désactivée.");
+      setError("Cette recette est indisponible. L’augmentation est désactivée.");
       return;
     }
     setError("");
@@ -63,7 +63,7 @@ function CartLine({ item, checked, index }: { item: CartItem; checked?: Validate
       className="sc-line"
       data-cart-line={item.productId}
       data-valid={checked ? String(checked.valid) : undefined}
-      aria-label={name ?? "Produit"}
+      aria-label={name ?? "Recette"}
       style={{ "--i": index } as React.CSSProperties}
     >
       <Link
@@ -99,9 +99,9 @@ function CartLine({ item, checked, index }: { item: CartItem; checked?: Validate
           {product ? (
             <Link href={productPath(product)}>{name}</Link>
           ) : checked ? (
-            "Produit indisponible"
+            "Recette indisponible"
           ) : (
-            "Vérification du produit…"
+            "Vérification de la recette…"
           )}
         </h2>
         <p className={`sc-status${checked && !checked.valid ? " sc-warning" : ""}`} role="status">
@@ -171,7 +171,7 @@ function CartLine({ item, checked, index }: { item: CartItem; checked?: Validate
           disabled={cart.busy}
           onClick={() => cart.remove(item.productId)}
           className="sc-remove"
-          aria-label={`Retirer ${name ?? "ce produit"} du panier`}
+          aria-label={`Retirer ${name ?? "cette recette"} du panier`}
           title="Retirer"
         >
           {trash}
@@ -255,7 +255,7 @@ export default function CartPage() {
         <h1>
           Votre panier
           {cart.hydrated && count > 0 && (
-            <span className="sc-count">{count === 1 ? "1 produit" : `${count} produits`}</span>
+            <span className="sc-count">{count === 1 ? "1 recette" : `${count} recettes`}</span>
           )}
         </h1>
         <p>Prix et disponibilités vérifiés à l’instant. Rien n’est payé avant la livraison.</p>
@@ -301,14 +301,14 @@ export default function CartPage() {
           <p lang="ar" dir="rtl" className="sc-ar">
             القفّة فارغة
           </p>
-          <h2 id="sc-empty-title">Votre panier attend ses premières plantes</h2>
-          <p>Parcourez les produits par besoin, ou demandez conseil : on vous dira quoi prendre.</p>
+          <h2 id="sc-empty-title">Votre panier attend sa première recette</h2>
+          <p>Choisissez une recette par objectif, ou demandez conseil : on vous dira laquelle prendre.</p>
           <div className="sc-empty-actions">
             <Link href="/shop#products" className="sc-primary">
-              Découvrir les produits <span aria-hidden="true">→</span>
+              Découvrir les recettes <span aria-hidden="true">→</span>
             </Link>
             <Link href="/shop#needs-title" className="sc-secondary">
-              Choisir par besoin
+              Choisir par objectif
             </Link>
           </div>
         </section>
@@ -345,7 +345,7 @@ export default function CartPage() {
               <h2>Récapitulatif</h2>
               <dl>
                 <div>
-                  <dt>Produits</dt>
+                  <dt>Recettes</dt>
                   <dd>{count}</dd>
                 </div>
                 <div>
@@ -373,7 +373,7 @@ export default function CartPage() {
               </dl>
               {cart.validation && !complete && (
                 <p className="sc-warning sc-summary-note">
-                  Retirez ou corrigez les produits indisponibles pour continuer.
+                  Retirez ou corrigez les recettes indisponibles pour continuer.
                 </p>
               )}
               {complete && !cart.busy ? (

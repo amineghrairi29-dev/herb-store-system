@@ -59,7 +59,7 @@ function Search({ id }: { id: string }) {
   return (
     <form role="search" action="/shop" method="get" className={styles.search}>
       <label htmlFor={id} className={styles.srOnly}>
-        Rechercher un produit
+        Rechercher une recette
       </label>
       <Icon kind="search" />
       <input id={id} name="q" type="search" placeholder="Digestion, sommeil, menthe…" autoComplete="off" />

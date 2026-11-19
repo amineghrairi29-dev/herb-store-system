@@ -12,7 +12,7 @@ export default function WhatsAppButton() {
     fetch(`${apiBase}/public/store-info`, { signal: controller.signal })
       .then((response) => (response.ok ? response.json() : null))
       .then((value: unknown) => {
-        if (isStoreInfo(value)) setHref(whatsappLink(value.phone, "Bonjour, j’ai une question sur un produit."));
+        if (isStoreInfo(value)) setHref(whatsappLink(value.phone, "Bonjour, j’ai une question sur une recette."));
       })
       .catch(() => {
         /* Optional shortcut: no error shown. */

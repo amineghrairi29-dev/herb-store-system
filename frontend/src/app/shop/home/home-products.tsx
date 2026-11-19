@@ -74,7 +74,7 @@ export default function HomeProducts({ query }: { query: string }) {
             name="q"
             type="search"
             defaultValue={query}
-            placeholder="Une recette, une plante, un objectif…"
+            placeholder="Une recette, un ingrédient, un objectif…"
             maxLength={200}
           />
           <button type="submit" className="h-btn h-btn-leaf">

@@ -64,7 +64,7 @@ async function orderQuote(client: Client, items: CartInput[]) {
   const checked = await validateCartInTransaction(client, items);
   if (checked.items.some((item) => !item.valid || !item.product))
     throw new ConflictException(
-      'Un produit ou une quantité est indisponible. Actualisez le panier.',
+      'Une recette ou une quantité est indisponible. Actualisez le panier.',
     );
   const lines = checked.items.map((item, index) => ({
     productId: item.productId,

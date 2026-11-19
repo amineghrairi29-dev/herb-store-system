@@ -12,7 +12,7 @@ import { Leaf } from "../storefront/leaf";
 
 const next = [
   { title: "On vous appelle", text: "Le magasin vous téléphone pour confirmer la commande et l’adresse." },
-  { title: "On prépare", text: "Vos plantes et recettes sont pesées et emballées à la boutique." },
+  { title: "On prépare", text: "Vos recettes sont préparées et emballées à la boutique." },
   { title: "On livre", text: "Vous payez en espèces à la réception, rien avant." },
 ];
 const fall = [

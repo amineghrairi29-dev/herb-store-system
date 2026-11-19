@@ -31,10 +31,11 @@ export default async function TermsPage() {
             )}
             . Passer une commande implique leur acceptation.
           </p>
-          <h2>2. Produits</h2>
+          <h2>2. Recettes</h2>
           <p>
-            Les produits proposés sont des plantes, herbes, épices et préparations naturelles. Les photos sont
-            indicatives : l’aspect des plantes peut varier d’un lot à l’autre.
+            Les recettes proposées sont des préparations faites main à la boutique, chacune pour un objectif, à partir
+            de plantes et d’ingrédients naturels. Elles sont vendues en boîte, en sachet au poids ou en flacon. Les
+            photos sont indicatives : l’aspect peut varier d’une préparation à l’autre.
           </p>
           <p>
             Les informations « Bienfaits » et « Mode d’utilisation » décrivent un usage traditionnel. Elles ne
@@ -50,7 +51,7 @@ export default async function TermsPage() {
           <p>
             La commande est enregistrée lorsque vous cliquez sur « Confirmer la commande ». Le magasin vous contacte
             ensuite par téléphone pour la confirmer. Le magasin peut refuser ou annuler une commande, notamment en cas
-            d’indisponibilité d’un produit ou d’informations de contact erronées ; vous en êtes alors informé.
+            d’indisponibilité d’une recette ou d’informations de contact erronées ; vous en êtes alors informé.
           </p>
           <h2>5. Paiement</h2>
           <p>Le paiement s’effectue à la livraison, en espèces. Aucun paiement n’est demandé en ligne.</p>

@@ -47,7 +47,7 @@ export async function validateCartInTransaction(
           availabilityStatus: null,
           currentPrice: null,
           product: null,
-          message: 'Produit indisponible',
+          message: 'Recette indisponible',
         };
       // Internal conversion and stock values never cross the public boundary.
       const { storageUnit, conversionFactor, derivedStock, ...product } = row;
