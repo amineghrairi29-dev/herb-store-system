@@ -80,13 +80,15 @@ export default function ClassificationsPage() {
         )}
         <div className="mt-6 grid gap-6 lg:grid-cols-[1fr_22rem]">
           <section className="min-w-0 rounded-xl border border-slate-200 bg-white p-4">
-            <h2 className="font-semibold">Classifications disponibles</h2>
+            <h2 className="font-semibold">Vos objectifs</h2>
             {!rows ? (
               <p role="status" className="mt-4">
                 Chargement...
               </p>
             ) : !rows.length ? (
-              <p className="mt-4 text-sm text-slate-500">Aucune classification. Créez-en une pour commencer.</p>
+              <p className="mt-4 text-sm text-slate-500">
+                Aucun objectif. Créez le premier, par exemple « Cheveux · الشعر ».
+              </p>
             ) : (
               <ul className="mt-3 divide-y divide-slate-100">
                 {rows.map((c) => (
@@ -132,7 +134,7 @@ export default function ClassificationsPage() {
             onSubmit={save}
             className="rounded-xl border border-slate-200 bg-white p-5"
           >
-            <h2 className="font-semibold">{editing ? "Modifier la classification" : "Nouvelle classification"}</h2>
+            <h2 className="font-semibold">{editing ? "Modifier l’objectif" : "Nouvel objectif"}</h2>
             <fieldset disabled={busy} className="mt-4 space-y-4 text-sm">
               <label className="block">
                 Nom *
@@ -173,8 +175,8 @@ export default function ClassificationsPage() {
               </label>
               {editing && (
                 <p className="text-xs text-slate-500">
-                  La désactivation conserve les liens. Les produits sans autre classification active sont masqués dans
-                  la boutique.
+                  Un objectif désactivé disparaît de la boutique, et ses recettes avec lui. Les recettes restent liées :
+                  il suffit de le réactiver.
                 </p>
               )}
               <div className="flex flex-wrap gap-3">

@@ -30,13 +30,13 @@ export default function MovementHistory({
       {filterable && (
         <div className="grid gap-4 border-b border-slate-200 p-5 sm:grid-cols-2 lg:grid-cols-5">
           <label className="flex flex-col gap-2 text-sm font-medium">
-            Produit
+            Recette
             <select
               value={filters.productId}
               onChange={(event) => setFilters({ ...filters, productId: event.target.value })}
               className={controlClass}
             >
-              <option value="">Tous les produits</option>
+              <option value="">Toutes les recettes</option>
               {[...products]
                 .sort((a, b) => a.name.localeCompare(b.name, "fr"))
                 .map((product) => (
@@ -113,7 +113,7 @@ export default function MovementHistory({
               <tr>
                 {[
                   "Date",
-                  "Produit",
+                  "Recette",
                   "SKU",
                   "Type",
                   "Quantité",
@@ -142,7 +142,7 @@ export default function MovementHistory({
                         href={`/admin/stock/products/${movement.productId}`}
                         className="text-emerald-800 hover:underline"
                       >
-                        <bdi dir="auto">{product?.name ?? `Produit #${movement.productId}`}</bdi>
+                        <bdi dir="auto">{product?.name ?? `Recette #${movement.productId}`}</bdi>
                       </Link>
                     </th>
                     <td className="px-4 py-4 font-mono text-xs">

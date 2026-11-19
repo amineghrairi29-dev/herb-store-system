@@ -29,9 +29,7 @@ export function classificationIds(value: unknown): number[] {
         id > 2147483647,
     )
   )
-    throw new BadRequestException(
-      'Sélectionnez au moins une classification (100 maximum).',
-    );
+    throw new BadRequestException('Choisissez un objectif pour la recette.');
   return [...new Set(value as number[])].sort((a, b) => a - b);
 }
 export interface ClassificationRow {
@@ -66,14 +64,14 @@ export async function validateLinks(
     )
   ).rows;
   if (rows.length !== ids.length)
-    throw new BadRequestException('Classification introuvable.');
+    throw new BadRequestException('Objectif introuvable.');
   if (rows.some((c) => !c.isActive && !retained.includes(c.id)))
     throw new ConflictException(
-      'Une classification désactivée ne peut pas être ajoutée au produit.',
+      'Cet objectif est désactivé : réactivez-le ou choisissez-en un autre.',
     );
   if (!rows.some((c) => c.isActive))
     throw new BadRequestException(
-      'Sélectionnez au moins un besoin actif. Les liens désactivés sont conservés uniquement pour historique.',
+      'Choisissez un objectif actif pour la recette.',
     );
   return rows;
 }
@@ -173,7 +171,7 @@ export class ClassificationsService {
       ),
     ).catch((error: unknown) => {
       if (isUniqueViolation(error))
-        throw new ConflictException('Cette classification existe déjà.');
+        throw new ConflictException('Cet objectif existe déjà.');
       throw error;
     });
   }
@@ -186,7 +184,7 @@ export class ClassificationsService {
         [id],
       );
       const old = await tx.orm.public.Classification.first({ id });
-      if (!old) throw new NotFoundException('Classification introuvable.');
+      if (!old) throw new NotFoundException('Objectif introuvable.');
       return audited(
         tx,
         'CLASSIFICATION_UPDATE',
@@ -234,7 +232,7 @@ export class ClassificationsService {
         [id],
       );
       const old = await tx.orm.public.Classification.first({ id });
-      if (!old) throw new NotFoundException('Classification introuvable.');
+      if (!old) throw new NotFoundException('Objectif introuvable.');
       const imagePath = await next(old.imagePath ?? null);
       return audited(
         tx,

@@ -91,7 +91,7 @@ export default function MovementForm({
     const values = new FormData(event.currentTarget);
     const quantity = normalizeDecimal(String(values.get("quantity") ?? ""));
     if (!selected || !units.includes(unit)) {
-      showError("Veuillez sélectionner un produit et une unité compatible.");
+      showError("Choisissez une recette et une unité compatible.");
       return;
     }
     if (showCurrentStock && !balanceReady) {
@@ -148,7 +148,7 @@ export default function MovementForm({
       <section aria-label={title} className="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm">
         {state.status === "loading" && (
           <p role="status" className="p-12 text-center text-sm text-slate-600">
-            Chargement des produits…
+            Chargement des recettes…
           </p>
         )}
         {state.status === "error" && (
@@ -168,9 +168,9 @@ export default function MovementForm({
         )}
         {state.status === "success" && state.products.length === 0 && (
           <p role="status" className="p-8 text-sm text-slate-600">
-            Aucun produit disponible.{" "}
+            Aucune recette disponible.{" "}
             <Link href="/admin/products/new" className="font-semibold text-emerald-800 underline">
-              Ajouter un produit
+              Ajouter une recette
             </Link>
           </p>
         )}
@@ -189,7 +189,7 @@ export default function MovementForm({
             <fieldset disabled={submitting} className="grid gap-5 p-6 sm:grid-cols-2 sm:p-8 disabled:opacity-70">
               <legend className="sr-only">{title}</legend>
               <label className="text-sm font-medium sm:col-span-2">
-                Produit *
+                Recette *
                 <select
                   required
                   value={selectedId}
@@ -202,7 +202,7 @@ export default function MovementForm({
                   className={inputClass}
                 >
                   <option value="" disabled>
-                    Sélectionner un produit
+                    Choisir une recette
                   </option>
                   {state.products.map((product) => (
                     <option key={product.id} value={product.id} dir="auto">

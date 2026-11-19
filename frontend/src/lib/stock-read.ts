@@ -50,13 +50,13 @@ export async function loadOverview(signal: AbortSignal) {
 
 export async function loadStockDetails(id: string, signal: AbortSignal) {
   if (!/^[1-9]\d*$/.test(id) || !Number.isSafeInteger(Number(id)) || Number(id) > 2147483647)
-    throw new Error("Identifiant de produit invalide.");
+    throw new Error("Identifiant de recette invalide.");
   const [product, balance, movements] = await Promise.all([
     stockRequest(`/products/${id}`, { signal }),
     productStock(Number(id), signal),
     loadMovements(signal),
   ]);
   if (!isProductDetails(product) || product.id !== Number(id))
-    throw new Error("Produit introuvable ou données invalides.");
+    throw new Error("Recette introuvable ou données invalides.");
   return { product, balance, movements: movements.filter((movement) => movement.productId === product.id) };
 }

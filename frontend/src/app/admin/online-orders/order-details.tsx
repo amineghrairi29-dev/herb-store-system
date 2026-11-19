@@ -167,7 +167,7 @@ export default function OrderDetails({ id }: { id: string }) {
       </div>
       <OrderFulfillment order={order} refresh={refresh} />
       <section className="mt-6 space-y-4 rounded-xl border bg-white p-5">
-        <h2 className="text-xl font-semibold">Produits commandés</h2>
+        <h2 className="text-xl font-semibold">Recettes commandées</h2>
         {order.items.map((item) => (
           <article key={item.productId} className="min-w-0 border-t pt-4">
             <h3 className="break-words font-semibold">
