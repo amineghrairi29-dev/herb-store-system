@@ -1,0 +1,81 @@
+/* Format filter: four pill chips with a small drawing, shared by the home page and the objective pages. */
+.ff {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.ff-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 44px;
+  padding: 0 16px 0 12px;
+  border: 1px solid var(--c-line);
+  border-radius: var(--r-pill);
+  background: var(--c-paper);
+  color: var(--c-forest);
+  font: inherit;
+  font-size: 14px;
+  cursor: pointer;
+  transition:
+    background var(--t-fast),
+    border-color var(--t-fast),
+    color var(--t-fast),
+    transform var(--t-fast);
+}
+.ff-chip:hover {
+  border-color: var(--c-leaf);
+  transform: translateY(-1px);
+}
+.ff-chip:focus-visible {
+  outline: 2px solid var(--c-leaf);
+  outline-offset: 2px;
+}
+.ff-chip[aria-pressed="true"] {
+  border-color: var(--c-forest);
+  background: var(--c-forest);
+  color: #fff;
+}
+.ff-chip:disabled {
+  cursor: progress;
+  opacity: 0.7;
+}
+.ff-icon {
+  width: 20px;
+  height: 20px;
+  flex: none;
+  color: var(--c-leaf);
+}
+.ff-chip[aria-pressed="true"] .ff-icon {
+  color: var(--c-honey);
+}
+.ff-ar {
+  font-size: 13px;
+  opacity: 0.65;
+}
+@media (max-width: 560px) {
+  .ff {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    margin-inline: -20px;
+    padding: 2px 20px 6px;
+    scrollbar-width: none;
+  }
+  .ff::-webkit-scrollbar {
+    display: none;
+  }
+  .ff-chip {
+    flex: none;
+  }
+  .ff-ar {
+    display: none;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .ff-chip {
+    transition: none;
+  }
+  .ff-chip:hover {
+    transform: none;
+  }
+}

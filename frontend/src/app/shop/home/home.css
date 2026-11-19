@@ -973,3 +973,6 @@
     transform: none;
   }
 }
+.h-format {
+  margin: -12px 0 28px;
+}

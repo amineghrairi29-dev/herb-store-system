@@ -4,7 +4,9 @@ import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState, useTransition } from "react";
 import { apiBase } from "@/lib/api-base";
 import type { Availability, CatalogueResponse, PublicClassification } from "@/types/public-product";
+import { parseFormat } from "@/lib/recipe";
 import ProductCard from "./product-card";
+import FormatFilter from "./storefront/format-filter";
 import { Leaf } from "./storefront/leaf";
 
 const availabilityChoices: { value: "" | Availability; label: string }[] = [
@@ -116,7 +118,8 @@ export default function Catalogue({
 
   const availability = params.get("availability") ?? "";
   const sort = params.get("sort") ?? "name_asc";
-  const filtered = !!(params.get("q")?.trim() || availability);
+  const format = parseFormat(params.get("format"));
+  const filtered = !!(params.get("q")?.trim() || availability || format);
   const busy = pending || (loading && !!result);
   const total = result?.pagination.totalItems ?? 0;
   const current = result?.pagination.page ?? 1;
@@ -180,6 +183,9 @@ export default function Catalogue({
           </select>
         </label>
       </div>
+      <div className="nd-format">
+        <FormatFilter value={format} onChange={(next) => go({ format: next ? next.toLowerCase() : null })} />
+      </div>
 
       <p className="nd-count" role="status" aria-live="polite">
         {result && !error ? (
@@ -199,7 +205,7 @@ export default function Catalogue({
             className="nd-reset"
             onClick={() => {
               setSearch("");
-              go({ q: null, availability: null });
+              go({ q: null, availability: null, format: null });
             }}
           >
             Effacer les filtres ×
@@ -238,7 +244,7 @@ export default function Catalogue({
                 className="nd-btn nd-btn-line"
                 onClick={() => {
                   setSearch("");
-                  go({ q: null, availability: null });
+                  go({ q: null, availability: null, format: null });
                 }}
               >
                 Effacer les filtres

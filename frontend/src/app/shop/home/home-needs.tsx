@@ -1,26 +1,31 @@
 import Link from "next/link";
 import { apiBase } from "@/lib/api-base";
 import ProductImage from "@/components/product-image";
-import type { CatalogueResponse, PublicClassification } from "@/types/public-product";
+import type { CatalogueResponse, PublicCategory, PublicClassification } from "@/types/public-product";
 import ScrollReveal from "../storefront/scroll-reveal";
 import { Leaf } from "../storefront/leaf";
 import { needTint } from "../besoins/need-tints";
 
 type Jar = PublicClassification & { count: number; photo: string | null };
+type Need = PublicClassification & { imagePath?: string | null };
 
-/** Number of recipes and one photo for an objective; zero and no photo if the API fails. */
-async function jarOf(need: PublicClassification): Promise<Jar> {
+/**
+ * Number of recipes and one photo for an objective: the photo chosen in the admin,
+ * otherwise the first recipe's. Zero recipes if the API fails.
+ */
+async function jarOf(need: Need): Promise<Jar> {
+  const chosen = need.imagePath ?? null;
   try {
     const params = new URLSearchParams({ classification: need.slug, pageSize: "1", page: "1", sort: "name_asc" });
     const response = await fetch(`${apiBase}/public/products?${params}`, {
       next: { revalidate: 120 },
       signal: AbortSignal.timeout(5000),
     });
-    if (!response.ok) return { ...need, count: 0, photo: null };
+    if (!response.ok) return { ...need, count: 0, photo: chosen };
     const result = (await response.json()) as CatalogueResponse;
-    return { ...need, count: result.pagination.totalItems, photo: result.data[0]?.mainImagePath ?? null };
+    return { ...need, count: result.pagination.totalItems, photo: chosen ?? result.data[0]?.mainImagePath ?? null };
   } catch {
-    return { ...need, count: 0, photo: null };
+    return { ...need, count: 0, photo: chosen };
   }
 }
 
@@ -37,13 +42,13 @@ function shelves<T>(items: T[], size: number): T[][] {
  * drop onto their shelf as the section comes into view. Phone: one shelf that scrolls.
  */
 export default async function HomeNeeds() {
-  let needs: PublicClassification[] = [];
+  let needs: Need[] = [];
   try {
     const response = await fetch(`${apiBase}/public/classifications?withProducts=true`, {
       next: { revalidate: 120 },
       signal: AbortSignal.timeout(5000),
     });
-    if (response.ok) needs = (await response.json()) as PublicClassification[];
+    if (response.ok) needs = (await response.json()) as PublicCategory[];
   } catch {
     /* Section hidden if the API is unreachable. */
   }

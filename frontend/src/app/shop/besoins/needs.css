@@ -873,3 +873,6 @@ a:focus-visible.nd-chip,
     transform: none;
   }
 }
+.nd-format {
+  margin: 16px 0 4px;
+}

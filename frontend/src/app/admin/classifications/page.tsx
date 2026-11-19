@@ -1,7 +1,9 @@
 "use client";
 import { useEffect, useState, type FormEvent } from "react";
 import { authRequest } from "@/lib/auth";
+import { productImageUrl } from "@/lib/product-image";
 import { fetchClassifications, type Classification } from "@/types/classification";
+import ObjectiveImage from "./objective-image";
 
 export default function ClassificationsPage() {
   const [rows, setRows] = useState<Classification[] | null>(null),
@@ -89,13 +91,26 @@ export default function ClassificationsPage() {
               <ul className="mt-3 divide-y divide-slate-100">
                 {rows.map((c) => (
                   <li key={c.id} className="flex items-center justify-between gap-3 py-3">
-                    <div className="min-w-0">
-                      <p className="break-words font-medium">
-                        <bdi>{c.nameFr}</bdi>
-                      </p>
-                      <p className="text-xs text-slate-500">
-                        {c.productCount ?? 0} produit(s) · {c.isActive ? "Active" : "Désactivée"}
-                      </p>
+                    <div className="flex min-w-0 items-center gap-3">
+                      <span className="grid size-10 shrink-0 place-items-center overflow-hidden rounded-full border border-slate-200 bg-slate-50">
+                        {productImageUrl(c.imagePath) ? (
+                          // eslint-disable-next-line @next/next/no-img-element
+                          <img src={productImageUrl(c.imagePath)!} alt="" className="size-full object-cover" />
+                        ) : (
+                          <span aria-hidden="true" className="text-slate-300">
+                            ◌
+                          </span>
+                        )}
+                      </span>
+                      <div className="min-w-0">
+                        <p className="break-words font-medium">
+                          <bdi>{c.nameFr}</bdi>
+                        </p>
+                        <p className="text-xs text-slate-500">
+                          {c.productCount ?? 0} recette(s) · {c.isActive ? "Active" : "Désactivée"}
+                          {!c.imagePath && " · sans photo"}
+                        </p>
+                      </div>
                     </div>
                     <button
                       disabled={busy}
@@ -173,6 +188,15 @@ export default function ClassificationsPage() {
                 )}
               </div>
             </fieldset>
+            {editing && (
+              <ObjectiveImage
+                objective={editing}
+                onChange={(next) => {
+                  setEditing(next);
+                  setRows((list) => list?.map((row) => (row.id === next.id ? next : row)) ?? list);
+                }}
+              />
+            )}
           </form>
         </div>
       </div>

@@ -65,6 +65,7 @@ describe.skipIf(process.env.RUN_DATABASE_TESTS !== '1')(
             saleUnit: 'G',
             conversionFactor: '1000',
             minStock: i === 2 ? '2.5' : null,
+            recipeFormat: i === 1 ? 'BOX' : i === 2 ? 'LIQUID' : null,
             location: 'SECRET',
             isActive: i !== 64,
             isSellable: i !== 65,
@@ -193,6 +194,15 @@ describe.skipIf(process.env.RUN_DATABASE_TESTS !== '1')(
         (await list({ availability: 'IN_STOCK' })).data.map((row) => row.id),
       ).toEqual([ids[0]]);
     });
+    it('filters recipes by format', async () => {
+      expect((await list({ format: 'box' })).data.map((row) => row.id)).toEqual(
+        [ids[1]],
+      );
+      expect(
+        (await list({ format: 'LIQUID' })).data.map((row) => row.id),
+      ).toEqual([ids[2]]);
+      expect((await list({ format: 'BAG' })).data).toEqual([]);
+    });
     it('preserves UTF-8 and exact money, exposes only the public allowlist', async () => {
       const rows = (await list({ q: 'نعناع' })).data;
       expect(rows).toHaveLength(1);
@@ -308,7 +318,13 @@ describe.skipIf(process.env.RUN_DATABASE_TESTS !== '1')(
       }
     });
     it('validates HTTP queries and uses two bulk SELECTs regardless of page size', async () => {
-      for (const query of ['page=0', 'sort=bad', 'q=a&q=b', 'availability=bad'])
+      for (const query of [
+        'page=0',
+        'sort=bad',
+        'q=a&q=b',
+        'availability=bad',
+        'format=jar',
+      ])
         await request(app.getHttpServer())
           .get(`/public/products?${query}`)
           .expect(400);

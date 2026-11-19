@@ -128,6 +128,20 @@ export default function ProductsTable() {
         </p>
       )}
 
+      {state.status === "success" && state.products.some((product) => !product.recipeFormat) && (
+        <p
+          role="note"
+          className="mx-6 mt-5 rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-900"
+        >
+          {(() => {
+            const missing = state.products.filter((product) => !product.recipeFormat).length;
+            return missing === 1 ? "1 recette n’a pas de format" : `${missing} recettes n’ont pas de format`;
+          })()}{" "}
+          (Boîte, Sachet ou Flacon). Sur le site, elles n’apparaissent dans aucun filtre de format : ouvrez-les avec «
+          Format manquant » pour le choisir.
+        </p>
+      )}
+
       {state.status === "success" && state.products.length > 0 && (
         <div
           role="region"
@@ -180,7 +194,19 @@ export default function ProductsTable() {
                   <td className="min-w-32 max-w-56 break-words px-5 py-5 text-slate-600">
                     <bdi dir="auto">{product.category}</bdi>
                   </td>
-                  <td className="whitespace-nowrap px-5 py-5 text-slate-600">{formatLabel(product)}</td>
+                  <td className="whitespace-nowrap px-5 py-5 text-slate-600">
+                    {product.recipeFormat ? (
+                      formatLabel(product)
+                    ) : (
+                      <Link
+                        href={`/admin/products/${product.id}/edit`}
+                        title="Choisissez Boîte, Sachet ou Flacon pour cette recette"
+                        className="inline-flex items-center gap-1.5 rounded-full bg-amber-50 px-2.5 py-1 text-xs font-semibold text-amber-800 ring-1 ring-amber-200 hover:bg-amber-100"
+                      >
+                        <span aria-hidden="true">!</span> Format manquant
+                      </Link>
+                    )}
+                  </td>
                   <td className="whitespace-nowrap px-5 py-5 text-right font-medium tabular-nums">
                     {priceFormatter.format(Number(product.salePrice))}
                     {product.saleUnit === "KG" && <span className="font-normal text-slate-500"> / kg</span>}
