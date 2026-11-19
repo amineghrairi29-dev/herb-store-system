@@ -3,7 +3,6 @@ import { redirect } from "next/navigation";
 import { getStoreInfo } from "@/lib/store-info";
 import { JsonLd, storeJsonLd } from "@/lib/structured-data";
 import HomeHero from "./home/home-hero";
-import HomeMarquee from "./home/home-marquee";
 import HomeNeeds from "./home/home-needs";
 import HomeStory from "./home/home-story";
 import HomeYears from "./home/home-years";
@@ -30,7 +29,6 @@ export default async function ShopPage({
     <div className="h-home">
       <JsonLd data={storeJsonLd(store)} />
       <HomeHero />
-      <HomeMarquee />
       <HomeNeeds />
       <HomeProducts key={query} query={query} />
       <HomeStory />

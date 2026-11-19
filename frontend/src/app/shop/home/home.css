@@ -391,47 +391,6 @@
   color: var(--c-muted);
 }
 
-/* Ribbon */
-.h-marquee {
-  overflow: hidden;
-  background: var(--c-leaf);
-  color: #fff;
-  transform: rotate(-1.2deg);
-  margin: -26px -10px 0;
-  position: relative;
-  z-index: 2;
-  box-shadow: 0 10px 30px rgb(31 58 36 / 0.15);
-}
-.h-marquee-track {
-  display: flex;
-  width: max-content;
-  animation: marquee 38s linear infinite;
-}
-.h-marquee:hover .h-marquee-track {
-  animation-play-state: paused;
-}
-.h-marquee-group {
-  display: flex;
-}
-.h-marquee-group span {
-  display: inline-flex;
-  align-items: center;
-  gap: 22px;
-  padding: 16px 0 16px 22px;
-  font-family: var(--font-display), Georgia, serif;
-  font-size: 22px;
-  white-space: nowrap;
-}
-.h-marquee-group i {
-  font-style: normal;
-  color: var(--c-honey-light);
-}
-@keyframes marquee {
-  to {
-    transform: translateX(-50%);
-  }
-}
-
 /* Objectives: jars on a wooden shelf */
 .h-needs-ar {
   margin: 0 0 -4px;
@@ -861,10 +820,6 @@
   .h-facts {
     gap: 12px 24px;
   }
-  .h-marquee-group span {
-    font-size: 18px;
-    padding-block: 12px;
-  }
   .h-story {
     grid-template-columns: 1fr;
     gap: 28px;
@@ -910,7 +865,6 @@
   .h-leaf,
   .h-stamp svg,
   .h-badge span,
-  .h-marquee-track,
   .h-skeleton {
     animation: none;
   }
