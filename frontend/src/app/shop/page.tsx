@@ -20,7 +20,7 @@ export default async function ShopPage({
   const params = await searchParams;
   // A need filter belongs to its own page; other old catalogue filters fall back to the product list.
   const classification = typeof params.classification === "string" ? params.classification : null;
-  if (classification) redirect(`/shop/besoins/${encodeURIComponent(classification)}`);
+  if (classification) redirect(`/shop/objectifs/${encodeURIComponent(classification)}`);
   if (["category", "subcategory", "availability", "sort", "page", "pageSize"].some((key) => params[key] !== undefined))
     redirect("/shop#products");
   const query = typeof params.q === "string" ? params.q.trim().slice(0, 200) : "";

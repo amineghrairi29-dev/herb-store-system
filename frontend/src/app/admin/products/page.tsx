@@ -36,7 +36,7 @@ export default function ProductsPage() {
         </header>
         <nav aria-label="Navigation du catalogue" className="mb-5 flex flex-wrap gap-5">
           <Link href="/admin/classifications" className="text-sm font-semibold text-emerald-800 hover:underline">
-            Gérer les objectifs (besoins)
+            Gérer les objectifs
           </Link>
           <Link href="/admin/stock" className="text-sm font-semibold text-emerald-800 hover:underline">
             Saisir le stock →

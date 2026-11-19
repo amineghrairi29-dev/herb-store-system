@@ -1,4 +1,4 @@
-/* Need pages (/shop/besoins/…), theme "Feuille et miel" (tokens in ../theme.css).
+/* Need pages (/shop/objectifs/…), theme "Feuille et miel" (tokens in ../theme.css).
    --tile / --tile-ink: the need's own tint, the same as its tile on the home page. */
 .nd {
   --tile: var(--c-sprout);

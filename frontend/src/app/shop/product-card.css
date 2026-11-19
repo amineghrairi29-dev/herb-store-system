@@ -1,5 +1,5 @@
 /* Product card, "étiquette" style (theme tokens in theme.css). Used on the home page,
-   the need pages and under a product ("Pour les mêmes besoins"). */
+   the need pages and under a product ("Pour les mêmes objectifs"). */
 .botanical-product-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));

@@ -45,7 +45,7 @@ export default function Catalogue({
   const router = useRouter();
   const [pending, startTransition] = useTransition();
   const params = new URLSearchParams(query);
-  const route = `/shop/besoins/${encodeURIComponent(need.slug)}`;
+  const route = `/shop/objectifs/${encodeURIComponent(need.slug)}`;
   const [retry, setRetry] = useState(0);
   // One state per answer, tagged with the request it answers: "loading" means the
   // latest answer is for an older request (no setState needed when a request starts).

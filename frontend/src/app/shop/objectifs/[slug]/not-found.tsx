@@ -14,7 +14,7 @@ export default function NeedNotFound() {
         </p>
         <div className="nd-empty-actions">
           <Link href="/shop#needs-title" className="nd-btn">
-            Voir les besoins
+            Voir les objectifs
           </Link>
           <Link href="/shop#products" className="nd-btn nd-btn-line">
             Toutes les recettes

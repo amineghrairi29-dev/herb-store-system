@@ -45,7 +45,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   return {
     title: `${need.nameFr} · ${need.nameAr}`,
     description,
-    alternates: { canonical: `/shop/besoins/${encodeURIComponent(need.slug)}` },
+    alternates: { canonical: `/shop/objectifs/${encodeURIComponent(need.slug)}` },
     openGraph: { title: need.nameFr, description },
   };
 }
@@ -91,21 +91,21 @@ export default async function NeedPage({
       <JsonLd
         data={breadcrumbJsonLd([
           ["Boutique", "/shop"],
-          [need.nameFr, `/shop/besoins/${encodeURIComponent(need.slug)}`],
+          [need.nameFr, `/shop/objectifs/${encodeURIComponent(need.slug)}`],
         ])}
       />
       <NeedHero need={need} total={preview.total} photos={photos} />
 
       {others.length > 0 && (
-        <nav className="nd-shelf" aria-label="Autres besoins">
-          <span className="nd-shelf-label">Autres besoins</span>
+        <nav className="nd-shelf" aria-label="Autres objectifs">
+          <span className="nd-shelf-label">Autres objectifs</span>
           <ul>
             {others.map((item) => {
               const [bg, color] = needTint(shelf.indexOf(item));
               return (
                 <li key={item.id}>
                   <Link
-                    href={`/shop/besoins/${encodeURIComponent(item.slug)}`}
+                    href={`/shop/objectifs/${encodeURIComponent(item.slug)}`}
                     className="nd-chip"
                     style={{ "--chip": bg, "--chip-ink": color } as React.CSSProperties}
                   >

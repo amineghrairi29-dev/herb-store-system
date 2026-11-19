@@ -24,10 +24,14 @@ const adminSections = [
 const nextConfig: NextConfig = {
   poweredByHeader: false,
   async redirects() {
-    return adminSections.flatMap((section) => [
-      { source: `/${section}`, destination: `/admin/${section}`, permanent: true },
-      { source: `/${section}/:path*`, destination: `/admin/${section}/:path*`, permanent: true },
-    ]);
+    return [
+      // Objective pages moved from /shop/besoins to /shop/objectifs.
+      { source: "/shop/besoins/:slug", destination: "/shop/objectifs/:slug", permanent: true },
+      ...adminSections.flatMap((section) => [
+        { source: `/${section}`, destination: `/admin/${section}`, permanent: true },
+        { source: `/${section}/:path*`, destination: `/admin/${section}/:path*`, permanent: true },
+      ]),
+    ];
   },
   async headers() {
     return [

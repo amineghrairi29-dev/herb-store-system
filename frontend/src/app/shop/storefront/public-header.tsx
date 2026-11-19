@@ -9,7 +9,7 @@ import styles from "./public-header.module.css";
 import { apiBase } from "@/lib/api-base";
 import { isStoreInfo, whatsappLink } from "@/lib/store-info";
 import type { CatalogueResponse, PublicClassification } from "@/types/public-product";
-import { needTint } from "../besoins/need-tints";
+import { needTint } from "../objectifs/need-tints";
 
 const links = [
   ["/shop#products", "Recettes"],
@@ -293,7 +293,7 @@ export default function PublicHeader() {
                 return (
                   <li key={need.id} style={{ animationDelay: `${40 + index * 40}ms` }}>
                     <Link
-                      href={`/shop/besoins/${encodeURIComponent(need.slug)}`}
+                      href={`/shop/objectifs/${encodeURIComponent(need.slug)}`}
                       className={styles.needTile}
                       style={{ "--tile": bg, "--tile-ink": ink } as React.CSSProperties}
                     >
