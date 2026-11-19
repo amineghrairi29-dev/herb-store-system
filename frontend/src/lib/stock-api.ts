@@ -34,7 +34,7 @@ export async function stockRequest(path: string, options: RequestInit = {}): Pro
 export async function stockProducts(signal: AbortSignal): Promise<ProductDetails[]> {
   const data = await stockRequest("/products", { signal });
   if (!Array.isArray(data) || !data.every(isProductDetails))
-    throw new Error("Les données des produits sont invalides.");
+    throw new Error("Les données des recettes sont invalides.");
   return data;
 }
 

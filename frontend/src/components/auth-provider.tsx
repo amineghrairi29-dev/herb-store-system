@@ -116,7 +116,7 @@ export default function AuthProvider({ children }: { children: React.ReactNode }
             <h1 className="text-2xl font-semibold">Accès non autorisé</h1>
             <p className="mt-3">Votre rôle ne permet pas d’accéder à cette page.</p>
             <Link href="/admin/products" className="mt-5 inline-block text-emerald-800 underline">
-              Retour aux produits
+              Retour aux recettes
             </Link>
           </main>
         )}

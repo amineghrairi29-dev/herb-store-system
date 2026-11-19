@@ -54,8 +54,8 @@ export default function ClassificationPicker({
   }
   return (
     <div className="mt-4 space-y-3">
-      <p className="text-sm text-slate-600">Sélectionnez au moins un besoin actif. Plusieurs choix sont possibles.</p>
-      {!items && !error && <p role="status">Chargement des classifications...</p>}
+      <p className="text-sm text-slate-600">Choisissez l’objectif de cette recette (un seul). C’est lui qui la range sur le site.</p>
+      {!items && !error && <p role="status">Chargement des objectifs…</p>}
       <div className="grid max-h-64 gap-2 overflow-y-auto sm:grid-cols-2">
         {items
           ?.filter((c) => c.isActive)
@@ -77,7 +77,7 @@ export default function ClassificationPicker({
           ))}
       </div>
       {items && !items.some((c) => c.isActive) && (
-        <p className="text-sm text-slate-500">Ajoutez votre premier besoin ci-dessous.</p>
+        <p className="text-sm text-slate-500">Ajoutez votre premier objectif ci-dessous.</p>
       )}
       {!adding ? (
         <button
@@ -86,12 +86,12 @@ export default function ClassificationPicker({
           onClick={() => setAdding(true)}
           className="text-sm font-semibold text-emerald-800 hover:underline disabled:opacity-50"
         >
-          + Ajouter un besoin
+          + Ajouter un objectif
         </button>
       ) : (
         <div className="flex flex-col gap-2 sm:flex-row">
           <label className="flex-1 text-sm">
-            Nouveau besoin
+            Nouvel objectif
             <input
               autoFocus
               value={name}

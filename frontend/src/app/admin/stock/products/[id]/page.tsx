@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Link from "@/components/auth-link";
 import StockDetails from "./stock-details";
-export const metadata: Metadata = { title: "Détail du stock produit" };
+export const metadata: Metadata = { title: "Stock de la recette" };
 export default async function Page({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
   return (
@@ -10,7 +10,7 @@ export default async function Page({ params }: { params: Promise<{ id: string }>
         <Link href="/admin/stock" className="text-sm font-semibold text-emerald-800 hover:underline">
           ← Gestion du stock
         </Link>
-        <h1 className="mb-8 mt-5 text-3xl font-semibold tracking-tight">Détail du stock produit</h1>
+        <h1 className="mb-8 mt-5 text-3xl font-semibold tracking-tight">Stock de la recette</h1>
         <StockDetails key={id} id={id} />
       </div>
     </main>

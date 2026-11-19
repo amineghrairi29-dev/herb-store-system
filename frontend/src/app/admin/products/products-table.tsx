@@ -49,7 +49,7 @@ export default function ProductsTable() {
         }
         const data: unknown = await response.json();
         if (!Array.isArray(data) || !data.every(isProduct)) {
-          throw new Error("Le format des produits reçu du serveur est invalide.");
+          throw new Error("La liste des recettes reçue du serveur est invalide.");
         }
         if (!controller.signal.aborted) {
           setState({ status: "success", products: data });

@@ -25,9 +25,9 @@ export default function StockTable() {
     <>
       <section aria-label="Résumé du stock" className="mb-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         {[
-          ["Total produits", summary.total],
-          ["Produits en stock faible", summary.low],
-          ["Produits en rupture", summary.empty],
+          ["Recettes suivies", summary.total],
+          ["Stock faible", summary.low],
+          ["En rupture", summary.empty],
           ["Total mouvements récents", summary.recent],
         ].map(([label, count]) => (
           <div key={label} className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
@@ -41,7 +41,7 @@ export default function StockTable() {
       </section>
       <div className="mb-6 flex flex-wrap items-center justify-between gap-3 text-xs text-slate-500">
         <p>
-          Données chargées le {new Date(asOf).toLocaleString("fr-FR")}. Les indicateurs portent sur tous les produits.
+          Données chargées le {new Date(asOf).toLocaleString("fr-FR")}. Les indicateurs portent sur toutes les recettes.
         </p>
         <button type="button" onClick={reload} className={controlClass}>
           Actualiser
@@ -49,13 +49,13 @@ export default function StockTable() {
       </div>
       <StockActions />
       <section
-        aria-label="Stocks des produits"
+        aria-label="Stock des recettes"
         className="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm"
       >
         <h2 className="border-b border-slate-200 px-6 py-5 font-semibold">État du stock</h2>
         <div className="flex flex-col gap-4 border-b border-slate-200 p-5 sm:flex-row sm:items-end">
           <label className="flex flex-1 flex-col gap-2 text-sm font-medium">
-            Rechercher un produit ou SKU
+            Rechercher une recette ou un SKU
             <input
               type="search"
               value={search}
@@ -84,11 +84,11 @@ export default function StockTable() {
           </button>
         </div>
         <p role="status" className="px-5 py-3 text-xs text-slate-500">
-          {visible.length} produit(s) affiché(s). Priorité aux ruptures, puis aux stocks faibles.
+          {visible.length} recette(s) affichée(s). Priorité aux ruptures, puis aux stocks faibles.
         </p>
         {visible.length === 0 ? (
           <p className="px-6 py-16 text-center text-sm text-slate-600">
-            {rows.length === 0 ? "Aucun produit disponible" : "Aucun produit ne correspond aux filtres"}
+            {rows.length === 0 ? "Aucune recette disponible" : "Aucune recette ne correspond aux filtres"}
           </p>
         ) : (
           <div
@@ -102,9 +102,9 @@ export default function StockTable() {
               <thead className="bg-slate-50 text-xs text-slate-600">
                 <tr>
                   {[
-                    "Produit",
+                    "Recette",
                     "SKU",
-                    "Catégorie",
+                    "Objectif",
                     "Stock actuel",
                     "Unité de stockage",
                     "Stock minimum",

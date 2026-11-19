@@ -26,7 +26,7 @@ export default function StockDetails({ id }: { id: string }) {
         <dl className="mt-6 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
           {[
             ["SKU", product.sku],
-            ["Catégorie", product.category],
+            ["Objectif", product.category],
             ["Stock actuel", `${balance.stock.replace(".", ",")} ${balance.unit}`],
             ["Unité de stockage", balance.unit],
             [

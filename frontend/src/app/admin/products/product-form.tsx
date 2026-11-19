@@ -180,7 +180,7 @@ export default function ProductForm({ product }: { product?: ProductDetails }) {
           typeof created.id !== "number" ||
           !Number.isInteger(created.id)
         )
-          throw new Error("Réponse de création invalide. Vérifiez la liste des produits avant de réessayer.");
+          throw new Error("Réponse de création invalide. Vérifiez la liste des recettes avant de réessayer.");
         id = created.id;
         setSavedId(id);
       }
