@@ -130,9 +130,7 @@ export default async function NeedPage({
               قلّنا على حاجتك، نعطيوك الوصفة المناسبة
             </p>
             <h2 id="nd-advice-title">Pas sûr de ce qui vous convient ?</h2>
-            <p>
-              Expliquez-nous votre besoin : Slouma vous indique la recette qui vous convient, gratuitement.
-            </p>
+            <p>Expliquez-nous votre besoin : Slouma vous indique la recette qui vous convient, gratuitement.</p>
           </div>
           {whatsapp ? (
             <a href={whatsapp} target="_blank" rel="noopener noreferrer" className="nd-advice-btn">
