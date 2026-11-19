@@ -24,9 +24,7 @@ export default function RootNotFound() {
           ما لقيناهاش
         </p>
         <h1 style={{ margin: "8px 0 10px", fontSize: 28, fontWeight: 500 }}>Page introuvable</h1>
-        <p style={{ margin: 0, color: "#5d6b57", lineHeight: 1.6 }}>
-          Le lien est peut-être ancien ou mal recopié.
-        </p>
+        <p style={{ margin: 0, color: "#5d6b57", lineHeight: 1.6 }}>Le lien est peut-être ancien ou mal recopié.</p>
         <Link
           href="/shop"
           style={{
