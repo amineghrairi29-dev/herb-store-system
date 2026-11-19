@@ -19,6 +19,16 @@ Chaque nouvelle commande envoie un message au magasin (référence, client, tél
 
 Idées pour plus tard : alerte quand une recette passe sous son seuil de stock, résumé du jour.
 
+## Identité du vendeur (CGV et pied de page)
+
+À traiter en même temps que Telegram. La loi tunisienne sur le commerce électronique (loi 2000-83) demande d'afficher l'identité du vendeur ; à vérifier avec le comptable :
+
+- nom ou raison sociale tel qu'il figure sur la patente ;
+- adresse de la boutique ;
+- matricule fiscal (et registre de commerce s'il y en a un).
+
+À ajouter ensuite dans les CGV (« 1. Objet » ou une section « Vendeur ») et en petit dans le pied de page.
+
 ## Autres points
 
 - Choisir l'hébergement et le domaine (comparatif : OVHcloud Tunisie VPS-1 + `.tn`).
