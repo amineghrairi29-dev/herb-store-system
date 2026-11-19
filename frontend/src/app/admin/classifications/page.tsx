@@ -86,7 +86,9 @@ export default function ClassificationsPage() {
                 Chargement...
               </p>
             ) : !rows.length ? (
-              <p className="mt-4 text-sm text-slate-500">Aucun objectif. Créez le premier, par exemple « Cheveux · الشعر ».</p>
+              <p className="mt-4 text-sm text-slate-500">
+                Aucun objectif. Créez le premier, par exemple « Cheveux · الشعر ».
+              </p>
             ) : (
               <ul className="mt-3 divide-y divide-slate-100">
                 {rows.map((c) => (

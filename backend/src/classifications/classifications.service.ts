@@ -29,9 +29,7 @@ export function classificationIds(value: unknown): number[] {
         id > 2147483647,
     )
   )
-    throw new BadRequestException(
-      'Choisissez un objectif pour la recette.',
-    );
+    throw new BadRequestException('Choisissez un objectif pour la recette.');
   return [...new Set(value as number[])].sort((a, b) => a - b);
 }
 export interface ClassificationRow {

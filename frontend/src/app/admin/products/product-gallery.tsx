@@ -65,7 +65,8 @@ export default function ProductGallery({ productId, initial }: { productId: numb
         Photos supplémentaires
       </h2>
       <p className="mt-1 text-sm text-slate-600">
-        Jusqu’à {MAX} photos (JPEG, PNG ou WebP, 3 Mo max), affichées après la photo principale sur la page de la recette.
+        Jusqu’à {MAX} photos (JPEG, PNG ou WebP, 3 Mo max), affichées après la photo principale sur la page de la
+        recette.
       </p>
       <div className="mt-4 grid grid-cols-3 gap-3 sm:grid-cols-6">
         {photos.map((photo) => {

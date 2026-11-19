@@ -54,7 +54,9 @@ export default function ClassificationPicker({
   }
   return (
     <div className="mt-4 space-y-3">
-      <p className="text-sm text-slate-600">Choisissez l’objectif de cette recette (un seul). C’est lui qui la range sur le site.</p>
+      <p className="text-sm text-slate-600">
+        Choisissez l’objectif de cette recette (un seul). C’est lui qui la range sur le site.
+      </p>
       {!items && !error && <p role="status">Chargement des objectifs…</p>}
       <div className="grid max-h-64 gap-2 overflow-y-auto sm:grid-cols-2">
         {items
